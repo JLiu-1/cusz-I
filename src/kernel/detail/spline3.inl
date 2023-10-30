@@ -58,12 +58,6 @@ namespace cusz {
 /********************************************************************************
  * host API
  ********************************************************************************/
-template <typename TITER, int LINEAR_BLOCK_SIZE>
-__global__ void c_spline3d_profiling_32x8x8data(
-    TITER   data,
-    DIM3    data_size,
-    STRIDE3 data_leap,
-    TITER errors);
 
 
 template <
@@ -886,7 +880,7 @@ __device__ void cusz::device_api::auto_tuning(volatile T s_data[9][9][33],  vola
     }
     //if(TIX<6 )
    //     printf("%d %.6f\n",TIX,errs[TIX]);
-   // __syncthreads(); 
+    __syncthreads(); 
 }
 
 
@@ -1189,19 +1183,12 @@ __global__ void cusz::c_spline3d_infprecis_32x8x8data(
         __shared__ struct {
             T data[9][9][33];
             T ectrl[9][9][33];
+            T local_errs[6];
 
            // T global_errs[6];
         } shmem;
 
-       // T cubic_errors=errors[0]+errors[2]+errors[4];
-       // T linear_errors=errors[1]+errors[3]+errors[5];
-     // bool do_cubic=(cubic_errors<=linear_errors);
-      intp_param.interpolators[0]=(errors[0]>errors[1]);
-      intp_param.interpolators[1]=(errors[2]>errors[3]);
-      intp_param.interpolators[2]=(errors[4]>errors[5]);
-      
-      bool do_reverse=(errors[4+intp_param.interpolators[2]]>errors[intp_param.interpolators[0]]);
-       intp_param.reverse[0]=intp_param.reverse[1]=intp_param.reverse[2]=do_reverse;
+       
        /*
        if(TIX==0 and BIX==0 and BIY==0 and BIZ==0){
         printf("Errors: %.6f %.6f %.6f %.6f %.6f %.6f \n",errors[0],errors[1],errors[2],errors[3],errors[4],errors[5]);
@@ -1227,6 +1214,20 @@ __global__ void cusz::c_spline3d_infprecis_32x8x8data(
 
 
        
+        cusz::device_api::auto_tuning<T,LINEAR_BLOCK_SIZE>(
+            shmem.data, shmem.local_errs, data_size, errors);
+
+        // T cubic_errors=errors[0]+errors[2]+errors[4];
+       // T linear_errors=errors[1]+errors[3]+errors[5];
+     // bool do_cubic=(cubic_errors<=linear_errors);
+      intp_param.interpolators[0]=(errors[0]>errors[1]);
+      intp_param.interpolators[1]=(errors[2]>errors[3]);
+      intp_param.interpolators[2]=(errors[4]>errors[5]);
+      
+      bool do_reverse=(errors[4+intp_param.interpolators[2]]>errors[intp_param.interpolators[0]]);
+       intp_param.reverse[0]=intp_param.reverse[1]=intp_param.reverse[2]=do_reverse;
+
+
 
 
         cusz::device_api::spline3d_layout2_interpolate<T, T, FP,LINEAR_BLOCK_SIZE, SPLINE3_COMPR, false>(
