@@ -1111,49 +1111,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate(
 /********************************************************************************
  * host API/kernel
  ********************************************************************************/
-template <typename TITER, int LINEAR_BLOCK_SIZE>
-__global__ void cusz::c_spline3d_profiling_32x8x8data(
-    TITER   data,
-    DIM3    data_size,
-    STRIDE3 data_leap,
-    TITER errors)
-{
-    // compile time variables
-    using T = typename std::remove_pointer<TITER>::type;
- 
 
-    {
-        __shared__ struct {
-            T data[9][9][33];
-            T ectrl[9][9][33];
-            T local_errs[6];
-           // T global_errs[6];
-        } shmem;
-
-
-        c_reset_scratch_33x9x9data<T, T, LINEAR_BLOCK_SIZE>(shmem.data, shmem.ectrl, 0.0);
-        //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
-        //    printf("reset\n");
-        //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
-        //    printf("dsz: %d %d %d\n",data_size.x,data_size.y,data_size.z);
-
-        global2shmem_33x9x9data<T, T, LINEAR_BLOCK_SIZE>(data, data_size, data_leap, shmem.data);
-
-
-
-        //todo:auto-tuning kernel
-
-        if (TIX < 6 and BIX==0 and BIY==0 and BIZ==0) errors[TIX] = 0.0;//risky
-
-        //__syncthreads();
-       
-
-        cusz::device_api::auto_tuning<T,LINEAR_BLOCK_SIZE>(
-            shmem.data, shmem.local_errs, data_size, errors);
-
-        
-    }
-}
 
 template <typename TITER, typename EITER, typename FP, int LINEAR_BLOCK_SIZE, typename CompactVal, typename CompactIdx, typename CompactNum>
 __global__ void cusz::c_spline3d_infprecis_32x8x8data(
