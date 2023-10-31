@@ -458,8 +458,9 @@ __forceinline__ __device__ void interpolate_stage(
                         printf("480 %.2e %.2e \n",s_data[z][y ][x- unit],s_data[z][y ][x+ unit]);*/
                   //  }
             auto global_x=BIX*BLOCK32+x, global_y=BIY*BLOCK8+y, global_z=BIZ*BLOCK8+z;
+            
+            //if(cubic){
             /*
-            if(cubic){
                 if CONSTEXPR (BLUE) {  //
 
                     if(BIZ!=GDZ-1){
@@ -562,32 +563,58 @@ __forceinline__ __device__ void interpolate_stage(
                         } 
                     }
                 }
+                */
                 
-            }
-            else{*/
+           // }
+            /*
+            else{
                 if CONSTEXPR (BLUE) {  //
-                   // if(global_z+unit<data_size.z)
+                    if(global_z+unit<data_size.z)
                     
                         pred = (s_data[z - unit][y][x] + s_data[z + unit][y][x]) / 2;
-                    //else
-                    //    pred=s_data[z - unit][y][x];
+                    else
+                        pred=s_data[z - unit][y][x];
                 }
                 if CONSTEXPR (YELLOW) {  //
-                    //if(global_y+unit<data_size.y)
+                    if(global_y+unit<data_size.y)
                     
                         pred = (s_data[z][y - unit][x] + s_data[z][y + unit][x]) / 2;
-                   // else
-                    //    pred = s_data[z][y - unit][x];
+                    else
+                        pred = s_data[z][y - unit][x];
                 }
 
                 if CONSTEXPR (HOLLOW) {  //
-                   // if(global_x+unit<data_size.x)
+                    if(global_x+unit<data_size.x)
                         pred = (s_data[z][y][x - unit] + s_data[z][y][x + unit]) / 2;
-                   // else
-                    //    pred = s_data[z][y][x - unit];
+                    else
+                        pred = s_data[z][y][x - unit];
                 }
                 
-            //}
+            }
+            */
+
+            if CONSTEXPR (BLUE) {  //
+
+                   
+                            pred = (-s_data[z - 3*unit][y][x]+9*s_data[z - unit][y][x] + 9*s_data[z + unit][y][x]-s_data[z + 3*unit][y][x]) / 16;
+                     
+                }
+                if CONSTEXPR (YELLOW) {  //
+                   // if(BIX == 5 and BIY == 22 and BIZ == 6 and unit==1 and x==29 and y==7 and z==0){
+                   //     printf("%.2e %.2e %.2e %.2e\n",s_data[z ][y- 3*unit][x],s_data[z ][y- unit][x],s_data[z ][y+ unit][x]);
+                  //  }
+                   
+                            pred = (-s_data[z ][y- 3*unit][x]+9*s_data[z ][y- unit][x] + 9*s_data[z ][y+ unit][x]-s_data[z][y + 3*unit][x]) / 16;
+                  
+                }
+
+                if CONSTEXPR (HOLLOW) {  //
+                    //if(BIX == 5 and BIY == 22 and BIZ == 6 and unit==1)
+                    //    printf("%d %d %d\n",x,y,z);
+                    
+                            pred = (-s_data[z ][y][x- 3*unit]+9*s_data[z ][y][x- unit] + 9*s_data[z ][y][x+ unit]-s_data[z ][y][x + 3*unit]) / 16;
+                    
+                }
             
 
             if CONSTEXPR (WORKFLOW == SPLINE3_COMPR) {
