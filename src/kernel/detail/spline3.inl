@@ -458,6 +458,7 @@ __forceinline__ __device__ void interpolate_stage(
                         printf("480 %.2e %.2e \n",s_data[z][y ][x- unit],s_data[z][y ][x+ unit]);*/
                   //  }
             auto global_x=BIX*BLOCK32+x, global_y=BIY*BLOCK8+y, global_z=BIZ*BLOCK8+z;
+            /*
             if(cubic){
                 if CONSTEXPR (BLUE) {  //
 
@@ -563,7 +564,7 @@ __forceinline__ __device__ void interpolate_stage(
                 }
                 
             }
-            else{
+            else{*/
                 if CONSTEXPR (BLUE) {  //
                     if(global_z+unit<data_size.z)
                     
@@ -586,7 +587,7 @@ __forceinline__ __device__ void interpolate_stage(
                         pred = s_data[z][y][x - unit];
                 }
                 
-            }
+            //}
             
 
             if CONSTEXPR (WORKFLOW == SPLINE3_COMPR) {
