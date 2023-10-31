@@ -602,37 +602,45 @@ __forceinline__ __device__ void interpolate_stage_blue(
             bool cubic_right_predicate=cubic and (z+3*unit<=BLOCK8) and (BIZ!=GDZ-1 or global_z+3*unit<data_size.z);
             bool linear_right_predicate=(BIZ!=GDZ-1 or global_z+unit<data_size.z);
 
+            if(cubic){
+                if(BIZ!=GDZ-1){
 
-            if(BIZ!=GDZ-1){
-
-                if(z>=3*unit and z+3*unit<=BLOCK8  )
-                    pred = (-s_data[z - 3*unit][y][x]+9*s_data[z - unit][y][x] + 9*s_data[z + unit][y][x]-s_data[z + 3*unit][y][x]) / 16;
-                else if (z+3*unit<=BLOCK8)
-                    pred = (3*s_data[z - unit][y][x] + 6*s_data[z + unit][y][x]-s_data[z + 3*unit][y][x]) / 8;
-                else if (z>=3*unit)
-                    pred = (-s_data[z - 3*unit][y][x]+6*s_data[z - unit][y][x] + 3*s_data[z + unit][y][x]) / 8;
-
-                else
-                    pred = (s_data[z - unit][y][x] + s_data[z + unit][y][x]) / 2;
-            }
-            else{
-                if(z>=3*unit){
-                    if(z+3*unit<=BLOCK8 and global_z+3*unit<data_size.z)
+                    if(z>=3*unit and z+3*unit<=BLOCK8  )
                         pred = (-s_data[z - 3*unit][y][x]+9*s_data[z - unit][y][x] + 9*s_data[z + unit][y][x]-s_data[z + 3*unit][y][x]) / 16;
-                    else if (global_z+unit<data_size.z)
+                    else if (z+3*unit<=BLOCK8)
+                        pred = (3*s_data[z - unit][y][x] + 6*s_data[z + unit][y][x]-s_data[z + 3*unit][y][x]) / 8;
+                    else if (z>=3*unit)
                         pred = (-s_data[z - 3*unit][y][x]+6*s_data[z - unit][y][x] + 3*s_data[z + unit][y][x]) / 8;
-                    else
-                        pred=s_data[z - unit][y][x];
 
+                    else
+                        pred = (s_data[z - unit][y][x] + s_data[z + unit][y][x]) / 2;
                 }
                 else{
-                    if(z+3*unit<=BLOCK8 and global_z+3*unit<data_size.z)
-                        pred = (3*s_data[z - unit][y][x] + 6*s_data[z + unit][y][x]-s_data[z + 3*unit][y][x]) / 8;
-                    else if (global_z+unit<data_size.z)
-                        pred = (s_data[z - unit][y][x] + s_data[z + unit][y][x]) / 2;
-                    else
-                        pred=s_data[z - unit][y][x];
-                } 
+                    if(z>=3*unit){
+                        if(z+3*unit<=BLOCK8 and global_z+3*unit<data_size.z)
+                            pred = (-s_data[z - 3*unit][y][x]+9*s_data[z - unit][y][x] + 9*s_data[z + unit][y][x]-s_data[z + 3*unit][y][x]) / 16;
+                        else if (global_z+unit<data_size.z)
+                            pred = (-s_data[z - 3*unit][y][x]+6*s_data[z - unit][y][x] + 3*s_data[z + unit][y][x]) / 8;
+                        else
+                            pred=s_data[z - unit][y][x];
+
+                    }
+                    else{
+                        if(z+3*unit<=BLOCK8 and global_z+3*unit<data_size.z)
+                            pred = (3*s_data[z - unit][y][x] + 6*s_data[z + unit][y][x]-s_data[z + 3*unit][y][x]) / 8;
+                        else if (global_z+unit<data_size.z)
+                            pred = (s_data[z - unit][y][x] + s_data[z + unit][y][x]) / 2;
+                        else
+                            pred=s_data[z - unit][y][x];
+                    } 
+                }
+            }
+            else{
+                if(global_z+unit<data_size.z)
+                    
+                    pred = (s_data[z - unit][y][x] + s_data[z + unit][y][x]) / 2;
+                else
+                    pred=s_data[z - unit][y][x];
             }
  
 
@@ -737,35 +745,43 @@ __forceinline__ __device__ void interpolate_stage_yellow(
         if (xyz33x9x9_predicate<BORDER_INCLUSIVE>(x, y, z,data_size)) {
             T1 pred = 0;
             auto global_y=BIY*BLOCK8+y;
+            if(cubic){
             
-            if(BIY!=GDY-1){
-                if(y>=3*unit and y+3*unit<=BLOCK8 )
-                    pred = (-s_data[z ][y- 3*unit][x]+9*s_data[z ][y- unit][x] + 9*s_data[z ][y+ unit][x]-s_data[z][y + 3*unit][x]) / 16;
-                else if (y+3*unit<=BLOCK8)
-                    pred = (3*s_data[z ][y - unit][x] + 6*s_data[z][y + unit][x]-s_data[z][y + 3*unit][x]) / 8;
-                else if (y>=3*unit)
-                    pred = (-s_data[z ][y- 3*unit][x]+6*s_data[z][y - unit][x] + 3*s_data[z][y + unit][x]) / 8;
-                else
-                    pred = (s_data[z][y - unit][x] + s_data[z][y + unit][x]) / 2;
-            }
-            else{
-                if(y>=3*unit){
-                    if(y+3*unit<=BLOCK8 and global_y+3*unit<data_size.y)
-                        pred = (-s_data[z ][y- 3*unit][x]+9*s_data[z][y - unit][x] + 9*s_data[z ][y+ unit][x]-s_data[z ][y+ 3*unit][x]) / 16;
-                    else if (global_y+unit<data_size.y)
-                        pred = (-s_data[z ][y- 3*unit][x]+6*s_data[z ][y- unit][x] + 3*s_data[z ][y+ unit][x]) / 8;
+                if(BIY!=GDY-1){
+                    if(y>=3*unit and y+3*unit<=BLOCK8 )
+                        pred = (-s_data[z ][y- 3*unit][x]+9*s_data[z ][y- unit][x] + 9*s_data[z ][y+ unit][x]-s_data[z][y + 3*unit][x]) / 16;
+                    else if (y+3*unit<=BLOCK8)
+                        pred = (3*s_data[z ][y - unit][x] + 6*s_data[z][y + unit][x]-s_data[z][y + 3*unit][x]) / 8;
+                    else if (y>=3*unit)
+                        pred = (-s_data[z ][y- 3*unit][x]+6*s_data[z][y - unit][x] + 3*s_data[z][y + unit][x]) / 8;
                     else
-                        pred=s_data[z ][y- unit][x];
-
+                        pred = (s_data[z][y - unit][x] + s_data[z][y + unit][x]) / 2;
                 }
                 else{
-                    if(y+3*unit<=BLOCK8 and global_y+3*unit<data_size.y)
-                        pred = (3*s_data[z][y - unit][x] + 6*s_data[z ][y+ unit][x]-s_data[z][y + 3*unit][x]) / 8;
-                    else if (global_y+unit<data_size.y)
-                        pred = (s_data[z ][y- unit][x] + s_data[z][y + unit][x]) / 2;
-                    else
-                        pred=s_data[z ][y- unit][x];
-                } 
+                    if(y>=3*unit){
+                        if(y+3*unit<=BLOCK8 and global_y+3*unit<data_size.y)
+                            pred = (-s_data[z ][y- 3*unit][x]+9*s_data[z][y - unit][x] + 9*s_data[z ][y+ unit][x]-s_data[z ][y+ 3*unit][x]) / 16;
+                        else if (global_y+unit<data_size.y)
+                            pred = (-s_data[z ][y- 3*unit][x]+6*s_data[z ][y- unit][x] + 3*s_data[z ][y+ unit][x]) / 8;
+                        else
+                            pred=s_data[z ][y- unit][x];
+
+                    }
+                    else{
+                        if(y+3*unit<=BLOCK8 and global_y+3*unit<data_size.y)
+                            pred = (3*s_data[z][y - unit][x] + 6*s_data[z ][y+ unit][x]-s_data[z][y + 3*unit][x]) / 8;
+                        else if (global_y+unit<data_size.y)
+                            pred = (s_data[z ][y- unit][x] + s_data[z][y + unit][x]) / 2;
+                        else
+                            pred=s_data[z ][y- unit][x];
+                    } 
+                }
+            }
+            else{
+                if(global_y+unit<data_size.y)
+                    pred = (s_data[z][y - unit][x] + s_data[z][y + unit][x]) / 2;
+                else
+                    pred = s_data[z][y - unit][x];
             }
  
 
@@ -869,35 +885,42 @@ __forceinline__ __device__ void interpolate_stage_hollow(
         if (xyz33x9x9_predicate<BORDER_INCLUSIVE>(x, y, z,data_size)) {
             T1 pred = 0;
             auto global_x=BIX*BLOCK32+x;
-            
-            if(BIX!=GDX-1){
-                if(x>=3*unit and x+3*unit<=BLOCK32 )
-                    pred = (-s_data[z ][y][x- 3*unit]+9*s_data[z ][y][x- unit] + 9*s_data[z ][y][x+ unit]-s_data[z ][y][x + 3*unit]) / 16;
-                else if (x+3*unit<=BLOCK32)
-                    pred = (3*s_data[z ][y][x- unit] + 6*s_data[z ][y][x + unit]-s_data[z][y][x + 3*unit]) / 8;
-                else if (x>=3*unit)
-                    pred = (-s_data[z][y][x - 3*unit]+6*s_data[z][y][x - unit] + 3*s_data[z ][y][x + unit]) / 8;
-                else
-                    pred = (s_data[z][y][x - unit] + s_data[z][y][x + unit]) / 2;
-            }
-            else{
-                if(x>=3*unit){
-                    if(x+3*unit<=BLOCK32 and global_x+3*unit<data_size.x)
-                        pred = (-s_data[z ][y][x- 3*unit]+9*s_data[z][y ][x- unit] + 9*s_data[z ][y][x+ unit]-s_data[z ][y][x+ 3*unit]) / 16;
-                    else if (global_x+unit<data_size.x)
-                        pred = (-s_data[z ][y][x- 3*unit]+6*s_data[z ][y][x- unit] + 3*s_data[z ][y][x+ unit]) / 8;
+            if(cubic){
+                if(BIX!=GDX-1){
+                    if(x>=3*unit and x+3*unit<=BLOCK32 )
+                        pred = (-s_data[z ][y][x- 3*unit]+9*s_data[z ][y][x- unit] + 9*s_data[z ][y][x+ unit]-s_data[z ][y][x + 3*unit]) / 16;
+                    else if (x+3*unit<=BLOCK32)
+                        pred = (3*s_data[z ][y][x- unit] + 6*s_data[z ][y][x + unit]-s_data[z][y][x + 3*unit]) / 8;
+                    else if (x>=3*unit)
+                        pred = (-s_data[z][y][x - 3*unit]+6*s_data[z][y][x - unit] + 3*s_data[z ][y][x + unit]) / 8;
                     else
-                        pred=s_data[z ][y][x- unit];
-
+                        pred = (s_data[z][y][x - unit] + s_data[z][y][x + unit]) / 2;
                 }
                 else{
-                    if(x+3*unit<=BLOCK32 and global_x+3*unit<data_size.x)
-                        pred = (3*s_data[z][y ][x- unit] + 6*s_data[z ][y][x+ unit]-s_data[z][y ][x+ 3*unit]) / 8;
-                    else if (global_x+unit<data_size.x)
-                        pred = (s_data[z ][y][x- unit] + s_data[z][y ][x+ unit]) / 2;
-                    else
-                        pred=s_data[z ][y][x- unit];
-                } 
+                    if(x>=3*unit){
+                        if(x+3*unit<=BLOCK32 and global_x+3*unit<data_size.x)
+                            pred = (-s_data[z ][y][x- 3*unit]+9*s_data[z][y ][x- unit] + 9*s_data[z ][y][x+ unit]-s_data[z ][y][x+ 3*unit]) / 16;
+                        else if (global_x+unit<data_size.x)
+                            pred = (-s_data[z ][y][x- 3*unit]+6*s_data[z ][y][x- unit] + 3*s_data[z ][y][x+ unit]) / 8;
+                        else
+                            pred=s_data[z ][y][x- unit];
+
+                    }
+                    else{
+                        if(x+3*unit<=BLOCK32 and global_x+3*unit<data_size.x)
+                            pred = (3*s_data[z][y ][x- unit] + 6*s_data[z ][y][x+ unit]-s_data[z][y ][x+ 3*unit]) / 8;
+                        else if (global_x+unit<data_size.x)
+                            pred = (s_data[z ][y][x- unit] + s_data[z][y ][x+ unit]) / 2;
+                        else
+                            pred=s_data[z ][y][x- unit];
+                    } 
+                }
+            }
+            else{
+                if(global_x+unit<data_size.x)
+                    pred = (s_data[z][y][x - unit] + s_data[z][y][x + unit]) / 2;
+                else
+                    pred = s_data[z][y][x - unit];
             }
 
 
