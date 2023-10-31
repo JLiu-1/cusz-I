@@ -469,13 +469,15 @@ __forceinline__ __device__ void interpolate_stage(
                     short cubic_right_predicate=(z+3*unit<=BLOCK8) and (BIZ!=GDZ-1 or global_z+3*unit<data_size.z);
                     //short linear_right_predicate=(BIZ!=GDZ-1 or global_z+unit<data_size.z);
 
-                    T1 A=cubic_left_predicate?s_data[z - 3*unit][y][x]:0,B=s_data[z - unit][y][x],C=s_data[z + unit][y][x],D=cubic_right_predicate?s_data[z + 3*unit][y][x]:0;
+                  //  T1 A=cubic_left_predicate?s_data[z - 3*unit][y][x]:0,B=s_data[z - unit][y][x],C=s_data[z + unit][y][x],D=cubic_right_predicate?s_data[z + 3*unit][y][x]:0;
 
-                    T1 S1=6*B-A,S2=3*B,S3=3*C,S4=6*C-D;
+                    //T1 S1=6*B-A,S2=3*B,S3=3*C,S4=6*C-D;
 
-                    pred=(cubic_left_predicate*S1+(!cubic_left_predicate or cubic_right_predicate)*S2+
-                        (!cubic_right_predicate or cubic_left_predicate)*S3+cubic_right_predicate*S4)
-                        /divider[cubic_left_predicate+cubic_right_predicate];
+                    //pred=(cubic_left_predicate*S1+(!cubic_left_predicate or cubic_right_predicate)*S2+
+                    //    (!cubic_right_predicate or cubic_left_predicate)*S3+cubic_right_predicate*S4)
+                    //    /divider[cubic_left_predicate+cubic_right_predicate];
+
+                    pred = (s_data[z - unit][y][x] + s_data[z + unit][y][x]) / 2;
 
 
 
@@ -519,14 +521,14 @@ __forceinline__ __device__ void interpolate_stage(
                 if CONSTEXPR (YELLOW) {  //
                     bool cubic_left_predicate=(y>=3*unit);
                     bool cubic_right_predicate=(y+3*unit<=BLOCK8) and (BIY!=GDY-1 or global_y+3*unit<data_size.y);
+                     pred = (s_data[z][y - unit][x] + s_data[z][y + unit][x]) / 2;
+                   // T1 A=cubic_left_predicate?s_data[z ][y- 3*unit][x]:0,B=s_data[z][y - unit][x],C=s_data[z][y + unit][x],D=cubic_right_predicate?s_data[z ][y+ 3*unit][x]:0;
 
-                    T1 A=cubic_left_predicate?s_data[z ][y- 3*unit][x]:0,B=s_data[z][y - unit][x],C=s_data[z][y + unit][x],D=cubic_right_predicate?s_data[z ][y+ 3*unit][x]:0;
+                   // T1 S1=6*B-A,S2=3*B,S3=3*C,S4=6*C-D;
 
-                    T1 S1=6*B-A,S2=3*B,S3=3*C,S4=6*C-D;
-
-                    pred=(cubic_left_predicate*S1+(!cubic_left_predicate or cubic_right_predicate)*S2+
-                        (!cubic_right_predicate or cubic_left_predicate)*S3+cubic_right_predicate*S4)
-                        /divider[cubic_left_predicate+cubic_right_predicate];
+                   // pred=(cubic_left_predicate*S1+(!cubic_left_predicate or cubic_right_predicate)*S2+
+                   //     (!cubic_right_predicate or cubic_left_predicate)*S3+cubic_right_predicate*S4)
+                   //     /divider[cubic_left_predicate+cubic_right_predicate];
                     //bool linear_right_predicate=(BIY!=GDY-1 or global_y+unit<data_size.y);
                    // if(BIX == 5 and BIY == 22 and BIZ == 6 and unit==1 and x==29 and y==7 and z==0){
                    //     printf("%.2e %.2e %.2e %.2e\n",s_data[z ][y- 3*unit][x],s_data[z ][y- unit][x],s_data[z ][y+ unit][x]);
@@ -572,13 +574,14 @@ __forceinline__ __device__ void interpolate_stage(
 
                     bool cubic_left_predicate=(x>=3*unit);
                     bool cubic_right_predicate=(x+3*unit<=BLOCK32) and (BIX!=GDX-1 or global_x+3*unit<data_size.x);
-                    T1 A=cubic_left_predicate?s_data[z ][y][x- 3*unit]:0,B=s_data[z][y][x - unit],C=s_data[z][y ][x+ unit],D=cubic_right_predicate?s_data[z ][y][x+ 3*unit]:0;
+                     pred = (s_data[z][y][x - unit] + s_data[z][y][x + unit]) / 2;
+                   // T1 A=cubic_left_predicate?s_data[z ][y][x- 3*unit]:0,B=s_data[z][y][x - unit],C=s_data[z][y ][x+ unit],D=cubic_right_predicate?s_data[z ][y][x+ 3*unit]:0;
 
-                    T1 S1=6*B-A,S2=3*B,S3=3*C,S4=6*C-D;
+                    //T1 S1=6*B-A,S2=3*B,S3=3*C,S4=6*C-D;
 
-                    pred=(cubic_left_predicate*S1+(!cubic_left_predicate or cubic_right_predicate)*S2+
-                        (!cubic_right_predicate or cubic_left_predicate)*S3+cubic_right_predicate*S4)
-                        /divider[cubic_left_predicate+cubic_right_predicate];
+                    //pred=(cubic_left_predicate*S1+(!cubic_left_predicate or cubic_right_predicate)*S2+
+                    //    (!cubic_right_predicate or cubic_left_predicate)*S3+cubic_right_predicate*S4)
+                    //    /divider[cubic_left_predicate+cubic_right_predicate];
                     //bool linear_right_predicate=(BIX!=GDX-1 or global_x+unit<data_size.x);
                     //if(BIX == 5 and BIY == 22 and BIZ == 6 and unit==1)
                     //    printf("%d %d %d\n",x,y,z);
