@@ -474,10 +474,10 @@ __forceinline__ __device__ void interpolate_stage(
 
                         if(cubic_left_predicate and cubic_right_predicate)
                             pred = (-s_data[z - 3*unit][y][x]+9*s_data[z - unit][y][x] + 9*s_data[z + unit][y][x]-s_data[z + 3*unit][y][x]) / 16;
-                        else if (cubic_right_predicate)
-                            pred = (3*s_data[z - unit][y][x] + 6*s_data[z + unit][y][x]-s_data[z + 3*unit][y][x]) / 8;
-                        else if (cubic_left_predicate and linear_right_predicate)
-                            pred = (-s_data[z - 3*unit][y][x]+6*s_data[z - unit][y][x] + 3*s_data[z + unit][y][x]) / 8;
+                        //else if (cubic_right_predicate)
+                       //     pred = (3*s_data[z - unit][y][x] + 6*s_data[z + unit][y][x]-s_data[z + 3*unit][y][x]) / 8;
+                        //else if (cubic_left_predicate and linear_right_predicate)
+                         //   pred = (-s_data[z - 3*unit][y][x]+6*s_data[z - unit][y][x] + 3*s_data[z + unit][y][x]) / 8;
 
                         else if (linear_right_predicate)
                             pred = (s_data[z - unit][y][x] + s_data[z + unit][y][x]) / 2;
