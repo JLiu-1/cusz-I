@@ -566,25 +566,25 @@ __forceinline__ __device__ void interpolate_stage(
             }
             else{*/
                 if CONSTEXPR (BLUE) {  //
-                    if(global_z+unit<data_size.z)
+                   // if(global_z+unit<data_size.z)
                     
                         pred = (s_data[z - unit][y][x] + s_data[z + unit][y][x]) / 2;
-                    else
-                        pred=s_data[z - unit][y][x];
+                    //else
+                    //    pred=s_data[z - unit][y][x];
                 }
                 if CONSTEXPR (YELLOW) {  //
-                    if(global_y+unit<data_size.y)
+                    //if(global_y+unit<data_size.y)
                     
                         pred = (s_data[z][y - unit][x] + s_data[z][y + unit][x]) / 2;
-                    else
-                        pred = s_data[z][y - unit][x];
+                   // else
+                    //    pred = s_data[z][y - unit][x];
                 }
 
                 if CONSTEXPR (HOLLOW) {  //
-                    if(global_x+unit<data_size.x)
+                   // if(global_x+unit<data_size.x)
                         pred = (s_data[z][y][x - unit] + s_data[z][y][x + unit]) / 2;
-                    else
-                        pred = s_data[z][y][x - unit];
+                   // else
+                    //    pred = s_data[z][y][x - unit];
                 }
                 
             //}
