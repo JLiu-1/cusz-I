@@ -475,8 +475,8 @@ __forceinline__ __device__ void interpolate_stage(
                    // if(BIZ!=GDZ-1){
 
                     if(cubic_left_predicate or cubic_right_predicate){
-                        pred=(cubic_left_predicate*(3*s_data[z - unit][y][x] + 6*s_data[z + unit][y][x]-s_data[z + 3*unit][y][x])
-                             +cubic_right_predicate*(-s_data[z - 3*unit][y][x]+6*s_data[z - unit][y][x] + 3*s_data[z + unit][y][x]))
+                        pred=(cubic_left_predicate?(3*s_data[z - unit][y][x] + 6*s_data[z + unit][y][x]-s_data[z + 3*unit][y][x]:0)
+                             +cubic_right_predicate?(-s_data[z - 3*unit][y][x]+6*s_data[z - unit][y][x] + 3*s_data[z + unit][y][x]):0)
                             /8*(cubic_left_predicate+cubic_right_predicate);
                     }
 
@@ -527,8 +527,8 @@ __forceinline__ __device__ void interpolate_stage(
                   //  }
                    // if(BIY!=GDY-1){
                     if(cubic_left_predicate or cubic_right_predicate){
-                        pred=(cubic_left_predicate*(3*s_data[z ][y- unit][x] + 6*s_data[z ][y+ unit][x]-s_data[z][y + 3*unit][x])
-                             +cubic_right_predicate*(-s_data[z ][y- 3*unit][x]+6*s_data[z][y - unit][x] + 3*s_data[z ][y+ unit][x]))
+                        pred=(cubic_left_predicate?(3*s_data[z ][y- unit][x] + 6*s_data[z ][y+ unit][x]-s_data[z][y + 3*unit][x]:0)
+                             +cubic_right_predicate?(-s_data[z ][y- 3*unit][x]+6*s_data[z][y - unit][x] + 3*s_data[z ][y+ unit][x]):0)
                             /8*(cubic_left_predicate+cubic_right_predicate);
                     }
 
@@ -577,8 +577,8 @@ __forceinline__ __device__ void interpolate_stage(
                     //    printf("%d %d %d\n",x,y,z);
                   //  if(BIX!=GDX-1){
                     if(cubic_left_predicate or cubic_right_predicate){
-                        pred=(cubic_left_predicate*(3*s_data[z ][y][x- unit] + 6*s_data[z][y][x + unit]-s_data[z][y][x + 3*unit])
-                             +cubic_right_predicate*(-s_data[z ][y][x- 3*unit]+6*s_data[z ][y][x- unit] + 3*s_data[z ][y][x+ unit]))
+                        pred=(cubic_left_predicate?(3*s_data[z ][y][x- unit] + 6*s_data[z][y][x + unit]-s_data[z][y][x + 3*unit]:0)
+                             +cubic_right_predicate?(-s_data[z ][y][x- 3*unit]+6*s_data[z ][y][x- unit] + 3*s_data[z ][y][x+ unit]):0)
                             /8*(cubic_left_predicate+cubic_right_predicate);
                     }
 
