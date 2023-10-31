@@ -458,22 +458,31 @@ __forceinline__ __device__ void interpolate_stage(
                         printf("480 %.2e %.2e \n",s_data[z][y ][x- unit],s_data[z][y ][x+ unit]);*/
                   //  }
             auto global_x=BIX*BLOCK32+x, global_y=BIY*BLOCK8+y, global_z=BIZ*BLOCK8+z;
+
+
+            
             
             //if(cubic){
             
                 if CONSTEXPR (BLUE) {  //
+                    bool cubic_left_predicate=(z>=3*unit);
+                    bool cubic_right_predicate=(z+3*unit<=BLOCK8) and (BIZ!=GDZ-1 or global_z+3*unit<data_size.z);
+                    bool linear_right_predicate=(BIZ!=GDZ-1 or global_z+unit<data_size.z);
+
 
                    // if(BIZ!=GDZ-1){
 
-                        if(z>=3*unit and z+3*unit<=BLOCK8  )
+                        if(cubic_left_predicate and cubic_right_predicate)
                             pred = (-s_data[z - 3*unit][y][x]+9*s_data[z - unit][y][x] + 9*s_data[z + unit][y][x]-s_data[z + 3*unit][y][x]) / 16;
-                        else if (z+3*unit<=BLOCK8)
+                        else if (cubic_right_predicate)
                             pred = (3*s_data[z - unit][y][x] + 6*s_data[z + unit][y][x]-s_data[z + 3*unit][y][x]) / 8;
-                        else if (z>=3*unit)
+                        else if (cubic_left_predicate and linear_right_predicate)
                             pred = (-s_data[z - 3*unit][y][x]+6*s_data[z - unit][y][x] + 3*s_data[z + unit][y][x]) / 8;
 
-                        else
+                        else if (linear_right_predicate)
                             pred = (s_data[z - unit][y][x] + s_data[z + unit][y][x]) / 2;
+                        else 
+                            pred=s_data[z - unit][y][x];
                     //}
                     /*
                     else{
@@ -498,18 +507,23 @@ __forceinline__ __device__ void interpolate_stage(
                     */
                 }
                 if CONSTEXPR (YELLOW) {  //
+                    bool cubic_left_predicate=(y>=3*unit);
+                    bool cubic_right_predicate=(y+3*unit<=BLOCK8) and (BIY!=GDY-1 or global_y+3*unit<data_size.y);
+                    bool linear_right_predicate=(BIY!=GDY-1 or global_y+unit<data_size.y);
                    // if(BIX == 5 and BIY == 22 and BIZ == 6 and unit==1 and x==29 and y==7 and z==0){
                    //     printf("%.2e %.2e %.2e %.2e\n",s_data[z ][y- 3*unit][x],s_data[z ][y- unit][x],s_data[z ][y+ unit][x]);
                   //  }
                    // if(BIY!=GDY-1){
-                        if(y>=3*unit and y+3*unit<=BLOCK8 )
+                        if(cubic_left_predicate and cubic_right_predicate)
                             pred = (-s_data[z ][y- 3*unit][x]+9*s_data[z ][y- unit][x] + 9*s_data[z ][y+ unit][x]-s_data[z][y + 3*unit][x]) / 16;
-                        else if (y+3*unit<=BLOCK8)
+                        else if (cubic_right_predicate)
                             pred = (3*s_data[z ][y - unit][x] + 6*s_data[z][y + unit][x]-s_data[z][y + 3*unit][x]) / 8;
-                        else if (y>=3*unit)
+                        else if (cubic_left_predicate and linear_right_predicate)
                             pred = (-s_data[z ][y- 3*unit][x]+6*s_data[z][y - unit][x] + 3*s_data[z][y + unit][x]) / 8;
-                        else
+                         else if (linear_right_predicate)
                             pred = (s_data[z][y - unit][x] + s_data[z][y + unit][x]) / 2;
+                        else 
+                            pred=s_data[z ][y- unit][x];
                   //  }
                     /*
                     else{
@@ -535,17 +549,24 @@ __forceinline__ __device__ void interpolate_stage(
                 }
 
                 if CONSTEXPR (HOLLOW) {  //
+
+                    bool cubic_left_predicate=(x>=3*unit);
+                    bool cubic_right_predicate=(x+3*unit<=BLOCK32) and (BIX!=GDX-1 or global_x+3*unit<data_size.x);
+                    bool linear_right_predicate=(BIX!=GDX-1 or global_x+unit<data_size.x);
                     //if(BIX == 5 and BIY == 22 and BIZ == 6 and unit==1)
                     //    printf("%d %d %d\n",x,y,z);
                   //  if(BIX!=GDX-1){
-                        if(x>=3*unit and x+3*unit<=BLOCK32 )
+                        if(cubic_left_predicate and cubic_right_predicate)
                             pred = (-s_data[z ][y][x- 3*unit]+9*s_data[z ][y][x- unit] + 9*s_data[z ][y][x+ unit]-s_data[z ][y][x + 3*unit]) / 16;
-                        else if (x+3*unit<=BLOCK32)
+                        else if (cubic_right_predicate)
                             pred = (3*s_data[z ][y][x- unit] + 6*s_data[z ][y][x + unit]-s_data[z][y][x + 3*unit]) / 8;
-                        else if (x>=3*unit)
+                        else if (cubic_left_predicate and linear_right_predicate)
                             pred = (-s_data[z][y][x - 3*unit]+6*s_data[z][y][x - unit] + 3*s_data[z ][y][x + unit]) / 8;
-                        else
+                        else if (linear_right_predicate)
                             pred = (s_data[z][y][x - unit] + s_data[z][y][x + unit]) / 2;
+                        else
+                            pred=s_data[z ][y][x- unit];
+
                    // }
                     /*
                     else{
