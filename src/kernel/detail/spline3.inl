@@ -478,7 +478,7 @@ __forceinline__ __device__ void interpolate_stage(
             auto b=interpolation_coeff_set2[interpolator];
             auto c=interpolation_coeff_set3[interpolator];
             */
-            if(interpolator==0){
+            if(interpolator==0 or unit>1){
                 if CONSTEXPR (BLUE) {  //
 
                     if(BIZ!=GDZ-1){
