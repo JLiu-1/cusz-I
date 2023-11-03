@@ -888,7 +888,7 @@ __device__ void cusz::device_api::auto_tuning(volatile T s_data[9][9][33],  vola
     //__syncthreads(); 
     if(TIX==0){
        // atomicAdd(const_cast<T*>(errs) + 6, 1.0);
-        while(errs[6]<num_blocks){}
+        while(errs[6]<num_blocks){printf("%d %d\n",errs[6],num_blocks);}
     }
     __syncthreads(); 
 }
