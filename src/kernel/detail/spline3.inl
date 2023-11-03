@@ -813,76 +813,59 @@ __device__ void cusz::device_api::auto_tuning(volatile T s_data[9][9][33],  DIM3
 }
 */
 template <typename T,int  LINEAR_BLOCK_SIZE>
-__device__ void cusz::device_api::auto_tuning(volatile T s_data[9][9][33],  volatile T local_errs[6], DIM3  data_size,  T * errs){
+__device__ void cusz::device_api::auto_tuning(volatile T s_data[9][9][33],  volatile T local_errs[2], DIM3  data_size,  T * errs){
     //current design: 4 points: (4,4,4), (12,4,4), (20,4,4), (28,4,4). 6 configs (3 directions, lin/cubic)
 
     //current design: 16 points: (4/12/20/28,3/5,3/5). 6 configs (3 directions, lin/cubic)
 
    //int num_blocks=((GDX+1)/2)*((GDY+1)/2)*((GDZ+1)/2);
-    if(BIX%2==0 and BIY%2==0 and BIZ%2==0){
-
-        auto iti=TIX % 16;
-        auto c=TIX/16;
-        bool predicate=  c<6;
-        // __shared__ T local_errs[6];
-
-
-
-        if(TIX<6)
-            local_errs[TIX]=0;
-        __syncthreads(); 
-        if(predicate){
-
-            auto itix=iti%4;
-            iti=iti/4;
-            auto itiy=iti%2;
-            auto itiz=iti/2;
-            auto x=4+8*itix;
-            //auto x =16;
-            auto y=3+2*itiy;
-            auto z=3+2*itiz;
-            T pred=0;
-            auto unit = 1;
-            switch(c){
-                case 0:
-                    pred = (-s_data[z - 3*unit][y][x]+9*s_data[z - unit][y][x] + 9*s_data[z + unit][y][x]-s_data[z + 3*unit][y][x]) / 16;
-                    break;
-
-                case 1:
-                    pred = (-3*s_data[z - 3*unit][y][x]+23*s_data[z - unit][y][x] + 23*s_data[z + unit][y][x]-3*s_data[z + 3*unit][y][x]) / 40;
-                    break;
-                case 2:
-                    pred = (-s_data[z ][y- 3*unit][x]+9*s_data[z ][y- unit][x] + 9*s_data[z ][y+ unit][x]-s_data[z][y + 3*unit][x]) / 16;
-                    break;
-                case 3:
-                    pred = (-3*s_data[z][y - 3*unit][x]+23*s_data[z ][y- unit][x] + 23*s_data[z ][y+ unit][x]-3*s_data[z ][y+ 3*unit][x]) / 40;
-                    break;
-
-                case 4:
-                    pred = (-s_data[z ][y][x- 3*unit]+9*s_data[z ][y][x- unit] + 9*s_data[z ][y][x+ unit]-s_data[z][y ][x+ 3*unit]) / 16;
-                    break;
-                case 5:
-                    pred = (-3*s_data[z][y][x - 3*unit]+23*s_data[z][y][x - unit] + 23*s_data[z ][y][x+ unit]-3*s_data[z][y][x + 3*unit]) / 40;
-                    break;
+    
+    auto iti=TIX % 32;
+    auto c=TIX/32;
+    bool predicate= iti<4 and c<2;
+    // __shared__ T local_errs[6];
 
 
 
-                default:
+    if(TIX<6)
+        local_errs[TIX]=0;
+    __syncthreads(); 
+    if(predicate){
+
+        
+        auto x=4+8*iti;
+        //auto x =16;
+        auto y=4;
+        auto z=4;
+        T pred=0;
+        auto unit = 1;
+        switch(c){
+            case 0:
+                pred = (s_data[z - unit][y][x] + s_data[z + unit][y][x]) / 2;
                 break;
-            }
-            T abs_error=fabs(pred-s_data[z][y][x]);
-            atomicAdd(const_cast<T*>(local_errs) + c, abs_error);
-            
 
-        } 
-        __syncthreads(); 
-        if(TIX<6) {
-            atomicAdd(const_cast<T*>(errs) + TIX, local_errs[TIX]);
+            case 1:
+                pred = (s_data[z ][y][x- unit] + s_data[z ][y][x+ unit]) / 2;
+                break;
+
+
+
+            default:
+            break;
         }
-        //__syncthreads(); 
-        // if(TIX==0)
-        //    atomicAdd(const_cast<T*>(errs) + 6, 1.0);
+        T abs_error=fabs(pred-s_data[z][y][x]);
+        atomicAdd(const_cast<T*>(local_errs) + c, abs_error);
+        
+
+    } 
+    __syncthreads(); 
+    if(TIX<2) {
+        atomicAdd(const_cast<T*>(errs) + TIX, local_errs[TIX]);
     }
+    //__syncthreads(); 
+    // if(TIX==0)
+        //    atomicAdd(const_cast<T*>(errs) + 6, 1.0);
+  
     //if(TIX<6 )
    //     printf("%d %.6f\n",TIX,errs[TIX]);
     //__syncthreads(); 
@@ -1154,7 +1137,7 @@ __global__ void cusz::c_spline3d_infprecis_32x8x8data(
         __shared__ struct {
             T data[9][9][33];
             T ectrl[9][9][33];
-            T local_errs[6];
+            T local_errs[2];
 
            // T global_errs[6];
         } shmem;
@@ -1191,11 +1174,11 @@ __global__ void cusz::c_spline3d_infprecis_32x8x8data(
         // T cubic_errors=errors[0]+errors[2]+errors[4];
        // T linear_errors=errors[1]+errors[3]+errors[5];
      // bool do_cubic=(cubic_errors<=linear_errors);
-      intp_param.interpolators[0]=(errors[0]>errors[1]);
-      intp_param.interpolators[1]=(errors[2]>errors[3]);
-      intp_param.interpolators[2]=(errors[4]>errors[5]);
+     // intp_param.interpolators[0]=(errors[0]>errors[1]);
+     // intp_param.interpolators[1]=(errors[2]>errors[3]);
+     // intp_param.interpolators[2]=(errors[4]>errors[5]);
       
-      bool do_reverse=(errors[4+intp_param.interpolators[2]]>errors[intp_param.interpolators[0]]);
+      bool do_reverse=(errors[1]>2*errors[0]);
        intp_param.reverse[0]=intp_param.reverse[1]=intp_param.reverse[2]=do_reverse;
 
 
