@@ -875,12 +875,12 @@ __device__ void cusz::device_api::auto_tuning(volatile T s_data[9][9][33],  vola
                 break;
             }
             T abs_error=fabs(pred-s_data[z][y][x]);
-            atomicAdd(const_cast<T*>(local_errs) + c, abs_error);
+            atomicAdd(const_cast<T*>(local_errs) + c%2, abs_error);
             
 
         } 
         __syncthreads(); 
-        if(TIX<6) {
+        if(TIX<2) {
             atomicAdd(const_cast<T*>(errs) + TIX, local_errs[TIX]);
         }
     }
@@ -1196,12 +1196,15 @@ __global__ void cusz::c_spline3d_infprecis_32x8x8data(
        // T cubic_errors=errors[0]+errors[2]+errors[4];
        // T linear_errors=errors[1]+errors[3]+errors[5];
      // bool do_cubic=(cubic_errors<=linear_errors);
+        /*
       intp_param.interpolators[0]=(errors[0]>errors[1]);
       intp_param.interpolators[1]=(errors[2]>errors[3]);
       intp_param.interpolators[2]=(errors[4]>errors[5]);
+      */
+        intp_param.interpolators[2]=intp_param.interpolators[1]=intp_param.interpolators[0]=(errors[0]>errors[1]);
       
-      bool do_reverse=(errors[4+intp_param.interpolators[2]]>errors[intp_param.interpolators[0]]);
-       intp_param.reverse[0]=intp_param.reverse[1]=intp_param.reverse[2]=do_reverse;
+      //bool do_reverse=(errors[4+intp_param.interpolators[2]]>errors[intp_param.interpolators[0]]);
+      // intp_param.reverse[0]=intp_param.reverse[1]=intp_param.reverse[2]=do_reverse;
        /*
        if(TIX==0 and BIX==0 and BIY==0 and BIZ==0){
         printf("Errors: %.6f %.6f %.6f %.6f %.6f %.6f \n",errors[0],errors[1],errors[2],errors[3],errors[4],errors[5]);
