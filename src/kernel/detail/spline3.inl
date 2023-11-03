@@ -818,7 +818,7 @@ __device__ void cusz::device_api::auto_tuning(volatile T s_data[9][9][33],  vola
 
     //current design: 16 points: (4/12/20/28,3/5,3/5). 6 configs (3 directions, lin/cubic)
 
-    int num_blocks=GDX*GDX*GDZ;
+    int num_blocks=((GDX+1)/2)*((GDY+1)/2)*((GDZ+1)/2);
     if(BIX%2==0 and BIY%2==0 and BIZ%2==0){
 
         auto iti=TIX % 16;
@@ -879,13 +879,16 @@ __device__ void cusz::device_api::auto_tuning(volatile T s_data[9][9][33],  vola
         if(TIX<6) {
             atomicAdd(const_cast<T*>(errs) + TIX, local_errs[TIX]);
         }
+        __syncthreads(); 
+         if(TIX==0)
+            atomicAdd(const_cast<T*>(errs) + 6, 1.0);
     }
     //if(TIX<6 )
    //     printf("%d %.6f\n",TIX,errs[TIX]);
-    __syncthreads(); 
+    //__syncthreads(); 
     if(TIX==0){
-        atomicAdd(const_cast<T*>(errs) + 6, 1.0);
-        while(errs[6]<num_blocks/2){}
+       // atomicAdd(const_cast<T*>(errs) + 6, 1.0);
+        while(errs[6]<num_blocks){}
     }
     __syncthreads(); 
 }
