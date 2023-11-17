@@ -509,6 +509,49 @@ __global__ void psz::cuda_hip::__kernel::delta_only::c_lorenzo_3d1l(  //
     // now delta[z] is delta
     quantize_write(delta[z], gix, giy, giz(z - 1), gid(z - 1));
     __syncthreads();
+
+  }
+  if(blockIdx.x==0 and blockIdx.y==0 and blockIdx.z==0 and threadIdx.x==0 and threadIdx.y==0){
+    for (auto z = 0; z < 8; z++) {
+        printf("\nprint from GPU, z=%d\n", z);
+        printf("    ");
+        for (auto i = 0; i < 33; i++) printf("%3d", i);
+        printf("\n");
+
+        for (auto y = 0; y < 8; y++) {
+            printf("y=%d ", y);
+            for (auto x = 0; x < 32; x++) {  //
+                auto global_id=base_id+x*stride3.x+y*stride3.y+z*stride3.z;
+                if CONSTEXPR (true) { printf("%.2e\t", (float)eq[global_id]); }
+                /*
+                else {
+                    T c = print_ectrl ? a[z][y][x] - radius : a[z][y][x];
+                    if (compress) {
+                        if (c == 0) { printf("%3c", '.'); }
+                        else {
+                            if (abs(c) >= 10) { printf("%3c", '*'); }
+                            else {
+                                if (print_ectrl) { printf("%3d", c); }
+                                else {
+                                    printf("%4.2f", c);
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        if (print_ectrl) { printf("%3d", c); }
+                        else {
+                            printf("%4.2f", c);
+                        }
+                    }
+                }
+                */
+            }
+            printf("\n");
+        }
+    }
+    printf("\nGPU print end\n\n");
+      
   }
 }
 
