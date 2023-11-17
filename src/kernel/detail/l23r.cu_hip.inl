@@ -245,7 +245,7 @@ __global__ void c_lorenzo_3d1l(
     quantize_compact_write(delta[z], gix, giy, giz(z - 1), gid(z - 1));
     __syncthreads();
   }
-  if(blockIdx.x==0 and blockIdx.y==0 and blockIdx.z==0 and threadIdx.x==0 and threadIdx.y==0){
+  if(blockIdx.x==6 and blockIdx.y==24 and blockIdx.z==16 and threadIdx.x==0 and threadIdx.y==0){
     for (auto z = 0; z < 8; z++) {
         printf("\nprint from GPU, z=%d\n", z);
         printf("    ");
@@ -254,7 +254,7 @@ __global__ void c_lorenzo_3d1l(
 
         for (auto y = 0; y < 8; y++) {
             printf("y=%d ", y);
-            for (auto x = 0; x < 32; x++) {  //
+            for (auto x = 0; x < 32; x++) {  
                 auto global_id=base_id+x*stride3.x+y*stride3.y+z*stride3.z;
                 printf("%3d\t", int(eq[global_id])-radius);
                //if CONSTEXPR (true) { printf("%.2e\t", (float)eq[global_id]); }
