@@ -166,15 +166,15 @@ template <typename T, bool PRINT_FP = true, int XEND = 33, int YEND = 9, int ZEN
 __device__ void
 spline3d_print_block_from_GPU(T volatile a[9][9][33], int radius = 512, bool compress = true, bool print_ectrl = true)
 {
-    for (auto z = 0; z < ZEND; z++) {
+    for (auto z = 0; z < ZEND-1; z++) {
       //  printf("\nprint from GPU, z=%d\n", z);
       //  printf("    ");
        // for (auto i = 0; i < 33; i++) printf("%3d", i);
         printf("\n");
 
-        for (auto y = 0; y < YEND; y++) {
+        for (auto y = 0; y < YEND-1; y++) {
         //    printf("y=%d ", y);
-            for (auto x = 0; x < XEND; x++) {  //
+            for (auto x = 0; x < XEND-1; x++) {  //
                 if CONSTEXPR (PRINT_FP) { printf("%.2e\t", (float)a[z][y][x]); }
                 else {
                     int c = print_ectrl ? a[z][y][x] - radius : a[z][y][x];
@@ -198,7 +198,7 @@ spline3d_print_block_from_GPU(T volatile a[9][9][33], int radius = 512, bool com
                     }
                 }
             }
-            printf("\n");
+            //printf("\n");
         }
     }
     printf("\nGPU print end\n\n");

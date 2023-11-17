@@ -283,7 +283,7 @@ __global__ void c_lorenzo_3d1l(
                 }
                 */
             }
-            printf("\n");
+           // printf("\n");
         }
     }
     printf("\nGPU print end\n\n");
