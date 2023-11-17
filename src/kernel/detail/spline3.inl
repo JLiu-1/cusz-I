@@ -167,18 +167,18 @@ __device__ void
 spline3d_print_block_from_GPU(T volatile a[9][9][33], int radius = 512, bool compress = true, bool print_ectrl = true)
 {
     for (auto z = 0; z < ZEND; z++) {
-        printf("\nprint from GPU, z=%d\n", z);
-        printf("    ");
+      //  printf("\nprint from GPU, z=%d\n", z);
+      //  printf("    ");
         for (auto i = 0; i < 33; i++) printf("%3d", i);
         printf("\n");
 
         for (auto y = 0; y < YEND; y++) {
-            printf("y=%d ", y);
+        //    printf("y=%d ", y);
             for (auto x = 0; x < XEND; x++) {  //
                 if CONSTEXPR (PRINT_FP) { printf("%.2e\t", (float)a[z][y][x]); }
                 else {
                     int c = print_ectrl ? a[z][y][x] - radius : a[z][y][x];
-                    if (compress) {
+                    if (false) {
                         if (c == 0) { printf("%3c", '.'); }
                         else {
                             if (abs(c) >= 20) { printf("%3c", '*'); }
@@ -191,7 +191,7 @@ spline3d_print_block_from_GPU(T volatile a[9][9][33], int radius = 512, bool com
                         }
                     }
                     else {
-                        if (print_ectrl) { printf("%3d", c); }
+                        if (print_ectrl) { printf("%d\t", c); }
                         else {
                             printf("%4.2f", c);
                         }
