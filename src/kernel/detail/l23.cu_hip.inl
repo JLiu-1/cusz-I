@@ -522,7 +522,8 @@ __global__ void psz::cuda_hip::__kernel::delta_only::c_lorenzo_3d1l(  //
             printf("y=%d ", y);
             for (auto x = 0; x < 32; x++) {  //
                 auto global_id=base_id+x*stride3.x+y*stride3.y+z*stride3.z;
-                if CONSTEXPR (true) { printf("%.2e\t", (float)eq[global_id]); }
+                printf("%.2e\t", (float)eq[global_id]);
+               //if CONSTEXPR (true) { printf("%.2e\t", (float)eq[global_id]); }
                 /*
                 else {
                     T c = print_ectrl ? a[z][y][x] - radius : a[z][y][x];
