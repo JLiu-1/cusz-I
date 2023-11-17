@@ -169,7 +169,7 @@ spline3d_print_block_from_GPU(T volatile a[9][9][33], int radius = 512, bool com
     for (auto z = 0; z < ZEND; z++) {
       //  printf("\nprint from GPU, z=%d\n", z);
       //  printf("    ");
-        for (auto i = 0; i < 33; i++) printf("%3d", i);
+       // for (auto i = 0; i < 33; i++) printf("%3d", i);
         printf("\n");
 
         for (auto y = 0; y < YEND; y++) {

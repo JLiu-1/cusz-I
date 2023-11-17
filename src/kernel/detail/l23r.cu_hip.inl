@@ -250,7 +250,7 @@ __global__ void c_lorenzo_3d1l(
         //printf("\nprint from GPU, z=%d\n", z);
       //  printf("    ");
       //printf("\n");
-        for (auto i = 0; i < 32; i++) printf("%3d", i);
+       // for (auto i = 0; i < 32; i++) printf("%3d", i);
         printf("\n");
 
         for (auto y = 0; y < 8; y++) {
