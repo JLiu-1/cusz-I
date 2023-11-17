@@ -209,7 +209,7 @@ __global__ void c_lorenzo_3d1l(
     bool quantizable = fabs(delta) < radius;
     T candidate = ZigZag ? delta : delta + radius;
     if (x < len3.x and y < len3.y and z < len3.z) {
-      if (false)
+      if (ZIGZAG)
         eq[gid] = posneg_encode(quantizable * static_cast<EqInt>(candidate));
       else
         eq[gid] = quantizable * static_cast<EqUint>(candidate);
@@ -245,7 +245,7 @@ __global__ void c_lorenzo_3d1l(
     quantize_compact_write(delta[z], gix, giy, giz(z - 1), gid(z - 1));
     __syncthreads();
   }
-  if(blockIdx.x==0 and blockIdx.y==0 and blockIdx.z==0 and threadIdx.x==0 and threadIdx.y==0){
+  if(blockIdx.x==4 and blockIdx.y==27 and blockIdx.z==27 and threadIdx.x==0 and threadIdx.y==0){
     for (auto z = 0; z < 8; z++) {
         printf("\nprint from GPU, z=%d\n", z);
         printf("    ");
