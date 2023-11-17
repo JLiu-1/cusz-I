@@ -209,7 +209,7 @@ __global__ void c_lorenzo_3d1l(
     bool quantizable = fabs(delta) < radius;
     T candidate = ZigZag ? delta : delta + radius;
     if (x < len3.x and y < len3.y and z < len3.z) {
-      if (ZigZag)
+      if (false)
         eq[gid] = posneg_encode(quantizable * static_cast<EqInt>(candidate));
       else
         eq[gid] = quantizable * static_cast<EqUint>(candidate);
@@ -249,14 +249,14 @@ __global__ void c_lorenzo_3d1l(
     for (auto z = 0; z < 8; z++) {
         printf("\nprint from GPU, z=%d\n", z);
         printf("    ");
-        for (auto i = 0; i < 33; i++) printf("%3d", i);
+        for (auto i = 0; i < 32; i++) printf("%3d", i);
         printf("\n");
 
         for (auto y = 0; y < 8; y++) {
             printf("y=%d ", y);
             for (auto x = 0; x < 32; x++) {  //
                 auto global_id=base_id+x*stride3.x+y*stride3.y+z*stride3.z;
-                printf("%3d\t", eq[global_id]-radius);
+                printf("%3d\t", int(eq[global_id])-radius);
                //if CONSTEXPR (true) { printf("%.2e\t", (float)eq[global_id]); }
                 /*
                 else {
