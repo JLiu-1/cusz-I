@@ -251,7 +251,7 @@ __global__ void c_lorenzo_3d1l(
       //  printf("    ");
       //printf("\n");
        // for (auto i = 0; i < 32; i++) printf("%3d", i);
-        printf("\n");
+      //  printf("\n");
 
         for (auto y = 0; y < 8; y++) {
            // printf("y=%d ", y);
