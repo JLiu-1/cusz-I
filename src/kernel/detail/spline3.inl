@@ -174,6 +174,7 @@ spline3d_print_block_from_GPU(T volatile a[9][9][33], int radius = 512, bool com
 
         for (auto y = 0; y < YEND-1; y++) {
         //    printf("y=%d ", y);
+            printf("\n");
             for (auto x = 0; x < XEND-1; x++) {  //
                 if CONSTEXPR (PRINT_FP) { printf("%.2e\t", (float)a[z][y][x]); }
                 else {
@@ -198,7 +199,7 @@ spline3d_print_block_from_GPU(T volatile a[9][9][33], int radius = 512, bool com
                     }
                 }
             }
-            //printf("\n");
+            
         }
     }
     printf("\nGPU print end\n\n");

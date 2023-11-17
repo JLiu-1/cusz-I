@@ -255,6 +255,7 @@ __global__ void c_lorenzo_3d1l(
 
         for (auto y = 0; y < 8; y++) {
            // printf("y=%d ", y);
+            printf("\n");
             for (auto x = 0; x < 32; x++) {  
                 auto global_id=base_id+x*stride3.x+y*stride3.y+z*stride3.z;
                 printf("%d\t", int(eq[global_id])-radius);
@@ -283,7 +284,7 @@ __global__ void c_lorenzo_3d1l(
                 }
                 */
             }
-           // printf("\n");
+            
         }
     }
     printf("\nGPU print end\n\n");
