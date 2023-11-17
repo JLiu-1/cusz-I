@@ -209,7 +209,7 @@ __global__ void c_lorenzo_3d1l(
     bool quantizable = fabs(delta) < radius;
     T candidate = ZigZag ? delta : delta + radius;
     if (x < len3.x and y < len3.y and z < len3.z) {
-      if (ZIGZAG)
+      if (ZigZag)
         eq[gid] = posneg_encode(quantizable * static_cast<EqInt>(candidate));
       else
         eq[gid] = quantizable * static_cast<EqUint>(candidate);
