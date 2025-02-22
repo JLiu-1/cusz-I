@@ -293,6 +293,9 @@ __device__ void c_gather_anchor(T1* data, DIM3 data_size, STRIDE3 data_leap, T1*
         auto data_id      = x + y * data_leap.y + z * data_leap.z;
         auto anchor_id    = ax + ay * anchor_leap.y + az * anchor_leap.z;
         anchor[anchor_id] = data[data_id];
+        if(TIX == 7 and BIX == 8 and BIY == 12 and BIZ == 12){
+            printf("anchor: %d, %d, %.2e, %.2e\n", anchor_id,data_id,anchor[anchor_id],data[data_id])
+        }
     }
     __syncthreads();
 }
@@ -350,6 +353,10 @@ __device__ void x_reset_scratch_17x17x17data(
 
             if (ax < anchor_size.x and ay < anchor_size.y and az < anchor_size.z)
                 s_xdata[z][y][x] = anchor[ax + ay * anchor_leap.y + az * anchor_leap.z];
+
+            if(BIX == 8 and BIY == 12 and BIZ == 12){
+                printf("anchor: %d, %d, %d\n", x, y,z,s_xdata[z][y][x])
+        }
         }
         /*****************************************************************************
          alternatively
