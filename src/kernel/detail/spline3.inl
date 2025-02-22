@@ -286,7 +286,7 @@ __device__ void c_gather_anchor(T1* data, DIM3 data_size, STRIDE3 data_leap, T1*
     auto y = 8*ay;
     auto z = 8*az;
 
-    bool pred1 = TIX < 7;//8 is num of anchor
+    bool pred1 = TIX < 8;//8 is num of anchor
     bool pred2 = x < data_size.x and y < data_size.y and z < data_size.z;
 
     if (pred1 and pred2) {
