@@ -589,7 +589,7 @@ __forceinline__ __device__ void interpolate_stage(
 
         
 
-        if (xyz33x9x9_predicate<BORDER_INCLUSIVE>(x, y, z,data_size)) {
+        if (xyz17x17x17_predicate<BORDER_INCLUSIVE>(x, y, z,data_size)) {
             T1 pred = 0;
 
             //if(BIX == 7 and BIY == 47 and BIZ == 15 and unit==4 and (CONSTEXPR (YELLOW)) )
@@ -619,7 +619,7 @@ __forceinline__ __device__ void interpolate_stage(
 
                         if(z>=3*unit and z+3*unit<=BLOCK16  )
                             pred = (-s_data[z - 3*unit][y][x]+9*s_data[z - unit][y][x] + 9*s_data[z + unit][y][x]-s_data[z + 3*unit][y][x]) / 16;
-                        else if (z+3*unit<=BLOCK8)
+                        else if (z+3*unit<=BLOCK16)
                             pred = (3*s_data[z - unit][y][x] + 6*s_data[z + unit][y][x]-s_data[z + 3*unit][y][x]) / 8;
                         else if (z>=3*unit)
                             pred = (-s_data[z - 3*unit][y][x]+6*s_data[z - unit][y][x] + 3*s_data[z + unit][y][x]) / 8;
