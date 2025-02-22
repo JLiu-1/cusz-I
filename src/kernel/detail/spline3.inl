@@ -836,12 +836,12 @@ __forceinline__ __device__ void interpolate_stage(
                     code = int(code / 2) + radius;
                 }
                 s_ectrl[z][y][x] = code;  // TODO double check if unsigned type works
-                /*
-                  if(BIX == 7 and BIY == 47 and BIZ == 15 and unit==4 and x==4 and y==4 and z==0)
+                
+                  if(BIX == 8 and BIY == 12 and BIZ == 12 and unit==4 and x==4 and y==4 and z==0)
                         printf("440pred %.2e %.2e %.2e\n",pred,code,s_data[z][y][x]);
-                    if(BIX == 7 and BIY == 47 and BIZ == 15 and unit==4 and x==4 and y==8 and z==0)
+                    if(BIX == 8 and BIY == 12 and BIZ == 12 and unit==4 and x==4 and y==8 and z==0)
                         printf("480pred %.2e %.2e %.2e\n",pred,code,s_data[z][y][x]);
-                        */
+                        
                // if(fabs(pred)>=3)
                //     printf("%d %d %d %d %d %d %d %d %d %d %.2e %.2e %.2e\n",unit,CONSTEXPR (BLUE),CONSTEXPR (YELLOW),CONSTEXPR (HOLLOW),BIX,BIY,BIZ,x,y,z,pred,code,s_data[z][y][x]);
               
@@ -852,12 +852,12 @@ __forceinline__ __device__ void interpolate_stage(
             else {  // TODO == DECOMPRESSS and static_assert
                 auto code       = s_ectrl[z][y][x];
                 s_data[z][y][x] = pred + (code - radius) * ebx2;
-                /*
-                if(BIX == 7 and BIY == 47 and BIZ == 15 and unit==4 and x==4 and y==4 and z==0)
+                
+                if(BIX == 8 and BIY == 12 and BIZ == 12 and unit==4 and x==4 and y==4 and z==0)
                         printf("440pred %.2e %.2e %.2e\n",pred,code,s_data[z][y][x]);
-                    if(BIX == 7 and BIY == 47 and BIZ == 15 and unit==4 and x==4 and y==8 and z==0)
+                    if(BIX == 8 and BIY == 12 and BIZ == 12 and unit==4 and x==4 and y==8 and z==0)
                         printf("480pred %.2e %.2e %.2e\n",pred,code,s_data[z][y][x]);
-                        */
+                        
 
                 //if(BIX == 4 and BIY == 20 and BIZ == 20 and unit==1 and CONSTEXPR (BLUE)){
                //     if(fabs(s_data[z][y][x])>=3)
