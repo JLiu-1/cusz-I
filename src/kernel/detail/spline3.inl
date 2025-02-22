@@ -359,7 +359,7 @@ __device__ void x_reset_scratch_17x17x17data(
 
             if(BIX == 8 and BIY == 12 and BIZ == 12){
                 printf("anchor: %d, %d, %d, %.2e\n", x, y,z,s_xdata[z][y][x]);
-            if(BIX == 9 and BIY == 13 and BIZ == 13 and x==0 and y==0 and z==0){
+            if(BIX == 9 and BIY == 13 and BIZ == 13 and x==0 and y==0 and z==0)
                 printf("91313anchor: %d, %d, %d, %.2e\n", x, y,z,s_xdata[z][y][x]);
         }
         }
