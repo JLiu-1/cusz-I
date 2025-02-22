@@ -355,7 +355,7 @@ __device__ void x_reset_scratch_17x17x17data(
                 s_xdata[z][y][x] = anchor[ax + ay * anchor_leap.y + az * anchor_leap.z];
 
             if(BIX == 8 and BIY == 12 and BIZ == 12){
-                printf("anchor: %d, %d, %d\n", x, y,z,s_xdata[z][y][x]);
+                printf("anchor: %d, %d, %d, %.2e\n", x, y,z,s_xdata[z][y][x]);
         }
         }
         /*****************************************************************************
