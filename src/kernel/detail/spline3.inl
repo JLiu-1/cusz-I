@@ -295,13 +295,13 @@ __device__ void c_gather_anchor(T1* data, DIM3 data_size, STRIDE3 data_leap, T1*
         auto data_id      = x + y * data_leap.y + z * data_leap.z;
         auto anchor_id    = ax + ay * anchor_leap.y + az * anchor_leap.z;
         anchor[anchor_id] = data[data_id];
-        
+        /*
         if( BIX == 6 and BIY == 12 and BIZ == 16){
             printf("anchor: %d,%d,%d,%d, %d, %.2e, %.2e,%d,%d,%d,%d\n",(TIX % 4)*8, ((TIX / 4) % 2)*8,((TIX / 4) / 2)*8, anchor_id,data_id,anchor[anchor_id],data[data_id],data_leap.y,data_leap.z,anchor_leap.y,anchor_leap.z);
         }
         if(TIX == 0 and BIX == 7 and BIY == 13 and BIZ == 17){
             printf("71317anchor: %d, %d, %.2e, %.2e\n", anchor_id,data_id,anchor[anchor_id],data[data_id]);
-        }
+        }*/
     }
     __syncthreads();
 }
@@ -359,11 +359,12 @@ __device__ void x_reset_scratch_33x17x9data(
 
             if (ax < anchor_size.x and ay < anchor_size.y and az < anchor_size.z)
                 s_xdata[z][y][x] = anchor[ax + ay * anchor_leap.y + az * anchor_leap.z];
-            
+            /*
             if(BIX == 6 and BIY == 12 and BIZ == 16)
                 printf("anchor: %d, %d, %d, %.2e\n", x, y,z,s_xdata[z][y][x]);
             if(BIX == 7 and BIY == 13 and BIZ == 17 and x==0 and y==0 and z==0)
                 printf("71317anchor: %d, %d, %d, %.2e\n", x, y,z,s_xdata[z][y][x]);
+                */
             
         }
         /*****************************************************************************
@@ -493,10 +494,10 @@ __device__ void global2shmem_fuse(E* ectrl, dim3 ectrl_size, dim3 ectrl_leap, T*
 
 
         if (gx < ectrl_size.x and gy < ectrl_size.y and gz < ectrl_size.z) s_ectrl[z][y][x] = static_cast<T>(ectrl[gid]) + scattered_outlier[gid];
-        if(BIX == 6 and BIY == 12 and BIZ == 16 and  x==4 and y==16 and z==0)
-            printf("61216 %.6e %d %d %.6e\n",s_ectrl[z][y][x],gid,ectrl[gid],scattered_outlier[gid]);
-        if(BIX == 6 and BIY == 13 and BIZ == 16 and  x==4 and y==0 and z==0)
-            printf("61316 %.6e %d %d %.6e\n",s_ectrl[z][y][x],gid,ectrl[gid],scattered_outlier[gid]);
+        //if(BIX == 6 and BIY == 12 and BIZ == 16 and  x==4 and y==16 and z==0)
+        //    printf("61216 %.6e %d %d %.6e\n",s_ectrl[z][y][x],gid,ectrl[gid],scattered_outlier[gid]);
+        //if(BIX == 6 and BIY == 13 and BIZ == 16 and  x==4 and y==0 and z==0)
+       //     printf("61316 %.6e %d %d %.6e\n",s_ectrl[z][y][x],gid,ectrl[gid],scattered_outlier[gid]);
 
     }
     __syncthreads();
@@ -554,8 +555,8 @@ shmem2global_33x17x9data_with_compaction(volatile T1 s_buf[9][17][33], T2* dram_
         auto gy  = (y + BIY * BLOCK16);
         auto gz  = (z + BIZ * BLOCK8);
         auto gid = gx + gy * buf_leap.y + gz * buf_leap.z;
-        if(gid==18954436)
-            printf("%d %d %d %d %d %d %d %d %d\n",BIX,BIY,BIZ,x,y,z,gx,gy,gz);
+        //if(gid==18954436)
+        //    printf("%d %d %d %d %d %d %d %d %d\n",BIX,BIY,BIZ,x,y,z,gx,gy,gz);
 
         auto candidate = s_buf[z][y][x];
         bool quantizable = (candidate >= 0) and (candidate < 2*radius);
@@ -565,8 +566,8 @@ shmem2global_33x17x9data_with_compaction(volatile T1 s_buf[9][17][33], T2* dram_
             // For performance purpose, it can be inlined in quantization
 
             dram_buf[gid] = quantizable * static_cast<T2>(candidate);
-            if(BIX == 6 and BIY == 13 and BIZ == 16 and  x==4 and y==0 and z==0)
-                printf("%d, %.2e %d %d\n",radius,candidate,gid,dram_buf[gid]);
+         //   if(BIX == 6 and BIY == 13 and BIZ == 16 and  x==4 and y==0 and z==0)
+         //       printf("%d, %.2e %d %d\n",radius,candidate,gid,dram_buf[gid]);
 
             
 
@@ -879,11 +880,11 @@ __forceinline__ __device__ void interpolate_stage(
               
                 s_data[z][y][x]  = pred + (code - radius) * ebx2;
 
-                if(BIX == 6 and BIY == 12 and BIZ == 16 and  x==4 and y==16 and z==0){
+                /*if(BIX == 6 and BIY == 12 and BIZ == 16 and  x==4 and y==16 and z==0){
                     printf("%d %d %d %d %.6e %.6e %.6e\n",BLUE,YELLOW,HOLLOW,unit,s_data[z ][y][x-unit],s_data[z ][y][x+unit],s_data[z][y][x+3*unit]);
                     printf("004pred %.6e %.2e %.6e %.6e %.6e %d\n",pred,code,s_data[z][y][x],ebx2,eb_r,radius);
 
-                }
+                }*/
                         
                    // if(BIX == 6 and BIY == 12 and BIZ == 16 and unit==4 and x==8 and y==8 and z==4)
                 
@@ -893,10 +894,10 @@ __forceinline__ __device__ void interpolate_stage(
                 auto code       = s_ectrl[z][y][x];
                 s_data[z][y][x] = pred + (code - radius) * ebx2;
                 
-                if(BIX == 6 and BIY == 12 and BIZ == 16 and  x==4 and y==16 and z==0){
+                /*if(BIX == 6 and BIY == 12 and BIZ == 16 and  x==4 and y==16 and z==0){
                     printf("%d %d %d %d %.6e %.6e %.6e\n",BLUE,YELLOW,HOLLOW,unit,s_data[z ][y][x-unit],s_data[z ][y][x+unit],s_data[z][y][x+3*unit]);
                     printf("004pred %.6e %.2e %.6e %.6e %.6e %d\n",pred,code,s_data[z][y][x],ebx2,eb_r,radius);
-                }
+                }*/
                         
                   //  if(BIX == 6 and BIY == 12 and BIZ == 16 and unit==4 and x==8 and y==8 and z==4)
                   //      printf("884pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[8][8][0],s_data[8][8][8],s_data[8][8][8]);
