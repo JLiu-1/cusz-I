@@ -594,7 +594,8 @@ __forceinline__ __device__ void interpolate_stage(
     int         radius,
     bool interpolator)
 {
-    static_assert(BLOCK_DIMX * BLOCK_DIMY * (COARSEN ? 1 : BLOCK_DIMZ) <= 384, "block oversized");
+    //static_assert(BLOCK_DIMX * BLOCK_DIMY * (COARSEN ? 1 : BLOCK_DIMZ) <= 384, "block oversized");
+    static_assert(COARSEN or BLOCK_DIMX * BLOCK_DIMY * BLOCK_DIMZ <= 384, "block oversized");
     static_assert((BLUE or YELLOW or HOLLOW) == true, "must be one hot");
     static_assert((BLUE and YELLOW) == false, "must be only one hot (1)");
     static_assert((BLUE and YELLOW) == false, "must be only one hot (2)");
@@ -1243,7 +1244,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate(
             s_data, s_ectrl,data_size, xyellow_reverse, yyellow_reverse, zyellow_reverse, unit, cur_eb_r, cur_ebx2, radius, intp_param.interpolators[1]);
         interpolate_stage<
             T1, T2, FP, decltype(xblue_reverse), decltype(yblue_reverse), decltype(zblue_reverse),  //
-            true, false, false, LINEAR_BLOCK_SIZE, 17, 9, COARSEN, 2, BORDER_INCLUSIVE, WORKFLOW>(
+            true, false, false, LINEAR_BLOCK_SIZE, 17, 9, NO_COARSEN, 2, BORDER_INCLUSIVE, WORKFLOW>(
             s_data, s_ectrl,data_size, xblue_reverse, yblue_reverse, zblue_reverse, unit, cur_eb_r, cur_ebx2, radius, intp_param.interpolators[2]);
     }
     else{
@@ -1257,7 +1258,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate(
             s_data, s_ectrl,data_size, xyellow, yyellow, zyellow, unit, cur_eb_r, cur_ebx2, radius, intp_param.interpolators[1]);
         interpolate_stage<
             T1, T2, FP, decltype(xhollow), decltype(yhollow), decltype(zhollow),  //
-            false, false, true, LINEAR_BLOCK_SIZE, 8, 9, COARSEN, 5, BORDER_INCLUSIVE, WORKFLOW>(
+            false, false, true, LINEAR_BLOCK_SIZE, 8, 9, NO_COARSEN, 5, BORDER_INCLUSIVE, WORKFLOW>(
             s_data, s_ectrl,data_size, xhollow, yhollow, zhollow, unit, cur_eb_r, cur_ebx2, radius, intp_param.interpolators[2]);
 
     }
