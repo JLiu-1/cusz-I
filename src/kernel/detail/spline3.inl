@@ -293,12 +293,13 @@ __device__ void c_gather_anchor(T1* data, DIM3 data_size, STRIDE3 data_leap, T1*
         auto data_id      = x + y * data_leap.y + z * data_leap.z;
         auto anchor_id    = ax + ay * anchor_leap.y + az * anchor_leap.z;
         anchor[anchor_id] = data[data_id];
-        if(TIX == 7 and BIX == 8 and BIY == 12 and BIZ == 12){
+        /*
+        if(TIX == 7 and BIX == 12 and BIY == 12 and BIZ == 8){
             printf("anchor: %d, %d, %.2e, %.2e,%d,%d,%d,%d\n", anchor_id,data_id,anchor[anchor_id],data[data_id],data_leap.y,data_leap.z,anchor_leap.y,anchor_leap.z);
         }
-        if(TIX == 0 and BIX == 9 and BIY == 13 and BIZ == 13){
-            printf("91313anchor: %d, %d, %.2e, %.2e\n", anchor_id,data_id,anchor[anchor_id],data[data_id]);
-        }
+        if(TIX == 0 and BIX == 13 and BIY == 13 and BIZ == 9){
+            printf("13139anchor: %d, %d, %.2e, %.2e\n", anchor_id,data_id,anchor[anchor_id],data[data_id]);
+        }*/
     }
     __syncthreads();
 }
@@ -356,11 +357,12 @@ __device__ void x_reset_scratch_17x17x17data(
 
             if (ax < anchor_size.x and ay < anchor_size.y and az < anchor_size.z)
                 s_xdata[z][y][x] = anchor[ax + ay * anchor_leap.y + az * anchor_leap.z];
-
-            if(BIX == 8 and BIY == 12 and BIZ == 12){
+            /*
+            if(BIX == 11 and BIY == 12 and BIZ == 8){
                 printf("anchor: %d, %d, %d, %.2e\n", x, y,z,s_xdata[z][y][x]);
-            if(BIX == 9 and BIY == 13 and BIZ == 13 and x==0 and y==0 and z==0)
-                printf("91313anchor: %d, %d, %d, %.2e\n", x, y,z,s_xdata[z][y][x]);
+            if(BIX == 13 and BIY == 13 and BIZ == 9 and x==0 and y==0 and z==0)
+                printf("13139anchor: %d, %d, %d, %.2e\n", x, y,z,s_xdata[z][y][x]);
+            */
         }
         }
         /*****************************************************************************
@@ -865,10 +867,10 @@ __forceinline__ __device__ void interpolate_stage(
                 auto code       = s_ectrl[z][y][x];
                 s_data[z][y][x] = pred + (code - radius) * ebx2;
                 
-                if(BIX == 8 and BIY == 12 and BIZ == 12 and unit==4 and x==4 and y==4 and z==0)
-                        printf("440pred %.2e %.2e %.2e\n",pred,code,s_data[z][y][x]);
-                    if(BIX == 8 and BIY == 12 and BIZ == 12 and unit==4 and x==4 and y==8 and z==0)
-                        printf("480pred %.2e %.2e %.2e\n",pred,code,s_data[z][y][x]);
+                if(BIX == 12 and BIY == 12 and BIZ == 8 and unit==4 and x==0 and y==0 and z==4)
+                        printf("004pred %.2e %.2e %.2e\n",pred,code,s_data[z][y][x]);
+                    if(BIX == 12 and BIY == 12 and BIZ == 8 and unit==4 and x==8 and y==8 and z==4)
+                        printf("884pred %.2e %.2e %.2e\n",pred,code,s_data[z][y][x]);
                         
 
                 //if(BIX == 4 and BIY == 20 and BIZ == 20 and unit==1 and CONSTEXPR (BLUE)){
