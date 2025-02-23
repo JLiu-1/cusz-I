@@ -382,9 +382,9 @@ __device__ void global2shmem_17x17x17data(T1* data, DIM3 data_size, STRIDE3 data
         auto x   = (_tix % BLOCK17);
         auto y   = (_tix / BLOCK17) % BLOCK17;
         auto z   = (_tix / BLOCK17) / BLOCK17;
-        auto gx  = (x + BIX * BLOCK17);
-        auto gy  = (y + BIY * BLOCK17);
-        auto gz  = (z + BIZ * BLOCK17);
+        auto gx  = (x + BIX * BLOCK16);
+        auto gy  = (y + BIY * BLOCK16);
+        auto gz  = (z + BIZ * BLOCK16);
         auto gid = gx + gy * data_leap.y + gz * data_leap.z;
 
         if (gx < data_size.x and gy < data_size.y and gz < data_size.z) s_data[z][y][x] = data[gid];
