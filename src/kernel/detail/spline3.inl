@@ -296,11 +296,11 @@ __device__ void c_gather_anchor(T1* data, DIM3 data_size, STRIDE3 data_leap, T1*
         auto anchor_id    = ax + ay * anchor_leap.y + az * anchor_leap.z;
         anchor[anchor_id] = data[data_id];
         
-        if(TIX == 7 and BIX == 12 and BIY == 12 and BIZ == 8){
+        if(TIX == 7 and BIX == 6 and BIY == 12 and BIZ == 16){
             printf("anchor: %d, %d, %.2e, %.2e,%d,%d,%d,%d\n", anchor_id,data_id,anchor[anchor_id],data[data_id],data_leap.y,data_leap.z,anchor_leap.y,anchor_leap.z);
         }
-        if(TIX == 0 and BIX == 13 and BIY == 13 and BIZ == 9){
-            printf("13139anchor: %d, %d, %.2e, %.2e\n", anchor_id,data_id,anchor[anchor_id],data[data_id]);
+        if(TIX == 0 and BIX == 7 and BIY == 13 and BIZ == 17){
+            printf("71317anchor: %d, %d, %.2e, %.2e\n", anchor_id,data_id,anchor[anchor_id],data[data_id]);
         }
     }
     __syncthreads();
@@ -360,10 +360,10 @@ __device__ void x_reset_scratch_33x17x9data(
             if (ax < anchor_size.x and ay < anchor_size.y and az < anchor_size.z)
                 s_xdata[z][y][x] = anchor[ax + ay * anchor_leap.y + az * anchor_leap.z];
             
-            if(BIX == 12 and BIY == 12 and BIZ == 8)
+            if(BIX == 6 and BIY == 12 and BIZ == 16)
                 printf("anchor: %d, %d, %d, %.2e\n", x, y,z,s_xdata[z][y][x]);
-            if(BIX == 13 and BIY == 13 and BIZ == 9 and x==0 and y==0 and z==0)
-                printf("13139anchor: %d, %d, %d, %.2e\n", x, y,z,s_xdata[z][y][x]);
+            if(BIX == 7 and BIY == 13 and BIZ == 17 and x==0 and y==0 and z==0)
+                printf("71317anchor: %d, %d, %d, %.2e\n", x, y,z,s_xdata[z][y][x]);
             
         }
         /*****************************************************************************
