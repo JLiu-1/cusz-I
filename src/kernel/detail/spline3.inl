@@ -777,8 +777,11 @@ __forceinline__ __device__ void interpolate_stage(
                             pred = (-3*s_data[z ][y- 3*unit][x]+23*s_data[z ][y- unit][x] + 23*s_data[z ][y+ unit][x]-3*s_data[z][y + 3*unit][x]) / 40;
                         else if (y+3*unit<=BLOCK16)
                             pred = (3*s_data[z ][y - unit][x] + 6*s_data[z][y + unit][x]-s_data[z][y + 3*unit][x]) / 8;
-                        else if (y>=3*unit)
+                        else if (y>=3*unit){
+                            if(BIX == 6 and BIY == 12 and BIZ == 16 and  x==4 and y==14 and z==0)
+                                printf("here\n");
                             pred = (-s_data[z ][y- 3*unit][x]+6*s_data[z][y - unit][x] + 3*s_data[z][y + unit][x]) / 8;
+                        }
                         else
                             pred = (s_data[z][y - unit][x] + s_data[z][y + unit][x]) / 2;
                     }
