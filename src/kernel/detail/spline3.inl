@@ -850,10 +850,10 @@ __forceinline__ __device__ void interpolate_stage(
                 }
                 s_ectrl[z][y][x] = code;  // TODO double check if unsigned type works
                 
-                  if(BIX == 8 and BIY == 12 and BIZ == 12 and unit==4 and x==4 and y==4 and z==0)
-                        printf("440pred %.2e %.2e %.2e\n",pred,code,s_data[z][y][x]);
-                    if(BIX == 8 and BIY == 12 and BIZ == 12 and unit==4 and x==4 and y==8 and z==0)
-                        printf("480pred %.2e %.2e %.2e\n",pred,code,s_data[z][y][x]);
+                  if(BIX == 12 and BIY == 12 and BIZ == 8 and unit==4 and x==0 and y==0 and z==4)
+                        printf("004pred %.2e %.2e %.2e\n",pred,code,s_data[z][y][x]);
+                    if(BIX == 12 and BIY == 12 and BIZ == 8 and unit==4 and x==8 and y==8 and z==4)
+                        printf("884pred %.2e %.2e %.2e\n",pred,code,s_data[z][y][x]);
                         
                // if(fabs(pred)>=3)
                //     printf("%d %d %d %d %d %d %d %d %d %d %.2e %.2e %.2e\n",unit,CONSTEXPR (BLUE),CONSTEXPR (YELLOW),CONSTEXPR (HOLLOW),BIX,BIY,BIZ,x,y,z,pred,code,s_data[z][y][x]);
