@@ -496,7 +496,7 @@ __device__ void global2shmem_fuse(E* ectrl, dim3 ectrl_size, dim3 ectrl_leap, T*
 // dram_outlier should be the same in type with shared memory buf
 template <typename T1, typename T2, int LINEAR_BLOCK_SIZE = DEFAULT_LINEAR_BLOCK_SIZE>
 __device__ void
-shmem2global_17x17x17data(volatile T1 s_buf[33][17][9], T2* dram_buf, DIM3 buf_size, STRIDE3 buf_leap)
+shmem2global_33x17x9data(volatile T1 s_buf[33][17][9], T2* dram_buf, DIM3 buf_size, STRIDE3 buf_leap)
 {
     auto x_size=BLOCK32+(BIX==GDX-1);
     auto y_size=BLOCK16+(BIY==GDY-1);
