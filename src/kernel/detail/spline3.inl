@@ -360,7 +360,7 @@ __device__ void x_reset_scratch_33x17x9data(
             if (ax < anchor_size.x and ay < anchor_size.y and az < anchor_size.z)
                 s_xdata[z][y][x] = anchor[ax + ay * anchor_leap.y + az * anchor_leap.z];
             
-            if(BIX == 12 and BIY == 12 and BIZ == 8){
+            if(BIX == 12 and BIY == 12 and BIZ == 8)
                 printf("anchor: %d, %d, %d, %.2e\n", x, y,z,s_xdata[z][y][x]);
             if(BIX == 13 and BIY == 13 and BIZ == 9 and x==0 and y==0 and z==0)
                 printf("13139anchor: %d, %d, %d, %.2e\n", x, y,z,s_xdata[z][y][x]);
