@@ -561,11 +561,12 @@ shmem2global_33x17x9data_with_compaction(volatile T1 s_buf[9][17][33], T2* dram_
         if (gx < buf_size.x and gy < buf_size.y and gz < buf_size.z) {
             // TODO this is for algorithmic demo by reading from shmem
             // For performance purpose, it can be inlined in quantization
+            
             dram_buf[gid] = quantizable * static_cast<T2>(candidate);
-
-
-            if(BIX == 6 and BIY == 12 and BIZ == 16 and  x==4 and y==16 and z==0)
+            if(BIX == 6 and BIY == 13 and BIZ == 16 and  x==4 and y==0 and z==0)
                 printf("%.2e %d %.2e\n",candidate,gid,dram_buf[gid]);
+
+            
 
 
             if (not quantizable) {
