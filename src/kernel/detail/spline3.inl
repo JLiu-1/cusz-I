@@ -564,7 +564,7 @@ shmem2global_33x17x9data_with_compaction(volatile T1 s_buf[9][17][33], T2* dram_
 
             dram_buf[gid] = quantizable * static_cast<T2>(candidate);
             if(BIX == 6 and BIY == 13 and BIZ == 16 and  x==4 and y==0 and z==0)
-                printf("%d, %.2e %d %.2e\n",radius,candidate,gid,dram_buf[gid]);
+                printf("%d, %.2e %d %d\n",radius,candidate,gid,dram_buf[gid]);
 
             
 
