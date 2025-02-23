@@ -530,7 +530,7 @@ shmem2global_17x17x17data(volatile T1 s_buf[33][17][9], T2* dram_buf, DIM3 buf_s
 // dram_outlier should be the same in type with shared memory buf
 template <typename T1, typename T2, int LINEAR_BLOCK_SIZE = DEFAULT_LINEAR_BLOCK_SIZE>
 __device__ void
-shmem2global_17x17x17data_with_compaction(volatile T1 s_buf[33][17][9], T2* dram_buf, DIM3 buf_size, STRIDE3 buf_leap, int radius, T1* dram_compactval = nullptr, uint32_t* dram_compactidx = nullptr, uint32_t* dram_compactnum = nullptr)
+shmem2global_33x17x9data_with_compaction(volatile T1 s_buf[33][17][9], T2* dram_buf, DIM3 buf_size, STRIDE3 buf_leap, int radius, T1* dram_compactval = nullptr, uint32_t* dram_compactidx = nullptr, uint32_t* dram_compactnum = nullptr)
 {
     auto x_size = BLOCK32 + (BIX == GDX-1);
     auto y_size = BLOCK16 + (BIY == GDY-1);
@@ -1543,11 +1543,11 @@ __global__ void cusz::x_spline3d_infprecis_32x16x8data(
     using T = typename std::remove_pointer<TITER>::type;
 
     __shared__ struct {
-        T data[17][17][17];
-        T ectrl[17][17][17];
+        T data[33][17][9];
+        T ectrl[33][17][9];
     } shmem;
 
-    x_reset_scratch_17x17x17data<T, T, LINEAR_BLOCK_SIZE>(shmem.data, shmem.ectrl, anchor, anchor_size, anchor_leap);
+    x_reset_scratch_33x17x9data<T, T, LINEAR_BLOCK_SIZE>(shmem.data, shmem.ectrl, anchor, anchor_size, anchor_leap);
 
     //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
     //        printf("esz: %d %d %d\n",ectrl_size.x,ectrl_size.y,ectrl_size.z);
@@ -1559,7 +1559,7 @@ __global__ void cusz::x_spline3d_infprecis_32x16x8data(
         shmem.data, shmem.ectrl, data_size, eb_r, ebx2, radius, intp_param);
     //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
     //        printf("dsz: %d %d %d\n",data_size.x,data_size.y,data_size.z);
-    shmem2global_17x17x17data<T, T, LINEAR_BLOCK_SIZE>(shmem.data, data, data_size, data_leap);
+    shmem2global_33x17x9data<T, T, LINEAR_BLOCK_SIZE>(shmem.data, data, data_size, data_leap);
 }
 
 #undef TIX
