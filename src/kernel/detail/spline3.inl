@@ -495,7 +495,7 @@ __device__ void global2shmem_fuse(E* ectrl, dim3 ectrl_size, dim3 ectrl_leap, T*
         if (gx < ectrl_size.x and gy < ectrl_size.y and gz < ectrl_size.z) s_ectrl[z][y][x] = static_cast<T>(ectrl[gid]) + scattered_outlier[gid];
         if(BIX == 6 and BIY == 12 and BIZ == 16 and  x==4 and y==16 and z==0)
             printf("61216%.6e %d %d %.6e\n",s_ectrl[z][y][x],gid,ectrl[gid],scattered_outlier[gid]);
-        if(BIX == 6 and BIY == 13 and BIZ == 16 and  x==4 and y==10 and z==0)
+        if(BIX == 6 and BIY == 13 and BIZ == 16 and  x==4 and y==0 and z==0)
             printf("61316%.6e %d %d %.6e\n",s_ectrl[z][y][x],gid,ectrl[gid],scattered_outlier[gid]);
 
     }
