@@ -128,10 +128,10 @@ namespace device_api {
  ********************************************************************************/
 
     template <typename T,int  LINEAR_BLOCK_SIZE>
-__device__ void auto_tuning(volatile T s_data[33][17][9],  volatile T local_errs[6], DIM3  data_size, volatile T* count);
+__device__ void auto_tuning(volatile T s_data[9][17][33],  volatile T local_errs[6], DIM3  data_size, volatile T* count);
 
  template <typename T,int  LINEAR_BLOCK_SIZE>
-__device__ void auto_tuning_2(volatile T s_data[33][17][9],  volatile T local_errs[6], DIM3  data_size, volatile T* count);
+__device__ void auto_tuning_2(volatile T s_data[9][17][33],  volatile T local_errs[6], DIM3  data_size, volatile T* count);
 
 template <
     typename T1,
@@ -141,7 +141,7 @@ template <
     bool WORKFLOW         = SPLINE3_COMPR,
     bool PROBE_PRED_ERROR = false>
 __device__ void
-spline3d_layout2_interpolate(volatile T1 s_data[33][17][9], volatile T2 s_ectrl[33][17][9],  DIM3  data_size,FP eb_r, FP ebx2, int radius, INTERPOLATION_PARAMS intp_param);
+spline3d_layout2_interpolate(volatile T1 s_data[9][17][33], volatile T2 s_ectrl[9][17][33],  DIM3  data_size,FP eb_r, FP ebx2, int radius, INTERPOLATION_PARAMS intp_param);
 }  // namespace device_api
 
 }  // namespace cusz
@@ -168,7 +168,7 @@ __forceinline__ __device__ bool xyz33x17x9_predicate(unsigned int x, unsigned in
 // control block_id3 in function call
 template <typename T, bool PRINT_FP = true, int XEND = BLOCK33, int YEND = BLOCK17, int ZEND = BLOCK9>
 __device__ void
-spline3d_print_block_from_GPU(T volatile a[33][17][9], int radius = 512, bool compress = true, bool print_ectrl = true)
+spline3d_print_block_from_GPU(T volatile a[9][17][33], int radius = 512, bool compress = true, bool print_ectrl = true)
 {
     for (auto z = 0; z < ZEND; z++) {
         printf("\nprint from GPU, z=%d\n", z);
@@ -209,7 +209,7 @@ spline3d_print_block_from_GPU(T volatile a[33][17][9], int radius = 512, bool co
 }
 
 template <typename T1, typename T2, int LINEAR_BLOCK_SIZE = DEFAULT_LINEAR_BLOCK_SIZE>
-__device__ void c_reset_scratch_33x17x9data(volatile T1 s_data[33][17][9], volatile T2 s_ectrl[33][17][9], int radius)
+__device__ void c_reset_scratch_33x17x9data(volatile T1 s_data[9][17][33], volatile T2 s_ectrl[9][17][33], int radius)
 {
     // alternatively, reinterprete cast volatile T?[][][] to 1D
     for (auto _tix = TIX; _tix < BLOCK33 * BLOCK17 * BLOCK9; _tix += LINEAR_BLOCK_SIZE) {
@@ -335,8 +335,8 @@ __device__ void c_gather_anchor(volatile T1 s_data[9][9][33], T1* anchor, STRIDE
 
 template <typename T1, typename T2 = T1, int LINEAR_BLOCK_SIZE = DEFAULT_LINEAR_BLOCK_SIZE>
 __device__ void x_reset_scratch_33x17x9data(
-    volatile T1 s_xdata[33][17][9],
-    volatile T2 s_ectrl[33][17][9],
+    volatile T1 s_xdata[9][17][33],
+    volatile T2 s_ectrl[9][17][33],
     T1*         anchor,       //
     DIM3        anchor_size,  //
     STRIDE3     anchor_leap)
@@ -376,7 +376,7 @@ __device__ void x_reset_scratch_33x17x9data(
 }
 
 template <typename T1, typename T2, int LINEAR_BLOCK_SIZE = DEFAULT_LINEAR_BLOCK_SIZE>
-__device__ void global2shmem_33x17x9data(T1* data, DIM3 data_size, STRIDE3 data_leap, volatile T2 s_data[33][17][9])
+__device__ void global2shmem_33x17x9data(T1* data, DIM3 data_size, STRIDE3 data_leap, volatile T2 s_data[9][17][33])
 {
     constexpr auto TOTAL = BLOCK33 * BLOCK17 * BLOCK9;
 
@@ -475,7 +475,7 @@ __device__ void global2shmem_profiling_data_2(T1* data, DIM3 data_size, STRIDE3 
 }
 
 template <typename T = float, typename E = u4, int LINEAR_BLOCK_SIZE = DEFAULT_LINEAR_BLOCK_SIZE>
-__device__ void global2shmem_fuse(E* ectrl, dim3 ectrl_size, dim3 ectrl_leap, T* scattered_outlier, volatile T s_ectrl[33][17][9])
+__device__ void global2shmem_fuse(E* ectrl, dim3 ectrl_size, dim3 ectrl_leap, T* scattered_outlier, volatile T s_ectrl[9][17][33])
 {
     constexpr auto TOTAL = BLOCK33 * BLOCK17 * BLOCK9;
 
@@ -496,7 +496,7 @@ __device__ void global2shmem_fuse(E* ectrl, dim3 ectrl_size, dim3 ectrl_leap, T*
 // dram_outlier should be the same in type with shared memory buf
 template <typename T1, typename T2, int LINEAR_BLOCK_SIZE = DEFAULT_LINEAR_BLOCK_SIZE>
 __device__ void
-shmem2global_33x17x9data(volatile T1 s_buf[33][17][9], T2* dram_buf, DIM3 buf_size, STRIDE3 buf_leap)
+shmem2global_33x17x9data(volatile T1 s_buf[9][17][33], T2* dram_buf, DIM3 buf_size, STRIDE3 buf_leap)
 {
     auto x_size=BLOCK32+(BIX==GDX-1);
     auto y_size=BLOCK16+(BIY==GDY-1);
@@ -530,7 +530,7 @@ shmem2global_33x17x9data(volatile T1 s_buf[33][17][9], T2* dram_buf, DIM3 buf_si
 // dram_outlier should be the same in type with shared memory buf
 template <typename T1, typename T2, int LINEAR_BLOCK_SIZE = DEFAULT_LINEAR_BLOCK_SIZE>
 __device__ void
-shmem2global_33x17x9data_with_compaction(volatile T1 s_buf[33][17][9], T2* dram_buf, DIM3 buf_size, STRIDE3 buf_leap, int radius, T1* dram_compactval = nullptr, uint32_t* dram_compactidx = nullptr, uint32_t* dram_compactnum = nullptr)
+shmem2global_33x17x9data_with_compaction(volatile T1 s_buf[9][17][33], T2* dram_buf, DIM3 buf_size, STRIDE3 buf_leap, int radius, T1* dram_compactval = nullptr, uint32_t* dram_compactidx = nullptr, uint32_t* dram_compactnum = nullptr)
 {
     auto x_size = BLOCK32 + (BIX == GDX-1);
     auto y_size = BLOCK16 + (BIY == GDY-1);
@@ -582,8 +582,8 @@ template <
     bool BORDER_INCLUSIVE,
     bool WORKFLOW>
 __forceinline__ __device__ void interpolate_stage(
-    volatile T1 s_data[33][17][9],
-    volatile T2 s_ectrl[33][17][9],
+    volatile T1 s_data[9][17][33],
+    volatile T2 s_ectrl[9][17][33],
     DIM3    data_size,
     LAMBDAX     xmap,
     LAMBDAY     ymap,
@@ -854,9 +854,9 @@ __forceinline__ __device__ void interpolate_stage(
                 s_ectrl[z][y][x] = code;  // TODO double check if unsigned type works
                 
                  if(BIX == 6 and BIY == 12 and BIZ == 16 and unit==4 and x==0 and y==0 and z==4)
-                        printf("004pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[0][0][0],s_data[0][0][8],s_data[0][0][16]);
+                        printf("004pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[0][0][0],s_data[0][0][8],s_data[0][0][8]);
                     if(BIX == 6 and BIY == 12 and BIZ == 16 and unit==4 and x==8 and y==8 and z==4)
-                        printf("884pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[8][8][0],s_data[8][8][8],s_data[8][8][16]);
+                        printf("884pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[8][8][0],s_data[8][8][8],s_data[8][8][8]);
                        
                // if(fabs(pred)>=3)
                //     printf("%d %d %d %d %d %d %d %d %d %d %.2e %.2e %.2e\n",unit,CONSTEXPR (BLUE),CONSTEXPR (YELLOW),CONSTEXPR (HOLLOW),BIX,BIY,BIZ,x,y,z,pred,code,s_data[z][y][x]);
@@ -870,9 +870,9 @@ __forceinline__ __device__ void interpolate_stage(
                 s_data[z][y][x] = pred + (code - radius) * ebx2;
                 
                 if(BIX == 6 and BIY == 12 and BIZ == 16 and unit==4 and x==0 and y==0 and z==4)
-                        printf("004pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[0][0][0],s_data[0][0][8],s_data[0][0][16]);
+                        printf("004pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[0][0][0],s_data[0][0][8],s_data[0][0][8]);
                     if(BIX == 6 and BIY == 12 and BIZ == 16 and unit==4 and x==8 and y==8 and z==4)
-                        printf("884pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[8][8][0],s_data[8][8][8],s_data[8][8][16]);
+                        printf("884pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[8][8][0],s_data[8][8][8],s_data[8][8][8]);
                         
                 
                 //if(BIX == 4 and BIY == 20 and BIZ == 20 and unit==1 and CONSTEXPR (BLUE)){
@@ -1099,8 +1099,8 @@ __device__ void cusz::device_api::auto_tuning_2(volatile T s_data[64], volatile 
 
 template <typename T1, typename T2, typename FP,int LINEAR_BLOCK_SIZE, bool WORKFLOW, bool PROBE_PRED_ERROR>
 __device__ void cusz::device_api::spline3d_layout2_interpolate(
-    volatile T1 s_data[33][17][9],
-    volatile T2 s_ectrl[33][17][9],
+    volatile T1 s_data[9][17][33],
+    volatile T2 s_ectrl[9][17][33],
      DIM3    data_size,
     FP          eb_r,
     FP          ebx2,
@@ -1449,8 +1449,8 @@ __global__ void cusz::c_spline3d_infprecis_32x16x8data(
 
     {
         __shared__ struct {
-            T data[33][17][9];
-            T ectrl[33][17][9];
+            T data[9][17][33];
+            T ectrl[9][17][33];
 
            // T global_errs[6];
         } shmem;
@@ -1544,8 +1544,8 @@ __global__ void cusz::x_spline3d_infprecis_32x16x8data(
     using T = typename std::remove_pointer<TITER>::type;
 
     __shared__ struct {
-        T data[33][17][9];
-        T ectrl[33][17][9];
+        T data[9][17][33];
+        T ectrl[9][17][33];
     } shmem;
 
     x_reset_scratch_33x17x9data<T, T, LINEAR_BLOCK_SIZE>(shmem.data, shmem.ectrl, anchor, anchor_size, anchor_leap);
