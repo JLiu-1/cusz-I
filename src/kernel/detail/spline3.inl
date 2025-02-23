@@ -552,6 +552,8 @@ shmem2global_33x17x9data_with_compaction(volatile T1 s_buf[9][17][33], T2* dram_
         auto gy  = (y + BIY * BLOCK16);
         auto gz  = (z + BIZ * BLOCK8);
         auto gid = gx + gy * buf_leap.y + gz * buf_leap.z;
+        if(gid==18954436)
+            printf("%d %d %d %d %d %d %d %d %d\n",BIX,BIY,BIZ,x,y,z,gx,gy,gz);
 
         auto candidate = s_buf[z][y][x];
         bool quantizable = (candidate >= 0) and (candidate < 2*radius);
