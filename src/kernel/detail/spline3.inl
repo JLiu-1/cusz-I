@@ -153,7 +153,7 @@ spline3d_layout2_interpolate(volatile T1 s_data[33][17][9], volatile T2 s_ectrl[
 namespace {
 
 template <bool INCLUSIVE = true>
-__forceinline__ __device__ bool xyz17x17x17_predicate(unsigned int x, unsigned int y, unsigned int z,const DIM3 &data_size)
+__forceinline__ __device__ bool xyz33x17x9_predicate(unsigned int x, unsigned int y, unsigned int z,const DIM3 &data_size)
 {
     if CONSTEXPR (INCLUSIVE) {  //
 
@@ -284,9 +284,9 @@ __device__ void c_gather_anchor(T1* data, DIM3 data_size, STRIDE3 data_leap, T1*
     auto ay = (TIX / 4) % 2 + BIY * 2;
     auto az = (TIX / 4) / 2 + BIZ;
 
-    auto x = 8*ax;
-    auto y = 8*ay;
-    auto z = 8*az;
+    auto x = 8 * ax;
+    auto y = 8 * ay;
+    auto z = 8 * az;
 
     bool pred1 = TIX < 8;//8 is num of anchor
     bool pred2 = x < data_size.x and y < data_size.y and z < data_size.z;
@@ -295,13 +295,13 @@ __device__ void c_gather_anchor(T1* data, DIM3 data_size, STRIDE3 data_leap, T1*
         auto data_id      = x + y * data_leap.y + z * data_leap.z;
         auto anchor_id    = ax + ay * anchor_leap.y + az * anchor_leap.z;
         anchor[anchor_id] = data[data_id];
-        /*
+        
         if(TIX == 7 and BIX == 12 and BIY == 12 and BIZ == 8){
             printf("anchor: %d, %d, %.2e, %.2e,%d,%d,%d,%d\n", anchor_id,data_id,anchor[anchor_id],data[data_id],data_leap.y,data_leap.z,anchor_leap.y,anchor_leap.z);
         }
         if(TIX == 0 and BIX == 13 and BIY == 13 and BIZ == 9){
             printf("13139anchor: %d, %d, %.2e, %.2e\n", anchor_id,data_id,anchor[anchor_id],data[data_id]);
-        }*/
+        }
     }
     __syncthreads();
 }
@@ -359,12 +359,12 @@ __device__ void x_reset_scratch_33x17x9data(
 
             if (ax < anchor_size.x and ay < anchor_size.y and az < anchor_size.z)
                 s_xdata[z][y][x] = anchor[ax + ay * anchor_leap.y + az * anchor_leap.z];
-            /*
-            if(BIX == 11 and BIY == 12 and BIZ == 8){
+            
+            if(BIX == 12 and BIY == 12 and BIZ == 8){
                 printf("anchor: %d, %d, %d, %.2e\n", x, y,z,s_xdata[z][y][x]);
             if(BIX == 13 and BIY == 13 and BIZ == 9 and x==0 and y==0 and z==0)
                 printf("13139anchor: %d, %d, %d, %.2e\n", x, y,z,s_xdata[z][y][x]);
-            */
+            
         }
         /*****************************************************************************
          alternatively
@@ -605,7 +605,7 @@ __forceinline__ __device__ void interpolate_stage(
 
         
 
-        if (xyz17x17x17_predicate<BORDER_INCLUSIVE>(x, y, z,data_size)) {
+        if (xyz33x17x9_predicate<BORDER_INCLUSIVE>(x, y, z,data_size)) {
             T1 pred = 0;
 
             //if(BIX == 7 and BIY == 47 and BIZ == 15 and unit==4 and (CONSTEXPR (YELLOW)) )
