@@ -863,7 +863,7 @@ __forceinline__ __device__ void interpolate_stage(
                 s_data[z][y][x]  = pred + (code - radius) * ebx2;
 
                 if(BIX == 6 and BIY == 12 and BIZ == 16 and  x==4 and y==14 and z==0){
-                    printf("%d %d %d %d %.6e %.6e %.6e\n",BLUE,YELLOW,HOLLOW,unit,s_data[z ][y-3*unit][x],s_data[z ][y0unit][x],s_data[z][y+unit][x]);
+                    printf("%d %d %d %d %.6e %.6e %.6e\n",BLUE,YELLOW,HOLLOW,unit,s_data[z ][y-3*unit][x],s_data[z ][y-unit][x],s_data[z][y+unit][x]);
                     printf("004pred %.6e %.2e %.6e %.6e %.6e %d\n",pred,code,s_data[z][y][x],ebx2,eb_r,radius);
 
                 }
