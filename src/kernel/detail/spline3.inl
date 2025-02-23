@@ -861,8 +861,12 @@ __forceinline__ __device__ void interpolate_stage(
               
                 s_data[z][y][x]  = pred + (code - radius) * ebx2;
 
-                if(BIX == 6 and BIY == 12 and BIZ == 16 and  x==1 and y==15 and z==0)
-                        printf("004pred %.6e %.2e %.6e %.6e %.6e %.6e\n",pred,code,s_data[z][y][x],ebx2,eb_r,radius);
+                if(BIX == 6 and BIY == 12 and BIZ == 16 and  x==1 and y==15 and z==0){
+                    printf("%d %d %d\n",BLUE,YELLOW,HOLLOW);
+                    printf("004pred %.6e %.2e %.6e %.6e %.6e %d\n",pred,code,s_data[z][y][x],ebx2,eb_r,radius);
+
+                }
+                        
                    // if(BIX == 6 and BIY == 12 and BIZ == 16 and unit==4 and x==8 and y==8 and z==4)
                 
 
@@ -871,8 +875,11 @@ __forceinline__ __device__ void interpolate_stage(
                 auto code       = s_ectrl[z][y][x];
                 s_data[z][y][x] = pred + (code - radius) * ebx2;
                 
-                if(BIX == 6 and BIY == 12 and BIZ == 16 and  x==1 and y==15 and z==0)
-                        printf("004pred %.6e %.2e %.6e %.6e %.6e %.6e\n",pred,code,s_data[z][y][x],ebx2,eb_r,radius);
+                if(BIX == 6 and BIY == 12 and BIZ == 16 and  x==1 and y==15 and z==0){
+                    printf("%d %d %d\n",BLUE,YELLOW,HOLLOW);
+                    printf("004pred %.6e %.2e %.6e %.6e %.6e %d\n",pred,code,s_data[z][y][x],ebx2,eb_r,radius);
+                }
+                        
                   //  if(BIX == 6 and BIY == 12 and BIZ == 16 and unit==4 and x==8 and y==8 and z==4)
                   //      printf("884pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[8][8][0],s_data[8][8][8],s_data[8][8][8]);
                         
