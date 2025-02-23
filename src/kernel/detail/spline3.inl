@@ -887,7 +887,7 @@ __forceinline__ __device__ void interpolate_stage(
 
     if CONSTEXPR (COARSEN) {
         constexpr auto TOTAL = BLOCK_DIMX * BLOCK_DIMY * BLOCK_DIMZ;
-        //if( BLOCK_DIMX *BLOCK_DIMY<= LINEAR_BLOCK_SIZE){
+        if( BLOCK_DIMX *BLOCK_DIMY<= LINEAR_BLOCK_SIZE){
             for (auto _tix = TIX; _tix < TOTAL; _tix += LINEAR_BLOCK_SIZE) {
                 auto itix = (_tix % BLOCK_DIMX);
                 auto itiy = (_tix / BLOCK_DIMX) % BLOCK_DIMY;
@@ -898,9 +898,9 @@ __forceinline__ __device__ void interpolate_stage(
                 
                 run(x, y, z);
             }
-        //}
+        }
         //may have bug    
-        /*
+        
         else{
             for (auto _tix = TIX; _tix < TOTAL; _tix += LINEAR_BLOCK_SIZE) {
                 auto itix = (_tix % BLOCK_DIMX);
@@ -911,7 +911,7 @@ __forceinline__ __device__ void interpolate_stage(
                 auto z    = zmap(itiz, unit);
                 run(x, y, z);
             }
-        }*/
+        }
         //may have bug  end
         
     }
