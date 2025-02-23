@@ -488,7 +488,14 @@ __device__ void global2shmem_fuse(E* ectrl, dim3 ectrl_size, dim3 ectrl_leap, T*
         auto gz  = (z + BIZ * BLOCK8);
         auto gid = gx + gy * ectrl_leap.y + gz * ectrl_leap.z;
 
+
+
+
+
         if (gx < ectrl_size.x and gy < ectrl_size.y and gz < ectrl_size.z) s_ectrl[z][y][x] = static_cast<T>(ectrl[gid]) + scattered_outlier[gid];
+        if(BIX == 6 and BIY == 12 and BIZ == 16 and  x==4 and y==16 and z==0)
+            printf("%d %d\n",s_ectrl[z][y][x],gid,ectrl[gid],scattered_outlier[gid]);
+
     }
     __syncthreads();
 }
@@ -553,6 +560,11 @@ shmem2global_33x17x9data_with_compaction(volatile T1 s_buf[9][17][33], T2* dram_
             // TODO this is for algorithmic demo by reading from shmem
             // For performance purpose, it can be inlined in quantization
             dram_buf[gid] = quantizable * static_cast<T2>(candidate);
+
+            
+            if(BIX == 6 and BIY == 12 and BIZ == 16 and  x==4 and y==16 and z==0)
+                printf("%d %d\n",candidate,gid,dram_buf[gid]);
+
 
             if (not quantizable) {
                 auto cur_idx = atomicAdd(dram_compactnum, 1);
