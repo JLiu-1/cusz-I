@@ -37,6 +37,7 @@ class pszmempool_cxx {
   Compact *compact;
 
   pszmem_cxx<B> *_compressed;  // compressed
+  B *_compressed_rre1;  // final compressed
 
   size_t len;
   int radius, bklen;
