@@ -1,4 +1,4 @@
-/**
+ /**
  * @file spline3.inl
  * @author Jinyang Liu, Shixun Wu, Jiannan Tian
  * @brief
@@ -219,7 +219,7 @@ __device__ void c_reset_scratch_17x17x17data(volatile T1 s_data[17][17][17], vol
         /*****************************************************************************
          okay to use
          ******************************************************************************/
-        if (x % 8 == 0 and y % 8 == 0 and z % 8 == 0) s_ectrl[z][y][x] = radius;
+        if (x % 16 == 0 and y % 16 == 0 and z % 16 == 0) s_ectrl[z][y][x] = radius;
         /*****************************************************************************
          alternatively
          ******************************************************************************/
@@ -278,15 +278,15 @@ __device__ void c_gather_anchor_old(T1* data, DIM3 data_size, STRIDE3 data_leap,
 template <typename T1, int LINEAR_BLOCK_SIZE = DEFAULT_LINEAR_BLOCK_SIZE>
 __device__ void c_gather_anchor(T1* data, DIM3 data_size, STRIDE3 data_leap, T1* anchor, STRIDE3 anchor_leap)
 {
-    auto ax = (TIX % 2) + BIX * 2;//2 is block16 by anchor stride
-    auto ay = (TIX / 2) % 2 + BIY * 2;
-    auto az = (TIX / 2) / 2 + BIZ * 2;
+    auto ax =  BIX;//1 is block16 by anchor stride
+    auto ay = BIY ;
+    auto az = BIZ ;
 
-    auto x = 8*ax;
-    auto y = 8*ay;
-    auto z = 8*az;
+    auto x = 16*ax;
+    auto y = 16*ay;
+    auto z = 16*az;
 
-    bool pred1 = TIX < 8;//8 is num of anchor
+    bool pred1 = TIX < 1;//1 is num of anchor
     bool pred2 = x < data_size.x and y < data_size.y and z < data_size.z;
 
     if (pred1 and pred2) {
@@ -348,12 +348,12 @@ __device__ void x_reset_scratch_17x17x17data(
         /*****************************************************************************
          okay to use
          ******************************************************************************/
-        if (x % 8 == 0 and y % 8 == 0 and z % 8 == 0) {
+        if (x % 16 == 0 and y % 16 == 0 and z % 16 == 0) {
             s_xdata[z][y][x] = 0;
 
-            auto ax = ((x / 8) + BIX * 2);
-            auto ay = ((y / 8) + BIY * 2);
-            auto az = ((z / 8) + BIZ * 2);
+            auto ax = ((x / 16) + BIX );
+            auto ay = ((y / 16) + BIY );
+            auto az = ((z / 16) + BIZ );
 
             if (ax < anchor_size.x and ay < anchor_size.y and az < anchor_size.z)
                 s_xdata[z][y][x] = anchor[ax + ay * anchor_leap.y + az * anchor_leap.z];
@@ -1176,9 +1176,50 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate(
     }
     */
     
+    int unit = 8;
+    //int m = 2, n = 2, p = 2;//block8 nums;
+    calc_eb(unit);
+    //set_orders(reverse[2]);
+    if(intp_param.reverse[2]){
+        interpolate_stage<
+            T1, T2, FP, decltype(xhollow_reverse), decltype(yhollow_reverse), decltype(zhollow_reverse),  //
+            false, false, true, LINEAR_BLOCK_SIZE, 1, 2, NO_COARSEN, 2, BORDER_INCLUSIVE, WORKFLOW>(
+            s_data, s_ectrl,data_size, xhollow_reverse, yhollow_reverse, zhollow_reverse, unit, cur_eb_r, cur_ebx2, radius, intp_param.interpolators[0]);
+
+        interpolate_stage<
+            T1, T2, FP, decltype(xyellow_reverse), decltype(yyellow_reverse), decltype(zyellow_reverse),  //
+            false, true, false, LINEAR_BLOCK_SIZE, 3, 1, NO_COARSEN, 2, BORDER_INCLUSIVE, WORKFLOW>(
+            s_data, s_ectrl,data_size, xyellow_reverse, yyellow_reverse, zyellow_reverse, unit, cur_eb_r, cur_ebx2, radius, intp_param.interpolators[1]);
+        interpolate_stage<
+            T1, T2, FP, decltype(xblue_reverse), decltype(yblue_reverse), decltype(zblue_reverse),  //
+            true, false, false, LINEAR_BLOCK_SIZE, 3, 3, NO_COARSEN, 1, BORDER_INCLUSIVE, WORKFLOW>(
+            s_data, s_ectrl,data_size, xblue_reverse, yblue_reverse, zblue_reverse, unit, cur_eb_r, cur_ebx2, radius, intp_param.interpolators[2]);
 
 
-    int unit = 4;
+    }
+    else{
+        //if( BIX==0 and BIY==0 and BIZ==0)
+       // printf("lv3s0\n");
+        interpolate_stage<
+            T1, T2, FP, decltype(xblue), decltype(yblue), decltype(zblue),  //
+            true, false, false, LINEAR_BLOCK_SIZE, 2, 2, NO_COARSEN, 1, BORDER_INCLUSIVE, WORKFLOW>(
+            s_data, s_ectrl,data_size, xblue, yblue, zblue, unit, cur_eb_r, cur_ebx2, radius, intp_param.interpolators[0]);
+       // if(BIX==0 and BIY==0 and BIZ==0)
+       // printf("lv3s1\n");
+        interpolate_stage<
+            T1, T2, FP, decltype(xyellow), decltype(yyellow), decltype(zyellow),  //
+            false, true, false, LINEAR_BLOCK_SIZE, 2, 1, NO_COARSEN, 3, BORDER_INCLUSIVE, WORKFLOW>(
+            s_data, s_ectrl,data_size, xyellow, yyellow, zyellow, unit, cur_eb_r, cur_ebx2, radius, intp_param.interpolators[1]);
+        //if(BIX==0 and BIY==0 and BIZ==0)
+      //  printf("lv3s2\n");
+        interpolate_stage<
+            T1, T2, FP, decltype(xhollow), decltype(yhollow), decltype(zhollow),  //
+            false, false, true, LINEAR_BLOCK_SIZE, 1, 3, NO_COARSEN, 3, BORDER_INCLUSIVE, WORKFLOW>(
+            s_data, s_ectrl,data_size, xhollow, yhollow, zhollow, unit, cur_eb_r, cur_ebx2, radius, intp_param.interpolators[2]);
+    }
+
+
+    unit = 4;
     //int m = 2, n = 2, p = 2;//block8 nums;
     calc_eb(unit);
     //set_orders(reverse[2]);
