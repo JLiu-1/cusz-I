@@ -949,6 +949,8 @@ __forceinline__ __device__ void interpolate_stage(
                 auto x    = xmap(itix, 1);//1 was unit
                 auto y    = ymap(itiy, 1);//1 was unit
                 auto z    = zmap(itiz, 1);//1 was unit
+                 if(BIX == 1 and BIY == 1 and BIZ == 0 and unit==8)
+                     printf("1108 %d %d %d\n",x,y,z);
                 
                 run(x, y, z);
             }
