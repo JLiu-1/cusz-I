@@ -394,9 +394,9 @@ __device__ void global2shmem_17x17x17data(T1* data, DIM3 data_size, STRIDE3 data
         auto gz  = (z + BIZ * BLOCK16)*unit;
         auto gid = gx + gy * data_leap.y + gz * data_leap.z;
 
-        if(BIX == 0 and BIY == 0 and BIZ == 0 and x==0 and y==0 and z==0){
-            printf("%d \n",data_leap.y,data_leap.z);
-        }
+        //if(BIX == 0 and BIY == 0 and BIZ == 0 and x==0 and y==0 and z==0){
+        //    printf("%d \n",data_leap.y,data_leap.z);
+       // }
 
         if (gx < data_size.x and gy < data_size.y and gz < data_size.z) s_data[z][y][x] = data[gid];
 /*
@@ -707,8 +707,9 @@ __forceinline__ __device__ void interpolate_stage(
                 }
 
                 if CONSTEXPR (HOLLOW) {  //
-                    //if(BIX == 23 and BIY == 23 and BIZ == 15 and unit==1)
-                    //    printf("%d %d %d %d %d %d\n",x,y,z,global_x,global_y,global_z);
+                    if(BIX == 23 and BIY == 23 and BIZ == 15 and unit==1)
+                        printf("%d %d %d %d %d %d\n",x,y,z,global_x,global_y,global_z);
+                    /*
                     if(BIX!=GDX-1){
                         if(x>=3 and x+3<=BLOCK16 )
                             pred = (-s_data[z ][y][x- 3]+9*s_data[z ][y][x- 1] + 9*s_data[z ][y][x + 1]-s_data[z ][y][x + 3]) / 16;
@@ -738,6 +739,7 @@ __forceinline__ __device__ void interpolate_stage(
                                 pred=s_data[z ][y][x- 1];
                         } 
                     }
+                    */
                 }
 
             }
