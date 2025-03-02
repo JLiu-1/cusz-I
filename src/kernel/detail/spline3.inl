@@ -394,9 +394,9 @@ __device__ void global2shmem_17x17x17data(T1* data, DIM3 data_size, STRIDE3 data
         auto gz  = (z + BIZ * BLOCK16)*unit;
         auto gid = gx + gy * data_leap.y + gz * data_leap.z;
 
-        if(gx==97 and gy==120 and gz==54){
-            printf("%d %d %d %d %d %d\n",BIX,BIY,BIZ,x,y,z);
-        }
+        //if(gx==97 and gy==120 and gz==54){
+        //    printf("%d %d %d %d %d %d\n",BIX,BIY,BIZ,x,y,z);
+        //}
 
         //if(BIX == 0 and BIY == 0 and BIZ == 0 and x==0 and y==0 and z==0){
         //    printf("%d \n",data_leap.y,data_leap.z);
@@ -912,16 +912,19 @@ __forceinline__ __device__ void interpolate_stage(
                
 
                 s_data[z][y][x]  = pred + (code - radius) * ebx2;
-               // if(BIX == 1 and BIY == 1 and BIZ == 0 and unit==8)
+                //if(BIX == 1 and BIY == 1 and BIZ == 0 and unit==8)
                 //     printf("%d %d %d\n",x,y,z);
-               // if(BIX == 1 and BIY == 1 and BIZ == 0 and unit==8 and x==0 and y==0 and z==5)
-                //        printf("110005pred %.2e %.2e %.2e\n",pred,code,s_data[z][y][x]);
+               if(BIX == 6 and BIY == 7 and BIZ == 3 and unit==1 and x==1 and y==8 and z==6)
+                       printf("673186pred %.2e %.2e %.2e\n",pred,code,s_data[z][y][x]);
                 
 
             }
             else {  // TODO == DECOMPRESSS and static_assert
                 auto code       = s_ectrl[z][y][x];
                 s_data[z][y][x] = pred + (code - radius) * ebx2;
+
+                if(BIX == 6 and BIY == 7 and BIZ == 3 and unit==1 and x==1 and y==8 and z==6)
+                       printf("673186pred %.2e %.2e %.2e\n",pred,code,s_data[z][y][x]);
                // if(BIX == 1 and BIY == 1 and BIZ == 0 and unit==8)
                //      printf("%d %d %d\n",x,y,z);
                // if(BIX == 1 and BIY == 1 and BIZ == 0 and unit==8 and x==0 and y==0 and z==5)
