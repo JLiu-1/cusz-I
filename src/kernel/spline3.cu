@@ -132,19 +132,7 @@ int spline_construct(
   
   }
 
-      cur_ebx2=ebx2,cur_eb_r=eb_r;
-      int temp=1;
-      while(temp<unit){
-          temp*=2;
-          cur_eb_r *= intp_param.alpha;
-          cur_ebx2 /= intp_param.alpha;
 
-      }
-      if(cur_ebx2 < ebx2 / intp_param.beta){
-          cur_ebx2 = ebx2 / intp_param.beta;
-          cur_eb_r = eb_r * intp_param.beta;
-
-      }
 
 
   for(int unit:{8,4,2,1}){
