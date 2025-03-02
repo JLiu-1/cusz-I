@@ -132,6 +132,8 @@ COR::compress_predict(pszctx* ctx, T* in, void* stream)
     ctx->splen = mem->compact->num_outliers();
   }
 
+  mem->e->control({D2H})->file(ofn("cuszi_quant.test"), ToFile);//add
+
   return this;
 }
 
