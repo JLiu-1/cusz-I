@@ -1361,7 +1361,7 @@ __global__ void cusz::c_spline3d_infprecis_16x16x16data_dynamic(
         c_reset_scratch_17x17x17data<T, T, LINEAR_BLOCK_SIZE>(shmem.data, shmem.ectrl, radius, on_anchor);
         if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
             printf("reset\n");
-        if(unit!=1)
+        //if(unit!=1)
      
         global2shmem_17x17x17data<T, T, LINEAR_BLOCK_SIZE>(data, data_size, data_leap, shmem.data,unit);
 
