@@ -583,7 +583,7 @@ shmem2global_17x17x17data_with_compaction(volatile T1 s_buf[17][17][17], T2* dra
             auto gid = gx + gy*bsx+gz*(bsx*bsy);
 
             if(level < 4){//non-anchor
-                gid+ = (bsx>>1)*(bsy>>1)*(bsz>>1)-((gz+1)>>2)*((bsy+1)>>2)*((bsx+1)>>2)-(gz%2==0)*((gy+1)>>2)*((bsx+1)>>2)-(gz%2==0 and gy%2==0)*((gx+1)>>2);
+                gid+ = (bsx>>1)*(bsy>>1)*(bsz>>1)-((gz+1)>>2)*((bsy+1)>>2)*((bsx+1)>>2)-(gz%2==0)*((gy+1)>>2)*((bsx+1)>>2)-(gz%2==0 && gy%2==0)*((gx+1)>>2);
             }
 
             // TODO this is for algorithmic demo by reading from shmem
