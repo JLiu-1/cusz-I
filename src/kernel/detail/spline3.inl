@@ -1354,7 +1354,7 @@ __global__ void cusz::c_spline3d_infprecis_16x16x16data_dynamic(
        }
        */
         
-
+        printf("%d\n",unit);
         c_reset_scratch_17x17x17data<T, T, LINEAR_BLOCK_SIZE>(shmem.data, shmem.ectrl, radius, on_anchor);
         if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
             printf("reset\n");
@@ -1368,12 +1368,13 @@ __global__ void cusz::c_spline3d_infprecis_16x16x16data_dynamic(
         // version 1, use shmem, erroneous
         // c_gather_anchor<T>(shmem.data, anchor, anchor_leap);
         // version 2, use global mem, correct
-        if(on_anchor)
+        if(on_anchor){
             c_gather_anchor<T>(data, data_size, data_leap, anchor, anchor_leap);
+        
 
-        if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
-            printf("anc\n");
-       
+            if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
+                printf("anc\n");
+        }
 
 
         cusz::device_api::spline3d_layout2_interpolate<T, T, FP,LINEAR_BLOCK_SIZE, SPLINE3_COMPR, false>(
