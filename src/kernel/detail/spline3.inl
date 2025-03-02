@@ -394,6 +394,10 @@ __device__ void global2shmem_17x17x17data(T1* data, DIM3 data_size, STRIDE3 data
         auto gz  = (z + BIZ * BLOCK16)*unit;
         auto gid = gx + gy * data_leap.y + gz * data_leap.z;
 
+        if(BIX == 0 and BIY == 0 and BIZ == 0 and x==0 and y==0 and z==0){
+            printf("%d \n",data_leap.y,data_leap.z);
+        }
+
         if (gx < data_size.x and gy < data_size.y and gz < data_size.z) s_data[z][y][x] = data[gid];
 /*
         if(BIX == 7 and BIY == 47 and BIZ == 15 and x==10 and y==8 and z==4){
@@ -1165,7 +1169,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate(
         //may have bug end
     }
     else{
-       /*
+       
         interpolate_stage<
             T1, T2, FP, decltype(xblue), decltype(yblue), decltype(zblue),  //
             true, false, false, LINEAR_BLOCK_SIZE, 9, 9, COARSEN, 8, BORDER_INCLUSIVE, WORKFLOW>(
@@ -1174,7 +1178,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate(
             T1, T2, FP, decltype(xyellow), decltype(yyellow), decltype(zyellow),  //
             false, true, false, LINEAR_BLOCK_SIZE, 9, 8, COARSEN, 17, BORDER_INCLUSIVE, WORKFLOW>(
             s_data, s_ectrl,data_size, xyellow, yyellow, zyellow, unit, eb_r, ebx2, radius, intp_param.interpolators[1]);
-         */
+         
         interpolate_stage<
             T1, T2, FP, decltype(xhollow), decltype(yhollow), decltype(zhollow),  //
             false, false, true, LINEAR_BLOCK_SIZE, 8, 17, COARSEN, 17, BORDER_EXCLUSIVE, WORKFLOW>(
