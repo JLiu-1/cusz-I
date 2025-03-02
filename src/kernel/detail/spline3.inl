@@ -927,9 +927,9 @@ __forceinline__ __device__ void interpolate_stage(
                 auto code       = s_ectrl[z][y][x];
                 s_data[z][y][x] = pred + (code - radius) * ebx2;
 
-                if(BIX == 2 and BIY == 3 and BIZ == 1 and unit==2 and x==16 and y==12 and z==1)
+                if(BIX == 2 and BIY == 3 and BIZ == 1 and unit==2 and x==16 and y==12 and z==11)
                        printf("23116121pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[z-1][y][x],s_data[z+1][y][x],s_data[z+3][y][x]);
-                if(BIX == 3 and BIY == 3 and BIZ == 1 and unit==2 and x==0 and y==12 and z==1)
+                if(BIX == 3 and BIY == 3 and BIZ == 1 and unit==2 and x==0 and y==12 and z==11)
                        printf("3310121pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[z-1][y][x],s_data[z+1][y][x],s_data[z+3][y][x]);
 
                 //if(BIX == 6 and BIY == 7 and BIZ == 3 and unit==1 and x==0 and y==8 and z==6)
