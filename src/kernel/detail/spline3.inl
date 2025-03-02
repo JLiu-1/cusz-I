@@ -677,7 +677,50 @@ __forceinline__ __device__ void interpolate_stage(
             auto b=interpolation_coeff_set2[interpolator];
             auto c=interpolation_coeff_set3[interpolator];
             */
-            if(interpolator==0){
+            if(unit == 8){
+                if CONSTEXPR (BLUE) {  //
+
+                    if(BIZ!=GDZ-1 or global_z+unit<data_size.z){
+
+                        
+                        pred = (s_data[z - 1][y][x] + s_data[z + 1][y][x]) / 2;
+                    }
+                    else{
+                        pred=s_data[z - 1][y][x];
+                        
+                    }
+                }
+                if CONSTEXPR (YELLOW) {  //
+                   // if(BIX == 5 and BIY == 22 and BIZ == 6 and unit==1 and x==29 and y==7 and z==0){
+                   //     printf("%.2e %.2e %.2e %.2e\n",s_data[z ][y- 3*unit][x],s_data[z ][y- unit][x],s_data[z ][y+ unit][x]);
+                  //  }
+                    if(BIY!=GDY-1 or global_y+unit<data_size.y){
+                    
+                        pred = (s_data[z][y - 1][x] + s_data[z][y + 1][x]) / 2;
+                    }
+                    else{
+                        
+                        pred=s_data[z ][y- 1][x];
+                    }
+                        
+                }
+
+                if CONSTEXPR (HOLLOW) {  //
+
+                    
+                    if(BIX!=GDX-1 or global_x+unit<data_size.x){
+                        pred = (s_data[z][y][x - 1] + s_data[z][y][x + 1]) / 2;
+                    }
+                    else{
+                        
+                        pred=s_data[z][y][x- 1];
+                        
+                    }
+                    
+                }
+
+            }
+            else if(interpolator==0){
                 if CONSTEXPR (BLUE) {  //
 
                     if(BIZ!=GDZ-1){
