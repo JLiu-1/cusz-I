@@ -1482,7 +1482,7 @@ __global__ void cusz::x_spline3d_infprecis_16x16x16data_dynamic(
 
     // global2shmem_33x9x9data<E, T, LINEAR_BLOCK_SIZE>(ectrl, ectrl_size, ectrl_leap, shmem.ectrl);
     if(!on_anchor)
-        global2shmem_17x17x17data_9x9x9(data, data_size, data_leap, shmem.data, int unit);
+        global2shmem_17x17x17data_9x9x9<T, T, LINEAR_BLOCK_SIZE>(data, data_size, data_leap, shmem.data, int unit);
     global2shmem_fuse<T, E, LINEAR_BLOCK_SIZE>(ectrl, ectrl_size, ectrl_leap, data, shmem.ectrl, unit);
 
 
