@@ -135,7 +135,7 @@ int spline_construct(
 
 
 
-  for(int unit:{8,4,2,1}){
+  for(int unit:{8,4,2}){
       auto cur_ebx2=ebx2;
       auto cur_eb_r=eb_r;
       int temp=1;
@@ -152,7 +152,6 @@ int spline_construct(
       }
     auto grid_dim =
         dim3(div(l3.x, BLOCK*unit ), div(l3.y, BLOCK*unit ), div(l3.z, BLOCK*unit));
-    printf("%d\n",unit);
     cusz::c_spline3d_infprecis_16x16x16data_dynamic<T*, E*, float, DEFAULT_BLOCK_SIZE>  //
         <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>(
             data->dptr(), data->template len3<dim3>(),
