@@ -159,10 +159,10 @@ __forceinline__ __device__ bool xyz17x17x17_predicate(unsigned int x, unsigned i
     if CONSTEXPR (INCLUSIVE) {  //
 
         
-            return (x*unit <= BLOCK16 and y*unit <= BLOCK16 and z*unit <= BLOCK16) and (BIX*BLOCK16+x)*unit<data_size.x and (BIY*BLOCK16+y)*unit<data_size.y and (BIZ*BLOCK16+z)*unit<data_size.z;
+            return (x <= BLOCK16 and y <= BLOCK16 and z <= BLOCK16) and (BIX*BLOCK16+x)*unit<data_size.x and (BIY*BLOCK16+y)*unit<data_size.y and (BIZ*BLOCK16+z)*unit<data_size.z;
     }
     else {
-        return x*unit < BLOCK16+(BIX==GDX-1) and y*unit < BLOCK16+(BIY==GDY-1) and z*unit < BLOCK16+(BIZ==GDZ-1) and (BIX*BLOCK16+x)*unit<data_size.x and (BIY*BLOCK16+y)*unit<data_size.y and (BIZ*BLOCK16+z)*unit<data_size.z;
+        return x < BLOCK16+(BIX==GDX-1) and y < BLOCK16+(BIY==GDY-1) and z < BLOCK16+(BIZ==GDZ-1) and (BIX*BLOCK16+x)*unit<data_size.x and (BIY*BLOCK16+y)*unit<data_size.y and (BIZ*BLOCK16+z)*unit<data_size.z;
     }
 }
 
@@ -908,20 +908,20 @@ __forceinline__ __device__ void interpolate_stage(
                
 
                 s_data[z][y][x]  = pred + (code - radius) * ebx2;
-                if(BIX == 1 and BIY == 1 and BIZ == 0 and unit==8)
-                     printf("%d %d %d\n",x,y,z);
-                if(BIX == 1 and BIY == 1 and BIZ == 0 and unit==8 and x==0 and y==0 and z==5)
-                        printf("110005pred %.2e %.2e %.2e\n",pred,code,s_data[z][y][x]);
+               // if(BIX == 1 and BIY == 1 and BIZ == 0 and unit==8)
+                //     printf("%d %d %d\n",x,y,z);
+               // if(BIX == 1 and BIY == 1 and BIZ == 0 and unit==8 and x==0 and y==0 and z==5)
+                //        printf("110005pred %.2e %.2e %.2e\n",pred,code,s_data[z][y][x]);
                 
 
             }
             else {  // TODO == DECOMPRESSS and static_assert
                 auto code       = s_ectrl[z][y][x];
                 s_data[z][y][x] = pred + (code - radius) * ebx2;
-                if(BIX == 1 and BIY == 1 and BIZ == 0 and unit==8)
-                     printf("%d %d %d\n",x,y,z);
-                if(BIX == 1 and BIY == 1 and BIZ == 0 and unit==8 and x==0 and y==0 and z==5)
-                        printf("110005pred %.2e %.2e %.2e\n",pred,code,s_data[z][y][x]);
+               // if(BIX == 1 and BIY == 1 and BIZ == 0 and unit==8)
+               //      printf("%d %d %d\n",x,y,z);
+               // if(BIX == 1 and BIY == 1 and BIZ == 0 and unit==8 and x==0 and y==0 and z==5)
+               //         printf("110005pred %.2e %.2e %.2e\n",pred,code,s_data[z][y][x]);
                 /*
                 if(BIX == 12 and BIY == 12 and BIZ == 8 and unit==4 and x==0 and y==0 and z==4)
                         printf("004pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[0][0][0],s_data[0][0][8],s_data[0][0][16]);
@@ -949,8 +949,8 @@ __forceinline__ __device__ void interpolate_stage(
                 auto x    = xmap(itix, 1);//1 was unit
                 auto y    = ymap(itiy, 1);//1 was unit
                 auto z    = zmap(itiz, 1);//1 was unit
-                 if(BIX == 1 and BIY == 1 and BIZ == 0 and unit==8)
-                     printf("1108 %d %d %d\n",x,y,z);
+                 //if(BIX == 1 and BIY == 1 and BIZ == 0 and unit==8)
+                  //   printf("1108 %d %d %d\n",x,y,z);
                 
                 run(x, y, z);
             }
