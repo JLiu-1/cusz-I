@@ -703,8 +703,8 @@ __forceinline__ __device__ void interpolate_stage(
                 }
 
                 if CONSTEXPR (HOLLOW) {  //
-                    //if(BIX == 5 and BIY == 22 and BIZ == 6 and unit==1)
-                    //    printf("%d %d %d\n",x,y,z);
+                    if(BIX == 23 and BIY == 23 and BIZ == 15 and unit==1)
+                        printf("%d %d %d %d %d %d\n",x,y,z,global_x,global_y,global_z);
                     if(BIX!=GDX-1){
                         if(x>=3 and x+3<=BLOCK16 )
                             pred = (-s_data[z ][y][x- 3]+9*s_data[z ][y][x- 1] + 9*s_data[z ][y][x + 1]-s_data[z ][y][x + 3]) / 16;
@@ -1174,12 +1174,12 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate(
             T1, T2, FP, decltype(xyellow), decltype(yyellow), decltype(zyellow),  //
             false, true, false, LINEAR_BLOCK_SIZE, 9, 8, COARSEN, 17, BORDER_INCLUSIVE, WORKFLOW>(
             s_data, s_ectrl,data_size, xyellow, yyellow, zyellow, unit, eb_r, ebx2, radius, intp_param.interpolators[1]);
-         /*
+         
         interpolate_stage<
             T1, T2, FP, decltype(xhollow), decltype(yhollow), decltype(zhollow),  //
             false, false, true, LINEAR_BLOCK_SIZE, 8, 17, COARSEN, 17, BORDER_EXCLUSIVE, WORKFLOW>(
             s_data, s_ectrl,data_size, xhollow, yhollow, zhollow, unit, eb_r, ebx2, radius, intp_param.interpolators[2]);
-          */ 
+         
 
     }
   //  if(TIX==0 and TIY==0 and TIZ==0 and BIX==0 and BIY==0 and BIZ==0)
