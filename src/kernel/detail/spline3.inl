@@ -1646,6 +1646,8 @@ __global__ void cusz::x_spline3d_infprecis_16x16x16data(
     __shared__ struct {
         T data[17][17][17];
         T ectrl[17][17][17];
+        STRIDE3 grid_leaps[5];
+        size_t prefix_nums[5];
         //uint64_t L16_num;
         //uint64_t L8_num;
         //uint64_t L4_num;
