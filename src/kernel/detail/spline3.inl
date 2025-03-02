@@ -502,7 +502,7 @@ __device__ void global2shmem_fuse(E* ectrl, dim3 ectrl_size, dim3 ectrl_leap, T*
             auto gid = gx + gy*bsx+gz*(bsx*bsy);
 
             if(level < 4){//non-anchor
-                gid+ = (bsx>>1)*(bsy>>1)*(bsz>>1)-((gz+1)>>2)*((bsy+1)>>2)*((bsx+1)>>2)-(gz%2==0)*((gy+1)>>2)*((bsx+1)>>2)-(gz%2==0 and gy%2==0)*((gx+1)>>2);
+                gid += (bsx>>1)*(bsy>>1)*(bsz>>1)-((gz+1)>>2)*((bsy+1)>>2)*((bsx+1)>>2)-(gz%2==0)*((gy+1)>>2)*((bsx+1)>>2)-(gz%2==0 && gy%2==0)*((gx+1)>>2);
             }
 
             s_ectrl[z][y][x] = static_cast<T>(ectrl[gid]) + scattered_outlier[gid];
