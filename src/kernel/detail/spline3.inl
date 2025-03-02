@@ -1356,22 +1356,23 @@ __global__ void cusz::c_spline3d_infprecis_16x16x16data_dynamic(
         
 
         c_reset_scratch_17x17x17data<T, T, LINEAR_BLOCK_SIZE>(shmem.data, shmem.ectrl, radius, on_anchor);
-        //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
-        //    printf("reset\n");
+        if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
+            printf("reset\n");
         //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
         //    printf("dsz: %d %d %d\n",data_size.x,data_size.y,data_size.z);
 
         global2shmem_17x17x17data<T, T, LINEAR_BLOCK_SIZE>(data, data_size, data_leap, shmem.data,unit);
 
-       // if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
-        //    printf("g2s\n");
+        if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
+            printf("g2s\n");
         // version 1, use shmem, erroneous
         // c_gather_anchor<T>(shmem.data, anchor, anchor_leap);
         // version 2, use global mem, correct
         if(on_anchor)
             c_gather_anchor<T>(data, data_size, data_leap, anchor, anchor_leap);
 
-
+        if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
+            printf("anc\n");
        
 
 
@@ -1380,8 +1381,8 @@ __global__ void cusz::c_spline3d_infprecis_16x16x16data_dynamic(
         
         
 
-        //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
-        //    printf("interp\n");
+        if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
+            printf("interp\n");
         //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
          //   printf("esz: %d %d %d\n",ectrl_size.x,ectrl_size.y,ectrl_size.z);
 
@@ -1392,8 +1393,8 @@ __global__ void cusz::c_spline3d_infprecis_16x16x16data_dynamic(
 
         // shmem2global_32x8x8data<T, E, LINEAR_BLOCK_SIZE>(shmem.ectrl, ectrl, ectrl_size, ectrl_leap);
 
-        //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
-        //    printf("s2g\n");
+        if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
+            printf("s2g\n");
     }
 }
 
