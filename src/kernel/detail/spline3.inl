@@ -554,7 +554,7 @@ shmem2global_17x17x17data_with_compaction(volatile T1 s_buf[17][17][17], T2* dra
         auto candidate = s_buf[z][y][x];
         bool quantizable = (candidate >= 0) and (candidate < 2*radius);
         //todo: revise the condition
-        if (!(unit != 8 and x%2==0 and y%2==0 and z%2==0)  and gx < buf_size.x and gy < buf_size.y and gz < buf_size.z) {
+        if ((!(unit != 8 and x%2==0 and y%2==0 and z%2==0))  and gx < buf_size.x and gy < buf_size.y and gz < buf_size.z) {
             // TODO this is for algorithmic demo by reading from shmem
             // For performance purpose, it can be inlined in quantization
             dram_buf[gid] = quantizable * static_cast<T2>(candidate);
