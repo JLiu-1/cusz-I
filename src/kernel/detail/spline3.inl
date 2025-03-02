@@ -412,6 +412,39 @@ __device__ void global2shmem_17x17x17data(T1* data, DIM3 data_size, STRIDE3 data
 }
 
 template <typename T1, typename T2, int LINEAR_BLOCK_SIZE = DEFAULT_LINEAR_BLOCK_SIZE>
+__device__ void global2shmem_17x17x17data_9x9x9(T1* data, DIM3 data_size, STRIDE3 data_leap, volatile T2 s_data[17][17][17], int unit = 1)
+{
+    constexpr auto TOTAL = 9 * 9 * 9;
+
+    for (auto _tix = TIX; _tix < TOTAL; _tix += LINEAR_BLOCK_SIZE) {
+        auto x   = ((_tix % 9))*2;
+        auto y   = ((_tix / 9) % 9)*2;
+        auto z   = ((_tix / 9) / 9)*2;
+        auto gx  = (x + BIX * BLOCK16)*unit;
+        auto gy  = (y + BIY * BLOCK16)*unit;
+        auto gz  = (z + BIZ * BLOCK16)*unit;
+        auto gid = gx + gy * data_leap.y + gz * data_leap.z;
+
+        //if(BIX == 0 and BIY == 0 and BIZ == 0 and x==0 and y==0 and z==0){
+        //    printf("%d \n",data_leap.y,data_leap.z);
+       // }
+
+        if (gx < data_size.x and gy < data_size.y and gz < data_size.z) s_data[z][y][x] = data[gid];
+/*
+        if(BIX == 7 and BIY == 47 and BIZ == 15 and x==10 and y==8 and z==4){
+            printf("g2s1084 %d %d %d %d %.2e %.2e \n",gx,gy,gz,gid,s_data[z][y][x],data[gid]);
+        }
+
+        if(BIX == 7 and BIY == 47 and BIZ == 15 and x==10 and y==4 and z==8){
+            printf("g2s1048 %d %d %d %d %.2e %.2e \n",gx,gy,gz,gid,s_data[z][y][x],data[gid]);
+        }*/
+    }
+    __syncthreads();
+}
+
+
+
+template <typename T1, typename T2, int LINEAR_BLOCK_SIZE = DEFAULT_LINEAR_BLOCK_SIZE>
 __device__ void global2shmem_profiling_16x16x16data(T1* data, DIM3 data_size, STRIDE3 data_leap, volatile T2 s_data[16][16][16])
 {
     constexpr auto TOTAL = 16 * 16 * 16;
@@ -1448,7 +1481,10 @@ __global__ void cusz::x_spline3d_infprecis_16x16x16data_dynamic(
     //        printf("esz: %d %d %d\n",ectrl_size.x,ectrl_size.y,ectrl_size.z);
 
     // global2shmem_33x9x9data<E, T, LINEAR_BLOCK_SIZE>(ectrl, ectrl_size, ectrl_leap, shmem.ectrl);
+    if(!on_anchor)
+        global2shmem_17x17x17data_9x9x9(data, data_size, data_leap, shmem.data, int unit);
     global2shmem_fuse<T, E, LINEAR_BLOCK_SIZE>(ectrl, ectrl_size, ectrl_leap, data, shmem.ectrl, unit);
+
 
     cusz::device_api::spline3d_layout2_interpolate<T, T, FP, LINEAR_BLOCK_SIZE, SPLINE3_DECOMPR, false>(
         shmem.data, shmem.ectrl, data_size, eb_r, ebx2, radius, intp_param, unit);
