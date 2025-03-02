@@ -1402,7 +1402,7 @@ template <
     typename TITER,
     typename FP,
     int LINEAR_BLOCK_SIZE>
-__global__ void cusz::x_spline3d_infprecis_16x16x16data(
+__global__ void cusz::x_spline3d_infprecis_16x16x16data_dynamic(
     EITER   ectrl,        // input 1
     DIM3    ectrl_size,   //
     STRIDE3 ectrl_leap,   //
