@@ -487,13 +487,14 @@ __device__ void global2shmem_fuse(E* ectrl, dim3 ectrl_size, dim3 ectrl_leap, T*
         //auto gid = gx + gy * ectrl_leap.y + gz * ectrl_leap.z;
 
         if (gx < ectrl_size.x and gy < ectrl_size.y and gz < ectrl_size.z) {
+            //todo: pre-compute the leaps and their halves
 
             auto bsx = ectrl_size.x, bsy=ectrl_size.y, bsz = ectrl_size.z;
             int level = 0;
             while(gx%2==0 and gy%2==0 and gz%2==0 and level <= 3){
-                bsx=bsx>>1;
-                bsy=bsy>>1;
-                bsz=bsz>>1;
+                bsx=(bsx+1)>>1;
+                bsy=(bsy+1)>>1;
+                bsz=(bsz+1)>>1;
                 gx=gx>>1;
                 gy=gy>>1;
                 gz=gz>>1;
@@ -502,7 +503,7 @@ __device__ void global2shmem_fuse(E* ectrl, dim3 ectrl_size, dim3 ectrl_leap, T*
             auto gid = gx + gy*bsx+gz*(bsx*bsy);
 
             if(level < 4){//non-anchor
-                gid += (bsx>>1)*(bsy>>1)*(bsz>>1)-((gz+1)>>2)*((bsy+1)>>2)*((bsx+1)>>2)-(gz%2==0)*((gy+1)>>2)*((bsx+1)>>2)-(gz%2==0 && gy%2==0)*((gx+1)>>2);
+                gid += ((bsx+1)>>1)*((bsy+1)>>1)*((bsz+1)>>1)-((gz+1)>>1)*((bsy+1)>>1)*((bsx+1)>>1)-(gz%2==0)*((gy+1)>>1)*((bsx+1)>>1)-(gz%2==0 && gy%2==0)*((gx+1)>>1);
             }
 
             s_ectrl[z][y][x] = static_cast<T>(ectrl[gid]) + scattered_outlier[gid];
@@ -571,10 +572,11 @@ shmem2global_17x17x17data_with_compaction(volatile T1 s_buf[17][17][17], T2* dra
 
             auto bsx = buf_size.x, bsy=buf_size.y, bsz = buf_size.z;
             int level = 0;
+            //todo: pre-compute the leaps and their halves
             while(gx%2==0 and gy%2==0 and gz%2==0 and level <= 3){
-                bsx=bsx>>1;
-                bsy=bsy>>1;
-                bsz=bsz>>1;
+                bsx=(bsx+1)>>1;
+                bsy=(bsy+1)>>1;
+                bsz=(bsz+1)>>1;
                 gx=gx>>1;
                 gy=gy>>1;
                 gz=gz>>1;
@@ -583,7 +585,7 @@ shmem2global_17x17x17data_with_compaction(volatile T1 s_buf[17][17][17], T2* dra
             auto gid = gx + gy*bsx+gz*(bsx*bsy);
 
             if(level < 4){//non-anchor
-                gid += (bsx>>1)*(bsy>>1)*(bsz>>1)-((gz+1)>>2)*((bsy+1)>>2)*((bsx+1)>>2)-(gz%2==0)*((gy+1)>>2)*((bsx+1)>>2)-(gz%2==0 && gy%2==0)*((gx+1)>>2);
+                gid += ((bsx+1)>>1)*((bsy+1)>>1)*((bsz+1)>>1)-((gz+1)>>1)*((bsy+1)>>1)*((bsx+1)>>1)-(gz%2==0)*((gy+1)>>1)*((bsx+1)>>1)-(gz%2==0 && gy%2==0)*((gx+1)>>1);
             }
 
             // TODO this is for algorithmic demo by reading from shmem
