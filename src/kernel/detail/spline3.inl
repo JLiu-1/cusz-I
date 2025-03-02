@@ -1353,9 +1353,9 @@ __global__ void cusz::c_spline3d_infprecis_16x16x16data_dynamic(
         printf("reverse: %d %d %d\n",intp_param.reverse[0],intp_param.reverse[1],intp_param.reverse[2]);
        }
        */
-        if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
-            printf("dsz: %d %d %d %d %d %d\n",data_size.x,data_size.y,data_size.z, GDX,GDY,GDZ);
-        
+        //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
+           // printf("dsz: %d %d %d %d %d %d\n",data_size.x,data_size.y,data_size.z, GDX,GDY,GDZ);
+
          if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
             printf("%d\n",unit);
         c_reset_scratch_17x17x17data<T, T, LINEAR_BLOCK_SIZE>(shmem.data, shmem.ectrl, radius, on_anchor);
