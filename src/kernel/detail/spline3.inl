@@ -834,7 +834,7 @@ __forceinline__ __device__ void interpolate_stage(
                             else if (global_x+unit<data_size.x)
                                 pred = (-s_data[z ][y][x- 3]+6*s_data[z ][y][x- 1] + 3*s_data[z ][y][x+ 1]) / 8;
                             else
-                                pred=s_data[z ][y][x- unit];
+                                pred=s_data[z ][y][x- 1];
 
                         }
                         else{
