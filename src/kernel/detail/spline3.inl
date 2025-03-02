@@ -1170,11 +1170,12 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate(
             T1, T2, FP, decltype(xblue), decltype(yblue), decltype(zblue),  //
             true, false, false, LINEAR_BLOCK_SIZE, 9, 9, COARSEN, 8, BORDER_INCLUSIVE, WORKFLOW>(
             s_data, s_ectrl,data_size, xblue, yblue, zblue, unit, eb_r, ebx2, radius, intp_param.interpolators[0]);
+            */
         interpolate_stage<
             T1, T2, FP, decltype(xyellow), decltype(yyellow), decltype(zyellow),  //
             false, true, false, LINEAR_BLOCK_SIZE, 9, 8, COARSEN, 17, BORDER_INCLUSIVE, WORKFLOW>(
             s_data, s_ectrl,data_size, xyellow, yyellow, zyellow, unit, eb_r, ebx2, radius, intp_param.interpolators[1]);
-        */
+        
         interpolate_stage<
             T1, T2, FP, decltype(xhollow), decltype(yhollow), decltype(zhollow),  //
             false, false, true, LINEAR_BLOCK_SIZE, 8, 17, COARSEN, 17, BORDER_EXCLUSIVE, WORKFLOW>(
