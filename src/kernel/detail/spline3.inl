@@ -707,8 +707,7 @@ __forceinline__ __device__ void interpolate_stage(
                 }
 
                 if CONSTEXPR (HOLLOW) {  //
-                    if(BIX == 23 and BIY == 23 and BIZ == 15 and unit==1)
-                        printf("nan %d %d %d %d %d %d\n",x,y,z,global_x,global_y,global_z);
+
                     
                     if(BIX!=GDX-1){
                         if(x>=3 and x+3<=BLOCK16 )
@@ -816,8 +815,7 @@ __forceinline__ __device__ void interpolate_stage(
                 if CONSTEXPR (HOLLOW) {  //
                     //if(BIX == 5 and BIY == 22 and BIZ == 6 and unit==1)
                     //    printf("%d %d %d\n",x,y,z);
-                    if(BIX == 23 and BIY == 23 and BIZ == 15 and unit==1)
-                        printf("nat %d %d %d %d %d %d\n",x,y,z,global_x,global_y,global_z);
+
                     
                     if(BIX!=GDX-1){
                         if(x>=3 and x+3<=BLOCK16 )
@@ -1365,20 +1363,20 @@ __global__ void cusz::c_spline3d_infprecis_16x16x16data_dynamic(
         printf("reverse: %d %d %d\n",intp_param.reverse[0],intp_param.reverse[1],intp_param.reverse[2]);
        }
        */
-        if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
-            printf("dsz: %d %d %d %d %d %d\n",data_size.x,data_size.y,data_size.z, GDX,GDY,GDZ);
+       // if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
+         //   printf("dsz: %d %d %d %d %d %d\n",data_size.x,data_size.y,data_size.z, GDX,GDY,GDZ);
 
-         if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
-            printf("%d\n",unit);
+        // if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
+        //    printf("%d\n",unit);
         c_reset_scratch_17x17x17data<T, T, LINEAR_BLOCK_SIZE>(shmem.data, shmem.ectrl, radius, on_anchor);
-        if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
-            printf("reset\n");
+       // if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
+        //    printf("reset\n");
         //if(unit!=1)
      
         global2shmem_17x17x17data<T, T, LINEAR_BLOCK_SIZE>(data, data_size, data_leap, shmem.data,unit);
 
-        if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
-            printf("g2s\n");
+        //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
+        //    printf("g2s\n");
         // version 1, use shmem, erroneous
         // c_gather_anchor<T>(shmem.data, anchor, anchor_leap);
         // version 2, use global mem, correct
@@ -1386,8 +1384,8 @@ __global__ void cusz::c_spline3d_infprecis_16x16x16data_dynamic(
             c_gather_anchor<T>(data, data_size, data_leap, anchor, anchor_leap);
         
 
-            if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
-                printf("anc\n");
+            //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
+            //    printf("anc\n");
         }
         //if(unit!=1)
 
@@ -1396,20 +1394,20 @@ __global__ void cusz::c_spline3d_infprecis_16x16x16data_dynamic(
         
         
 
-        if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
-            printf("interp\n");
+       // if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
+        //    printf("interp\n");
         //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
          //   printf("esz: %d %d %d\n",ectrl_size.x,ectrl_size.y,ectrl_size.z);
 
 
         //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
-        if(unit!=1)
+       // if(unit!=1)
         shmem2global_17x17x17data_with_compaction<T, E, LINEAR_BLOCK_SIZE>(shmem.ectrl, ectrl, ectrl_size, ectrl_leap, radius, compact_val, compact_idx, compact_num, unit);
 
         // shmem2global_32x8x8data<T, E, LINEAR_BLOCK_SIZE>(shmem.ectrl, ectrl, ectrl_size, ectrl_leap);
 
-        if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
-            printf("s2g\n");
+        //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
+        //    printf("s2g\n");
     }
 }
 
