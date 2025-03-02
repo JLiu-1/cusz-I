@@ -119,7 +119,7 @@ __global__ void x_spline3d_infprecis_16x16x16data_dynamic(
     FP      eb_r,
     FP      ebx2,
     int     radius,
-    INTERPOLATION_PARAMS intp_param
+    INTERPOLATION_PARAMS intp_param,
     int unit,
     bool on_anchor);
 
