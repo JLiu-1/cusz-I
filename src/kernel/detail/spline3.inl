@@ -401,9 +401,9 @@ __device__ void global2shmem_17x17x17data(T1* data, DIM3 data_size, STRIDE3 data
 
         if (gx < data_size.x and gy < data_size.y and gz < data_size.z) s_data[z][y][x] = data[gid];
 
-        if(gx==96 and gy==120 and gz==54){
-          printf("%d %d %d %d %d %d %d %.6e\n",BIX,BIY,BIZ,x,y,z,unit,s_data[z][y][x] );
-        }
+        //if(gx==96 and gy==120 and gz==54){
+        //  printf("%d %d %d %d %d %d %d %.6e\n",BIX,BIY,BIZ,x,y,z,unit,s_data[z][y][x] );
+        //}
 
 /*
         if(BIX == 7 and BIY == 47 and BIZ == 15 and x==10 and y==8 and z==4){
@@ -918,10 +918,10 @@ __forceinline__ __device__ void interpolate_stage(
                 s_data[z][y][x]  = pred + (code - radius) * ebx2;
                 //if(BIX == 1 and BIY == 1 and BIZ == 0 and unit==8)
                 //     printf("%d %d %d\n",x,y,z);
-               if(BIX == 2 and BIY == 3 and BIZ == 1 and unit==2 and x==16 and y==12 and z==11)
-                       printf("231161211pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[z-1][y][x],s_data[z+1][y][x],s_data[z+3][y][x]);
-                if(BIX == 3 and BIY == 3 and BIZ == 1 and unit==2 and x==0 and y==12 and z==11)
-                       printf("33101211pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[z-1][y][x],s_data[z+1][y][x],s_data[z+3][y][x]);
+               //if(BIX == 2 and BIY == 3 and BIZ == 1 and unit==2 and x==16 and y==12 and z==11)
+              //        printf("231161211pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[z-1][y][x],s_data[z+1][y][x],s_data[z+3][y][x]);
+               // if(BIX == 3 and BIY == 3 and BIZ == 1 and unit==2 and x==0 and y==12 and z==11)
+               //        printf("33101211pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[z-1][y][x],s_data[z+1][y][x],s_data[z+3][y][x]);
                 
 
             }
@@ -929,10 +929,10 @@ __forceinline__ __device__ void interpolate_stage(
                 auto code       = s_ectrl[z][y][x];
                 s_data[z][y][x] = pred + (code - radius) * ebx2;
 
-                if(BIX == 2 and BIY == 3 and BIZ == 1 and unit==2 and x==16 and y==12 and z==11)
-                       printf("23116121pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[z-1][y][x],s_data[z+1][y][x],s_data[z+3][y][x]);
-                if(BIX == 3 and BIY == 3 and BIZ == 1 and unit==2 and x==0 and y==12 and z==11)
-                       printf("3310121pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[z-1][y][x],s_data[z+1][y][x],s_data[z+3][y][x]);
+              //  if(BIX == 2 and BIY == 3 and BIZ == 1 and unit==2 and x==16 and y==12 and z==11)
+              //         printf("23116121pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[z-1][y][x],s_data[z+1][y][x],s_data[z+3][y][x]);
+              //  if(BIX == 3 and BIY == 3 and BIZ == 1 and unit==2 and x==0 and y==12 and z==11)
+              //         printf("3310121pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[z-1][y][x],s_data[z+1][y][x],s_data[z+3][y][x]);
 
                 //if(BIX == 6 and BIY == 7 and BIZ == 3 and unit==1 and x==0 and y==8 and z==6)
                // if(BIX == 1 and BIY == 1 and BIZ == 0 and unit==8)
