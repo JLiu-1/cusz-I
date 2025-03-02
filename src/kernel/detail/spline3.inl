@@ -713,7 +713,7 @@ __forceinline__ __device__ void interpolate_stage(
                     }
                     else{
                         
-                        pred=s_data[z][y][x- 1];
+                        pred=s_data[z ][y][x- 1];
                         
                     }
                     
@@ -742,7 +742,7 @@ __forceinline__ __device__ void interpolate_stage(
                             else if (global_z+unit<data_size.z)
                                 pred = (-s_data[z - 3][y][x]+6*s_data[z - 1][y][x] + 3*s_data[z + 1][y][x]) / 8;
                             else
-                                pred=2*s_data[z - 1][y][x]-s_data[z - 3][y][x];
+                                pred=s_data[z - 1][y][x];
 
                         }
                         else{
@@ -776,7 +776,7 @@ __forceinline__ __device__ void interpolate_stage(
                             else if (global_y+unit<data_size.y)
                                 pred = (-s_data[z ][y- 3][x]+6*s_data[z ][y- 1][x] + 3*s_data[z ][y+ 1][x]) / 8;
                             else
-                                pred=2*s_data[z ][y- 1][x]-s_data[z ][y- 3][x];
+                                pred=s_data[z ][y- 1][x];
 
                         }
                         else{
@@ -810,7 +810,7 @@ __forceinline__ __device__ void interpolate_stage(
                             else if (global_x+unit<data_size.x)
                                 pred = (-s_data[z ][y][x- 3]+6*s_data[z ][y][x- 1] + 3*s_data[z ][y][x + 1]) / 8;
                             else
-                                pred=2*s_data[z ][y][x- 1]-s_data[z ][y][x- 3];
+                                pred=s_data[z ][y][x- 1];
 
                         }
                         else{
@@ -848,7 +848,7 @@ __forceinline__ __device__ void interpolate_stage(
                             else if (global_z+unit<data_size.z)
                                 pred = (-s_data[z - 3][y][x]+6*s_data[z - 1][y][x] + 3*s_data[z + 1][y][x]) / 8;
                             else
-                                pred=2*s_data[z - 1][y][x]-s_data[z - 3][y][x];
+                                pred=s_data[z - 1][y][x];
 
                         }
                         else{
@@ -882,7 +882,7 @@ __forceinline__ __device__ void interpolate_stage(
                             else if (global_y+unit<data_size.y)
                                 pred = (-s_data[z ][y- 3][x]+6*s_data[z ][y- 1][x] + 3*s_data[z ][y + 1][x]) / 8;
                             else
-                                pred=2*s_data[z ][y- 1][x]-s_data[z ][y- 3][x];
+                                pred=s_data[z ][y- 1][x];
 
                         }
                         else{
@@ -918,7 +918,7 @@ __forceinline__ __device__ void interpolate_stage(
                             else if (global_x+unit<data_size.x)
                                 pred = (-s_data[z ][y][x- 3]+6*s_data[z ][y][x- 1] + 3*s_data[z ][y][x+ 1]) / 8;
                             else
-                                pred=2*s_data[z ][y][x- 1]-s_data[z ][y][x - 3];
+                                pred=s_data[z ][y][x- 1];
 
                         }
                         else{
