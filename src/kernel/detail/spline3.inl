@@ -575,6 +575,8 @@ shmem2global_17x17x17data(volatile T1 s_buf[17][17][17], T2* dram_buf, DIM3 buf_
 }
 
 
+
+
 // dram_outlier should be the same in type with shared memory buf
 template <typename T1, typename T2, int LINEAR_BLOCK_SIZE = DEFAULT_LINEAR_BLOCK_SIZE>
 __device__ void
@@ -1461,6 +1463,7 @@ __global__ void cusz::c_spline3d_infprecis_16x16x16data_dynamic(
 
         //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
        // if(unit!=1)
+        shmem2global_17x17x17data<T, T, LINEAR_BLOCK_SIZE>(shmem.data, data, data_size, data_leap, unit);
         shmem2global_17x17x17data_with_compaction<T, E, LINEAR_BLOCK_SIZE>(shmem.ectrl, ectrl, ectrl_size, ectrl_leap, radius, compact_val, compact_idx, compact_num, unit);
 
         // shmem2global_32x8x8data<T, E, LINEAR_BLOCK_SIZE>(shmem.ectrl, ectrl, ectrl_size, ectrl_leap);
