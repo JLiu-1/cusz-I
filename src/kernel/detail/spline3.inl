@@ -490,6 +490,7 @@ __device__ void global2shmem_fuse(E* ectrl, dim3 ectrl_size, dim3 ectrl_leap, T*
             //todo: pre-compute the leaps and their halves
 
             int level = 0;
+            auto data_gid = gx + gy * ectrl_leap.y + gz * ectrl_leap.z;
             while(gx%2==0 and gy%2==0 and gz%2==0 and level <= 3){
                 
                 gx=gx>>1;
@@ -503,7 +504,7 @@ __device__ void global2shmem_fuse(E* ectrl, dim3 ectrl_size, dim3 ectrl_leap, T*
                 gid += prefix_nums[level]-((gz+1)>>1)*grid_leaps[level+1].z-(gz%2==0)*((gy+1)>>1)*grid_leaps[level+1].y-(gz%2==0 && gy%2==0)*((gx+1)>>1);
             }
 
-            s_ectrl[z][y][x] = static_cast<T>(ectrl[gid]) + scattered_outlier[gid];
+            s_ectrl[z][y][x] = static_cast<T>(ectrl[gid]) + scattered_outlier[data_gid];
         }
     }
     __syncthreads();
@@ -567,6 +568,14 @@ shmem2global_17x17x17data_with_compaction(volatile T1 s_buf[17][17][17], T2* dra
 
         if (gx < buf_size.x and gy < buf_size.y and gz < buf_size.z) {
 
+            
+
+            if (not quantizable) {
+                auto data_gid = gx + gy * buf_leap.y + gz * buf_leap.z;
+                auto cur_idx = atomicAdd(dram_compactnum, 1);
+                dram_compactidx[cur_idx] = data_gid;
+                dram_compactval[cur_idx] = candidate;
+            }
             int level = 0;
             //todo: pre-compute the leaps and their halves
             while(gx%2==0 and gy%2==0 and gz%2==0 and level <= 3){
@@ -586,11 +595,7 @@ shmem2global_17x17x17data_with_compaction(volatile T1 s_buf[17][17][17], T2* dra
             // For performance purpose, it can be inlined in quantization
             dram_buf[gid] = quantizable * static_cast<T2>(candidate);
 
-            if (not quantizable) {
-                auto cur_idx = atomicAdd(dram_compactnum, 1);
-                dram_compactidx[cur_idx] = gid;
-                dram_compactval[cur_idx] = candidate;
-            }
+
         }
     }
     __syncthreads();
