@@ -708,7 +708,7 @@ __forceinline__ __device__ void interpolate_stage(
 
                 if CONSTEXPR (HOLLOW) {  //
                     if(BIX == 23 and BIY == 23 and BIZ == 15 and unit==1)
-                        printf("%d %d %d %d %d %d\n",x,y,z,global_x,global_y,global_z);
+                        printf("nan %d %d %d %d %d %d\n",x,y,z,global_x,global_y,global_z);
                     /*
                     if(BIX!=GDX-1){
                         if(x>=3 and x+3<=BLOCK16 )
@@ -817,7 +817,7 @@ __forceinline__ __device__ void interpolate_stage(
                     //if(BIX == 5 and BIY == 22 and BIZ == 6 and unit==1)
                     //    printf("%d %d %d\n",x,y,z);
                     if(BIX == 23 and BIY == 23 and BIZ == 15 and unit==1)
-                        printf("%d %d %d %d %d %d\n",x,y,z,global_x,global_y,global_z);
+                        printf("nat %d %d %d %d %d %d\n",x,y,z,global_x,global_y,global_z);
                     if(BIX!=GDX-1){
                         if(x>=3 and x+3<=BLOCK16 )
                             pred = (-3*s_data[z ][y][x - 3]+23*s_data[z ][y][x - 1] + 23*s_data[z ][y][x + 1]-3*s_data[z ][y][x + 3]) / 40;
