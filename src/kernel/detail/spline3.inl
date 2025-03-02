@@ -1383,7 +1383,7 @@ __global__ void cusz::c_spline3d_infprecis_16x16x16data_dynamic(
             if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
                 printf("anc\n");
         }
-        //if(unit!=1)
+        if(unit!=1)
 
         cusz::device_api::spline3d_layout2_interpolate<T, T, FP,LINEAR_BLOCK_SIZE, SPLINE3_COMPR, false>(
             shmem.data, shmem.ectrl, data_size, eb_r, ebx2, radius, intp_param, unit);
