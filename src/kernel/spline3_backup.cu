@@ -45,14 +45,15 @@ int spline_construct(
     pszmem_cxx<T>* data, pszmem_cxx<T>* anchor, pszmem_cxx<E>* ectrl,
     void* _outlier, double eb, double rel_eb, uint32_t radius, INTERPOLATION_PARAMS &intp_param, float* time, void* stream, pszmem_cxx<T>* profiling_errors)
 {
-  constexpr auto BLOCK = 16;
+  constexpr auto BLOCK = 8;
   auto div = [](auto _l, auto _subl) { return (_l - 1) / _subl + 1; };
 
   auto ebx2 = eb * 2;
   auto eb_r = 1 / eb;
 
   auto l3 = data->template len3<dim3>();
-  
+  auto grid_dim =
+      dim3(div(l3.x, BLOCK * 2), div(l3.y, BLOCK * 2), div(l3.z, BLOCK * 2));
 
 
   auto auto_tuning_grid_dim =
@@ -132,48 +133,15 @@ int spline_construct(
   
   }
 
-      cur_ebx2=ebx2,cur_eb_r=eb_r;
-      int temp=1;
-      while(temp<unit){
-          temp*=2;
-          cur_eb_r *= intp_param.alpha;
-          cur_ebx2 /= intp_param.alpha;
 
-      }
-      if(cur_ebx2 < ebx2 / intp_param.beta){
-          cur_ebx2 = ebx2 / intp_param.beta;
-          cur_eb_r = eb_r * intp_param.beta;
-
-      }
-
-
-  for(int unit:{8,4,2,1}){
-      auto cur_ebx2=ebx2;
-      auto cur_eb_r=eb_r;
-      int temp=1;
-      while(temp<unit){
-          temp*=2;
-          cur_eb_r *= intp_param.alpha;
-          cur_ebx2 /= intp_param.alpha;
-
-      }
-      if(cur_ebx2 < ebx2 / intp_param.beta){
-          cur_ebx2 = ebx2 / intp_param.beta;
-          cur_eb_r = eb_r * intp_param.beta;
-
-      }
-    auto grid_dim =
-        dim3(div(l3.x, BLOCK*unit ), div(l3.y, BLOCK*unit ), div(l3.z, BLOCK*unit));
-
-    cusz::c_spline3d_infprecis_16x16x16data_dynamic<T*, E*, float, DEFAULT_BLOCK_SIZE>  //
-        <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>(
-            data->dptr(), data->template len3<dim3>(),
-            data->template st3<dim3>(),  //
-            ectrl->dptr(), ectrl->template len3<dim3>(),
-            ectrl->template st3<dim3>(),  //
-            anchor->dptr(), anchor->template st3<dim3>(), ot->val(), ot->idx(),
-            ot->num(), cur_eb_r, cur_ebx2, radius, intp_param, unit, unit==8);//,profiling_errors->dptr());
-  }
+  cusz::c_spline3d_infprecis_16x16x16data<T*, E*, float, DEFAULT_BLOCK_SIZE>  //
+      <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>(
+          data->dptr(), data->template len3<dim3>(),
+          data->template st3<dim3>(),  //
+          ectrl->dptr(), ectrl->template len3<dim3>(),
+          ectrl->template st3<dim3>(),  //
+          anchor->dptr(), anchor->template st3<dim3>(), ot->val(), ot->idx(),
+          ot->num(), eb_r, ebx2, radius, intp_param);//,profiling_errors->dptr());
 
   STOP_GPUEVENT_RECORDING(stream);
   CHECK_GPU(GpuStreamSync(stream));
@@ -188,7 +156,7 @@ int spline_reconstruct(
     pszmem_cxx<T>* anchor, pszmem_cxx<E>* ectrl, pszmem_cxx<T>* xdata,
     double eb, uint32_t radius, INTERPOLATION_PARAMS intp_param, float* time, void* stream)
 {
-  constexpr auto BLOCK = 16;
+  constexpr auto BLOCK = 8;
 
   auto div = [](auto _l, auto _subl) { return (_l - 1) / _subl + 1; };
 
@@ -196,41 +164,21 @@ int spline_reconstruct(
   auto eb_r = 1 / eb;
 
   auto l3 = xdata->template len3<dim3>();
-  
+  auto grid_dim =
+      dim3(div(l3.x, BLOCK * 2), div(l3.y, BLOCK * 2), div(l3.z, BLOCK * 2));
 
   CREATE_GPUEVENT_PAIR;
   START_GPUEVENT_RECORDING(stream);
 
-  for(int unit:{8,4,2,1}){
-
-    auto cur_ebx2=ebx2;
-    auto cur_eb_r=eb_r;
-    int temp=1;
-    while(temp<unit){
-        temp*=2;
-        cur_eb_r *= intp_param.alpha;
-        cur_ebx2 /= intp_param.alpha;
-
-    }
-    if(cur_ebx2 < ebx2 / intp_param.beta){
-        cur_ebx2 = ebx2 / intp_param.beta;
-        cur_eb_r = eb_r * intp_param.beta;
-
-    }
-
-    auto grid_dim =
-      dim3(div(l3.x, BLOCK ), div(l3.y, BLOCK ), div(l3.z, BLOCK ));
-
-    cusz::x_spline3d_infprecis_16x16x16data_dynamic<E*, T*, float, DEFAULT_BLOCK_SIZE>   //
-        <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>  //
-        (ectrl->dptr(), ectrl->template len3<dim3>(),
-         ectrl->template st3<dim3>(),  //
-         anchor->dptr(), anchor->template len3<dim3>(),
-         anchor->template st3<dim3>(),  //
-         xdata->dptr(), xdata->template len3<dim3>(),
-         xdata->template st3<dim3>(),  //
-         cur_eb_r, cur_ebx2, radius, intp_param, unit, unit==8);
-  }
+  cusz::x_spline3d_infprecis_16x16x16data<E*, T*, float, DEFAULT_BLOCK_SIZE>   //
+      <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>  //
+      (ectrl->dptr(), ectrl->template len3<dim3>(),
+       ectrl->template st3<dim3>(),  //
+       anchor->dptr(), anchor->template len3<dim3>(),
+       anchor->template st3<dim3>(),  //
+       xdata->dptr(), xdata->template len3<dim3>(),
+       xdata->template st3<dim3>(),  //
+       eb_r, ebx2, radius, intp_param);
 
   STOP_GPUEVENT_RECORDING(stream);
   CHECK_GPU(GpuStreamSync(stream));
