@@ -546,7 +546,7 @@ shmem2global_17x17x17data(volatile T1 s_buf[17][17][17], T2* dram_buf, DIM3 buf_
 // dram_outlier should be the same in type with shared memory buf
 template <typename T1, typename T2, int LINEAR_BLOCK_SIZE = DEFAULT_LINEAR_BLOCK_SIZE>
 __device__ void
-shmem2global_17x17x17data_with_compaction(volatile T1 s_buf[17][17][17], T2* dram_buf, DIM3 buf_size, STRIDE3 buf_leap, int radius,volatile STRIDE3 grid_leaps[5],volatile size_t prefix_nums[5], T1* dram_compactval = nullptr, uint32_t* dram_compactidx = nullptr, uint32_t* dram_compactnum = nullptr,)
+shmem2global_17x17x17data_with_compaction(volatile T1 s_buf[17][17][17], T2* dram_buf, DIM3 buf_size, STRIDE3 buf_leap, int radius,volatile STRIDE3 grid_leaps[5],volatile size_t prefix_nums[5], T1* dram_compactval = nullptr, uint32_t* dram_compactidx = nullptr, uint32_t* dram_compactnum = nullptr)
 {
     auto x_size = BLOCK16 + (BIX == GDX-1);
     auto y_size = BLOCK16 + (BIY == GDY-1);
@@ -1495,9 +1495,9 @@ __global__ void cusz::c_spline3d_profiling_data_2(
 }
 
 
-__device__ void cusz::pre_compute(DIM3 data_size){
+__forceinline__ __device__ void pre_compute(DIM3 data_size, volatile STRIDE3 grid_leaps[5], volatile size_t prefix_nums[5]){
     if(TIX==0){
-        auto d_size = data_size
+        auto d_size = data_size;
         
         int level = 0;
         while(level<=4){
@@ -1576,7 +1576,7 @@ __global__ void cusz::c_spline3d_infprecis_16x16x16data(
         printf("reverse: %d %d %d\n",intp_param.reverse[0],intp_param.reverse[1],intp_param.reverse[2]);
        }
        */
-        pre_compute(ectrl_size);
+        pre_compute(ectrl_size,shmem.grid_leaps,shmem.prefix_nums);
 
         c_reset_scratch_17x17x17data<T, T, LINEAR_BLOCK_SIZE>(shmem.data, shmem.ectrl, radius);
         //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
@@ -1654,7 +1654,7 @@ __global__ void cusz::x_spline3d_infprecis_16x16x16data(
         //uint64_t L2_num;
     } shmem;
 
-    pre_compute(ectrl_size);
+    pre_compute(ectrl_size,shmem.grid_leaps,shmem.prefix_nums);
 
     x_reset_scratch_17x17x17data<T, T, LINEAR_BLOCK_SIZE>(shmem.data, shmem.ectrl, anchor, anchor_size, anchor_leap);
 
