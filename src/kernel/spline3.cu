@@ -206,7 +206,7 @@ int spline_reconstruct(
     }
 
     auto grid_dim =
-      dim3(div(l3.x, BLOCK ), div(l3.y, BLOCK ), div(l3.z, BLOCK ));
+      dim3(div(l3.x, BLOCK*unit ), div(l3.y, BLOCK*unit ), div(l3.z, BLOCK*unit ));
 
     cusz::x_spline3d_infprecis_16x16x16data_dynamic<E*, T*, float, DEFAULT_BLOCK_SIZE>   //
         <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>  //
