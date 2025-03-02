@@ -1317,7 +1317,7 @@ __global__ void cusz::c_spline3d_infprecis_16x16x16data_dynamic(
     INTERPOLATION_PARAMS intp_param,
     //TITER errors
     int unit,
-    bool on_anchor,
+    bool on_anchor
     )
 {
     // compile time variables
