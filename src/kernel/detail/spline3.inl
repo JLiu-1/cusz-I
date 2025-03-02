@@ -1610,7 +1610,7 @@ __global__ void cusz::c_spline3d_infprecis_16x16x16data(
 
         //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
 
-        shmem2global_17x17x17data_with_compaction<T, E, LINEAR_BLOCK_SIZE>(shmem.ectrl, ectrl, ectrl_size, ectrl_leap, radius, shemem.grid_leaps,shmem.prefix_nums, compact_val, compact_idx, compact_num);
+        shmem2global_17x17x17data_with_compaction<T, E, LINEAR_BLOCK_SIZE>(shmem.ectrl, ectrl, ectrl_size, ectrl_leap, radius, shmem.grid_leaps,shmem.prefix_nums, compact_val, compact_idx, compact_num);
 
         // shmem2global_32x8x8data<T, E, LINEAR_BLOCK_SIZE>(shmem.ectrl, ectrl, ectrl_size, ectrl_leap);
 
@@ -1662,7 +1662,7 @@ __global__ void cusz::x_spline3d_infprecis_16x16x16data(
     //        printf("esz: %d %d %d\n",ectrl_size.x,ectrl_size.y,ectrl_size.z);
 
     // global2shmem_33x9x9data<E, T, LINEAR_BLOCK_SIZE>(ectrl, ectrl_size, ectrl_leap, shmem.ectrl);
-    global2shmem_fuse<T, E, LINEAR_BLOCK_SIZE>(ectrl, ectrl_size, ectrl_leap, data, shmem.ectrl, shemem.grid_leaps,shmem.prefix_nums);
+    global2shmem_fuse<T, E, LINEAR_BLOCK_SIZE>(ectrl, ectrl_size, ectrl_leap, data, shmem.ectrl, shmem.grid_leaps,shmem.prefix_nums);
 
     cusz::device_api::spline3d_layout2_interpolate<T, T, FP, LINEAR_BLOCK_SIZE, SPLINE3_DECOMPR, false>(
         shmem.data, shmem.ectrl, data_size, eb_r, ebx2, radius, intp_param);
