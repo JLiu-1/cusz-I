@@ -1110,7 +1110,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate(
     FP          ebx2,
     int         radius,
     INTERPOLATION_PARAMS intp_param,
-    int unit;
+    int unit
     )
 {
     auto xblue = [] __device__(int _tix, int unit) -> int { return unit * (_tix * 2); };
