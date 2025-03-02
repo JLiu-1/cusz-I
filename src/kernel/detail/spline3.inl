@@ -395,7 +395,7 @@ __device__ void global2shmem_17x17x17data(T1* data, DIM3 data_size, STRIDE3 data
         auto gid = gx + gy * data_leap.y + gz * data_leap.z;
 
         if(gx==97 and gy==120 and gz==54){
-            printf("%d %d %d %d\n",BIX,BIY,BIZ,unit);
+            printf("%d %d %d %d %d %d\n",BIX,BIY,BIZ,x,y,z);
         }
 
         //if(BIX == 0 and BIY == 0 and BIZ == 0 and x==0 and y==0 and z==0){
