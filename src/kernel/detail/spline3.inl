@@ -484,9 +484,29 @@ __device__ void global2shmem_fuse(E* ectrl, dim3 ectrl_size, dim3 ectrl_leap, T*
         auto gx  = (x + BIX * BLOCK16);
         auto gy  = (y + BIY * BLOCK16);
         auto gz  = (z + BIZ * BLOCK16);
-        auto gid = gx + gy * ectrl_leap.y + gz * ectrl_leap.z;
+        //auto gid = gx + gy * ectrl_leap.y + gz * ectrl_leap.z;
 
-        if (gx < ectrl_size.x and gy < ectrl_size.y and gz < ectrl_size.z) s_ectrl[z][y][x] = static_cast<T>(ectrl[gid]) + scattered_outlier[gid];
+        if (gx < ectrl_size.x and gy < ectrl_size.y and gz < ectrl_size.z) {
+
+            auto bsx = ectrl_size.x, bsy=ectrl_size.y, bsz = ectrl_size.z;
+            int level = 0;
+            while(gx%2==0 and gy%2==0 and gz%2==0 and level <= 3){
+                bsx=bsx>>1;
+                bsy=bsy>>1;
+                bsz=bsz>>1;
+                gx=gx>>1;
+                gy=gy>>1;
+                gz=gz>>1;
+                level ++;
+            }
+            auto gid = gx + gy*bsx+gz*(bsx*bsy);
+
+            if(level < 4){//non-anchor
+                gid = (bsx>>1)*(bsy>>1)*(bsz>>1)-(gz%2==0)*((gy+1)>>2)*((bsx+1)>>2)-(gz%2==0 and gy%2==0)*((gx+1)>>2);
+            }
+            
+            s_ectrl[z][y][x] = static_cast<T>(ectrl[gid]) + scattered_outlier[gid];
+        }
     }
     __syncthreads();
 }
@@ -542,12 +562,30 @@ shmem2global_17x17x17data_with_compaction(volatile T1 s_buf[17][17][17], T2* dra
         auto gx  = (x + BIX * BLOCK16);
         auto gy  = (y + BIY * BLOCK16);
         auto gz  = (z + BIZ * BLOCK16);
-        auto gid = gx + gy * buf_leap.y + gz * buf_leap.z;
+        //auto gid = gx + gy * buf_leap.y + gz * buf_leap.z;
 
         auto candidate = s_buf[z][y][x];
         bool quantizable = (candidate >= 0) and (candidate < 2*radius);
 
         if (gx < buf_size.x and gy < buf_size.y and gz < buf_size.z) {
+
+            auto bsx = buf_size.x, bsy=buf_size.y, bsz = buf_size.z;
+            int level = 0;
+            while(gx%2==0 and gy%2==0 and gz%2==0 and level <= 3){
+                bsx=bsx>>1;
+                bsy=bsy>>1;
+                bsz=bsz>>1;
+                gx=gx>>1;
+                gy=gy>>1;
+                gz=gz>>1;
+                level ++;
+            }
+            auto gid = gx + gy*bsx+gz*(bsx*bsy);
+
+            if(level < 4){//non-anchor
+                gid = (bsx>>1)*(bsy>>1)*(bsz>>1)-(gz%2==0)*((gy+1)>>2)*((bsx+1)>>2)-(gz%2==0 and gy%2==0)*((gx+1)>>2);
+            }
+
             // TODO this is for algorithmic demo by reading from shmem
             // For performance purpose, it can be inlined in quantization
             dram_buf[gid] = quantizable * static_cast<T2>(candidate);
@@ -1584,6 +1622,10 @@ __global__ void cusz::x_spline3d_infprecis_16x16x16data(
     __shared__ struct {
         T data[17][17][17];
         T ectrl[17][17][17];
+        //uint64_t L16_num;
+        //uint64_t L8_num;
+        //uint64_t L4_num;
+        //uint64_t L2_num;
     } shmem;
 
     x_reset_scratch_17x17x17data<T, T, LINEAR_BLOCK_SIZE>(shmem.data, shmem.ectrl, anchor, anchor_size, anchor_leap);
