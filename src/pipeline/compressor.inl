@@ -132,6 +132,8 @@ COR::compress_predict(pszctx* ctx, T* in, void* stream)
     ctx->splen = mem->compact->num_outliers();
   }
 
+  mem->e->control({D2H})->file("quantbins_reordered.test", ToFile);
+
   return this;
 }
 
