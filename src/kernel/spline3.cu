@@ -53,7 +53,7 @@ int spline_construct(
 
   auto l3 = data->template len3<dim3>();
   auto grid_dim =
-      dim3(div(l3.x, BLOCK * 4), div(l3.y, BLOCK), div(l3.z, BLOCK));
+      dim3(div(l3.x, BLOCK * 2), div(l3.y, BLOCK * 2), div(l3.z, BLOCK * 2));
 
 
   auto auto_tuning_grid_dim =
@@ -134,7 +134,7 @@ int spline_construct(
   }
 
 
-  cusz::c_spline3d_infprecis_32x8x8data<T*, E*, float, DEFAULT_BLOCK_SIZE>  //
+  cusz::c_spline3d_infprecis_16x16x16data<T*, E*, float, DEFAULT_BLOCK_SIZE>  //
       <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>(
           data->dptr(), data->template len3<dim3>(),
           data->template st3<dim3>(),  //
@@ -165,12 +165,12 @@ int spline_reconstruct(
 
   auto l3 = xdata->template len3<dim3>();
   auto grid_dim =
-      dim3(div(l3.x, BLOCK * 4), div(l3.y, BLOCK), div(l3.z, BLOCK));
+      dim3(div(l3.x, BLOCK * 2), div(l3.y, BLOCK * 2), div(l3.z, BLOCK * 2));
 
   CREATE_GPUEVENT_PAIR;
   START_GPUEVENT_RECORDING(stream);
 
-  cusz::x_spline3d_infprecis_32x8x8data<E*, T*, float, DEFAULT_BLOCK_SIZE>   //
+  cusz::x_spline3d_infprecis_16x16x16data<E*, T*, float, DEFAULT_BLOCK_SIZE>   //
       <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>  //
       (ectrl->dptr(), ectrl->template len3<dim3>(),
        ectrl->template st3<dim3>(),  //
@@ -201,10 +201,10 @@ INIT(f4, u2)
 INIT(f4, u4)
 INIT(f4, f4)
 
-INIT(f8, u1)
-INIT(f8, u2)
-INIT(f8, u4)
-INIT(f8, f4)
+//INIT(f8, u1)
+//INIT(f8, u2)
+//INIT(f8, u4)
+//INIT(f8, f4)
 
 #undef INIT
 #undef SETUP
