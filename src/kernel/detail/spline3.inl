@@ -992,7 +992,7 @@ __forceinline__ __device__ void interpolate_stage(
                         }
 
                     }
-                    newcode[idx++]=code;
+                    newcodes[idx++]=code;
                 }
             }
             __syncthreads();
