@@ -901,8 +901,125 @@ __forceinline__ __device__ void interpolate_stage(
               
                 s_data[z][y][x]  = pred + (code - radius) * ebx2;
                 
-                 __syncthreads();
+               
+                
 
+
+            }
+            else {  // TODO == DECOMPRESSS and static_assert
+                auto code       = s_ectrl[z][y][x];
+                s_data[z][y][x] = pred + (code - radius) * ebx2;
+                /*
+                if(BIX == 12 and BIY == 12 and BIZ == 8 and unit==4 and x==0 and y==0 and z==4)
+                        printf("004pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[0][0][0],s_data[0][0][8],s_data[0][0][16]);
+                    if(BIX == 12 and BIY == 12 and BIZ == 8 and unit==4 and x==8 and y==8 and z==4)
+                        printf("884pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[8][8][0],s_data[8][8][8],s_data[8][8][16]);
+                        
+                */
+                //if(BIX == 4 and BIY == 20 and BIZ == 20 and unit==1 and CONSTEXPR (BLUE)){
+               //     if(fabs(s_data[z][y][x])>=3)
+
+              //      printf("%d %d %d %d %d %d %d %d %d %d %.2e %.2e %.2e\n",unit,CONSTEXPR (BLUE),CONSTEXPR (YELLOW),CONSTEXPR (HOLLOW),BIX,BIY,BIZ,x,y,z,pred,code,s_data[z][y][x]);
+               // }
+            }
+        }
+    };
+    // -------------------------------------------------------------------------------- //
+
+    if CONSTEXPR (COARSEN) {
+        constexpr auto TOTAL = BLOCK_DIMX * BLOCK_DIMY * BLOCK_DIMZ;
+        //if( BLOCK_DIMX *BLOCK_DIMY<= LINEAR_BLOCK_SIZE){
+            for (auto _tix = TIX; _tix < TOTAL; _tix += LINEAR_BLOCK_SIZE) {
+                auto itix = (_tix % BLOCK_DIMX);
+                auto itiy = (_tix / BLOCK_DIMX) % BLOCK_DIMY;
+                auto itiz = (_tix / BLOCK_DIMX) / BLOCK_DIMY;
+                auto x    = xmap(itix, unit);
+                auto y    = ymap(itiy, unit);
+                auto z    = zmap(itiz, unit);
+                
+                run(x, y, z);
+
+
+                  __syncthreads();
+                  auto code = s_ectrl[z][y][x];
+                  if(WORKFLOW == SPLINE3_COMPR and xyz17x17x17_predicate<BORDER_INCLUSIVE>(x, y, z,data_size)){
+                        if CONSTEXPR (BLUE) {
+                            if(y>=unit and x>=unit){
+                                code -= s_ectrl[z][y-unit][x] + s_ectrl[z][y][x-unit] - s_ectrl[z][y-unit][x-unit]-unit;
+                            }
+                            else if(y>=unit){
+                                code -= s_ectrl[z][y-unit][x]-unit;
+                            }
+                            else if(x>=unit){
+                                code -= s_ectrl[z][y][x-unit]-unit;
+                            }
+
+                        }
+                        if CONSTEXPR (YELLOW) { 
+
+                            if(z>=unit and x>=unit){
+                                code -= s_ectrl[z-unit][y][x] + s_ectrl[z][y][x-unit] - s_ectrl[z-unit][y][x-unit]-unit;
+                            }
+                            else if(z>=unit){
+                                code -= s_ectrl[z-unit][y][x]-unit;
+                            }
+                            else if(x>=unit){
+                                code -= s_ectrl[z][y][x-unit]-unit;
+                            }
+
+                        }
+                        if CONSTEXPR (HOLLOW){
+                            if(z>=unit and y>=unit){
+                                code -= s_ectrl[z-unit][y][x] + s_ectrl[z][y-unit][x] - s_ectrl[z-unit][y-unit][x]-unit;
+                            }
+                            else if(z>=unit){
+                                code -= s_ectrl[z-unit][y][x]-unit;
+                            }
+                            else if(y>=unit){
+                                code -= s_ectrl[z][y-unit][x]-unit;
+                            }
+
+                        }
+                    }
+                 __syncthreads();
+                 s_ectrl[z][y][x] = code;
+
+
+            }
+        //}
+        //may have bug    
+        /*
+        else{
+            for (auto _tix = TIX; _tix < TOTAL; _tix += LINEAR_BLOCK_SIZE) {
+                auto itix = (_tix % BLOCK_DIMX);
+                auto itiz = (_tix / BLOCK_DIMX) % BLOCK_DIMZ;
+                auto itiy = (_tix / BLOCK_DIMX) / BLOCK_DIMZ;
+                auto x    = xmap(itix, unit);
+                auto y    = ymap(itiy, unit);
+                auto z    = zmap(itiz, unit);
+                run(x, y, z);
+            }
+        }*/
+        //may have bug  end
+        
+    }
+    else {
+        auto itix = (TIX % BLOCK_DIMX);
+        auto itiy = (TIX / BLOCK_DIMX) % BLOCK_DIMY;
+        auto itiz = (TIX / BLOCK_DIMX) / BLOCK_DIMY;
+        auto x    = xmap(itix, unit);
+        auto y    = ymap(itiy, unit);
+        auto z    = zmap(itiz, unit);
+
+        
+
+     //   printf("%d %d %d\n", x,y,z);
+        run(x, y, z);
+
+
+          __syncthreads();
+          auto code = s_ectrl[z][y][x];
+          if(WORKFLOW == SPLINE3_COMPR and xyz17x17x17_predicate<BORDER_INCLUSIVE>(x, y, z,data_size)){
                 if CONSTEXPR (BLUE) {
                     if(y>=unit and x>=unit){
                         code -= s_ectrl[z][y-unit][x] + s_ectrl[z][y][x-unit] - s_ectrl[z][y-unit][x-unit]-unit;
@@ -940,74 +1057,11 @@ __forceinline__ __device__ void interpolate_stage(
                     }
 
                 }
-                 __syncthreads();
-                 s_ectrl[z][y][x] = code;
-                
-
-
             }
-            else {  // TODO == DECOMPRESSS and static_assert
-                auto code       = s_ectrl[z][y][x];
-                s_data[z][y][x] = pred + (code - radius) * ebx2;
-                /*
-                if(BIX == 12 and BIY == 12 and BIZ == 8 and unit==4 and x==0 and y==0 and z==4)
-                        printf("004pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[0][0][0],s_data[0][0][8],s_data[0][0][16]);
-                    if(BIX == 12 and BIY == 12 and BIZ == 8 and unit==4 and x==8 and y==8 and z==4)
-                        printf("884pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[8][8][0],s_data[8][8][8],s_data[8][8][16]);
-                        
-                */
-                //if(BIX == 4 and BIY == 20 and BIZ == 20 and unit==1 and CONSTEXPR (BLUE)){
-               //     if(fabs(s_data[z][y][x])>=3)
+         __syncthreads();
+         s_ectrl[z][y][x] = code;
 
-              //      printf("%d %d %d %d %d %d %d %d %d %d %.2e %.2e %.2e\n",unit,CONSTEXPR (BLUE),CONSTEXPR (YELLOW),CONSTEXPR (HOLLOW),BIX,BIY,BIZ,x,y,z,pred,code,s_data[z][y][x]);
-               // }
-            }
-        }
-    };
-    // -------------------------------------------------------------------------------- //
 
-    if CONSTEXPR (COARSEN) {
-        constexpr auto TOTAL = BLOCK_DIMX * BLOCK_DIMY * BLOCK_DIMZ;
-        //if( BLOCK_DIMX *BLOCK_DIMY<= LINEAR_BLOCK_SIZE){
-            for (auto _tix = TIX; _tix < TOTAL; _tix += LINEAR_BLOCK_SIZE) {
-                auto itix = (_tix % BLOCK_DIMX);
-                auto itiy = (_tix / BLOCK_DIMX) % BLOCK_DIMY;
-                auto itiz = (_tix / BLOCK_DIMX) / BLOCK_DIMY;
-                auto x    = xmap(itix, unit);
-                auto y    = ymap(itiy, unit);
-                auto z    = zmap(itiz, unit);
-                
-                run(x, y, z);
-            }
-        //}
-        //may have bug    
-        /*
-        else{
-            for (auto _tix = TIX; _tix < TOTAL; _tix += LINEAR_BLOCK_SIZE) {
-                auto itix = (_tix % BLOCK_DIMX);
-                auto itiz = (_tix / BLOCK_DIMX) % BLOCK_DIMZ;
-                auto itiy = (_tix / BLOCK_DIMX) / BLOCK_DIMZ;
-                auto x    = xmap(itix, unit);
-                auto y    = ymap(itiy, unit);
-                auto z    = zmap(itiz, unit);
-                run(x, y, z);
-            }
-        }*/
-        //may have bug  end
-        
-    }
-    else {
-        auto itix = (TIX % BLOCK_DIMX);
-        auto itiy = (TIX / BLOCK_DIMX) % BLOCK_DIMY;
-        auto itiz = (TIX / BLOCK_DIMX) / BLOCK_DIMY;
-        auto x    = xmap(itix, unit);
-        auto y    = ymap(itiy, unit);
-        auto z    = zmap(itiz, unit);
-
-        
-
-     //   printf("%d %d %d\n", x,y,z);
-        run(x, y, z);
     }
     __syncthreads();
 }
