@@ -948,38 +948,38 @@ __forceinline__ __device__ void interpolate_stage(
                         code = s_ectrl[z][y][x];
                         if CONSTEXPR (BLUE) {
                             if(y>=unit and x>=unit){
-                                code -= s_ectrl[z][y-unit][x] + s_ectrl[z][y][x-unit] - s_ectrl[z][y-unit][x-unit]-unit;
+                                code -= s_ectrl[z][y-unit][x] + s_ectrl[z][y][x-unit] - s_ectrl[z][y-unit][x-unit]-radius;
                             }
                             else if(y>=unit){
-                                code -= s_ectrl[z][y-unit][x]-unit;
+                                code -= s_ectrl[z][y-unit][x]-radius;
                             }
                             else if(x>=unit){
-                                code -= s_ectrl[z][y][x-unit]-unit;
+                                code -= s_ectrl[z][y][x-unit]-radius;
                             }
 
                         }
                         if CONSTEXPR (YELLOW) { 
 
                             if(z>=unit and x>=unit){
-                                code -= s_ectrl[z-unit][y][x] + s_ectrl[z][y][x-unit] - s_ectrl[z-unit][y][x-unit]-unit;
+                                code -= s_ectrl[z-unit][y][x] + s_ectrl[z][y][x-unit] - s_ectrl[z-unit][y][x-unit]-radius;
                             }
                             else if(z>=unit){
-                                code -= s_ectrl[z-unit][y][x]-unit;
+                                code -= s_ectrl[z-unit][y][x]-radius;
                             }
                             else if(x>=unit){
-                                code -= s_ectrl[z][y][x-unit]-unit;
+                                code -= s_ectrl[z][y][x-unit]-radius;
                             }
 
                         }
                         if CONSTEXPR (HOLLOW){
                             if(z>=unit and y>=unit){
-                                code -= s_ectrl[z-unit][y][x] + s_ectrl[z][y-unit][x] - s_ectrl[z-unit][y-unit][x]-unit;
+                                code -= s_ectrl[z-unit][y][x] + s_ectrl[z][y-unit][x] - s_ectrl[z-unit][y-unit][x]-radius;
                             }
                             else if(z>=unit){
-                                code -= s_ectrl[z-unit][y][x]-unit;
+                                code -= s_ectrl[z-unit][y][x]-radius;
                             }
                             else if(y>=unit){
-                                code -= s_ectrl[z][y-unit][x]-unit;
+                                code -= s_ectrl[z][y-unit][x]-radius;
                             }
 
                         }
@@ -1029,38 +1029,38 @@ __forceinline__ __device__ void interpolate_stage(
                 code = s_ectrl[z][y][x];
                 if CONSTEXPR (BLUE) {
                     if(y>=unit and x>=unit){
-                        code -= s_ectrl[z][y-unit][x] + s_ectrl[z][y][x-unit] - s_ectrl[z][y-unit][x-unit]-unit;
+                        code -= s_ectrl[z][y-unit][x] + s_ectrl[z][y][x-unit] - s_ectrl[z][y-unit][x-unit]-radius;
                     }
                     else if(y>=unit){
-                        code -= s_ectrl[z][y-unit][x]-unit;
+                        code -= s_ectrl[z][y-unit][x]-radius;
                     }
                     else if(x>=unit){
-                        code -= s_ectrl[z][y][x-unit]-unit;
+                        code -= s_ectrl[z][y][x-unit]-radius;
                     }
 
                 }
                 if CONSTEXPR (YELLOW) { 
 
                     if(z>=unit and x>=unit){
-                        code -= s_ectrl[z-unit][y][x] + s_ectrl[z][y][x-unit] - s_ectrl[z-unit][y][x-unit]-unit;
+                        code -= s_ectrl[z-unit][y][x] + s_ectrl[z][y][x-unit] - s_ectrl[z-unit][y][x-unit]-radius;
                     }
                     else if(z>=unit){
-                        code -= s_ectrl[z-unit][y][x]-unit;
+                        code -= s_ectrl[z-unit][y][x]-radius;
                     }
                     else if(x>=unit){
-                        code -= s_ectrl[z][y][x-unit]-unit;
+                        code -= s_ectrl[z][y][x-unit]-radius;
                     }
 
                 }
                 if CONSTEXPR (HOLLOW){
                     if(z>=unit and y>=unit){
-                        code -= s_ectrl[z-unit][y][x] + s_ectrl[z][y-unit][x] - s_ectrl[z-unit][y-unit][x]-unit;
+                        code -= s_ectrl[z-unit][y][x] + s_ectrl[z][y-unit][x] - s_ectrl[z-unit][y-unit][x]-radius;
                     }
                     else if(z>=unit){
-                        code -= s_ectrl[z-unit][y][x]-unit;
+                        code -= s_ectrl[z-unit][y][x]-radius;
                     }
                     else if(y>=unit){
-                        code -= s_ectrl[z][y-unit][x]-unit;
+                        code -= s_ectrl[z][y-unit][x]-radius;
                     }
 
                 }
