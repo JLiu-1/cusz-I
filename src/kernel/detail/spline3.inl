@@ -1043,7 +1043,7 @@ __forceinline__ __device__ void interpolate_stage(
      //   printf("%d %d %d\n", x,y,z);
         run(x, y, z);
 
-
+            /*
           __syncthreads();
           
           T2 code;
@@ -1091,7 +1091,7 @@ __forceinline__ __device__ void interpolate_stage(
          __syncthreads();
          if(valid)
             s_ectrl[z][y][x] = code;
-
+        */
 
     }
     __syncthreads();
