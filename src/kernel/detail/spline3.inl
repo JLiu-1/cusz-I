@@ -941,8 +941,9 @@ __forceinline__ __device__ void interpolate_stage(
 
 
                   __syncthreads();
-                  auto code = s_ectrl[z][y][x];
+                  
                   if(WORKFLOW == SPLINE3_COMPR and xyz17x17x17_predicate<BORDER_INCLUSIVE>(x, y, z,data_size)){
+                        auto code = s_ectrl[z][y][x];
                         if CONSTEXPR (BLUE) {
                             if(y>=unit and x>=unit){
                                 code -= s_ectrl[z][y-unit][x] + s_ectrl[z][y][x-unit] - s_ectrl[z][y-unit][x-unit]-unit;
@@ -1018,8 +1019,9 @@ __forceinline__ __device__ void interpolate_stage(
 
 
           __syncthreads();
-          auto code = s_ectrl[z][y][x];
+          
           if(WORKFLOW == SPLINE3_COMPR and xyz17x17x17_predicate<BORDER_INCLUSIVE>(x, y, z,data_size)){
+                auto code = s_ectrl[z][y][x];
                 if CONSTEXPR (BLUE) {
                     if(y>=unit and x>=unit){
                         code -= s_ectrl[z][y-unit][x] + s_ectrl[z][y][x-unit] - s_ectrl[z][y-unit][x-unit]-unit;
