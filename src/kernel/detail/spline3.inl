@@ -942,7 +942,9 @@ __forceinline__ __device__ void interpolate_stage(
 
                   __syncthreads();
                   T2 code;
-                  if(WORKFLOW == SPLINE3_COMPR and xyz17x17x17_predicate<BORDER_INCLUSIVE>(x, y, z,data_size)){
+                  auto valid=xyz17x17x17_predicate<BORDER_INCLUSIVE>(x, y, z,data_size);
+
+                  if(WORKFLOW == SPLINE3_COMPR and valid){
                         code = s_ectrl[z][y][x];
                         if CONSTEXPR (BLUE) {
                             if(y>=unit and x>=unit){
@@ -983,7 +985,7 @@ __forceinline__ __device__ void interpolate_stage(
                         }
                     }
                  __syncthreads();
-                 if(xyz17x17x17_predicate<BORDER_INCLUSIVE>(x, y, z,data_size))
+                 if(valid)
                     s_ectrl[z][y][x] = code;
 
 
@@ -1022,7 +1024,8 @@ __forceinline__ __device__ void interpolate_stage(
           __syncthreads();
           
           T2 code;
-          if(WORKFLOW == SPLINE3_COMPR and xyz17x17x17_predicate<BORDER_INCLUSIVE>(x, y, z,data_size)){
+          auto valid=xyz17x17x17_predicate<BORDER_INCLUSIVE>(x, y, z,data_size);
+          if(WORKFLOW == SPLINE3_COMPR and valid){
                 code = s_ectrl[z][y][x];
                 if CONSTEXPR (BLUE) {
                     if(y>=unit and x>=unit){
@@ -1063,7 +1066,7 @@ __forceinline__ __device__ void interpolate_stage(
                 }
             }
          __syncthreads();
-         if(xyz17x17x17_predicate<BORDER_INCLUSIVE>(x, y, z,data_size))
+         if(valid)
             s_ectrl[z][y][x] = code;
 
 
