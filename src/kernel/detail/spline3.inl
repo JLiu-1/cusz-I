@@ -927,7 +927,7 @@ __forceinline__ __device__ void interpolate_stage(
     // -------------------------------------------------------------------------------- //
 
     if CONSTEXPR (COARSEN) {
-        constexpr auto TOTAL = ((BLOCK_DIMX * BLOCK_DIMY * BLOCK_DIMZ-1)/LINEAR_BLOCK_SIZE + 1)*LINEAR_BLOCK_SIZE;
+        constexpr auto TOTAL = BLOCK_DIMX * BLOCK_DIMY * BLOCK_DIMZ;
         //if( BLOCK_DIMX *BLOCK_DIMY<= LINEAR_BLOCK_SIZE){
             for (auto _tix = TIX; _tix < TOTAL; _tix += LINEAR_BLOCK_SIZE) {
                 auto itix = (_tix % BLOCK_DIMX);
@@ -939,57 +939,80 @@ __forceinline__ __device__ void interpolate_stage(
                 
                 run(x, y, z);
 
-
-                  __syncthreads();
+            }
+            __syncthreads();
+            T2 newcodes[10];
+            int idx=0;
+             for (auto _tix = TIX; _tix < TOTAL; _tix += LINEAR_BLOCK_SIZE) {
+                auto itix = (_tix % BLOCK_DIMX);
+                auto itiy = (_tix / BLOCK_DIMX) % BLOCK_DIMY;
+                auto itiz = (_tix / BLOCK_DIMX) / BLOCK_DIMY;
+                auto x    = xmap(itix, unit);
+                auto y    = ymap(itiy, unit);
+                auto z    = zmap(itiz, unit);
                   T2 code;
                   auto valid=xyz17x17x17_predicate<BORDER_INCLUSIVE>(x, y, z,data_size);
 
                   if(WORKFLOW == SPLINE3_COMPR and valid){
-                        code = s_ectrl[z][y][x];
-                        if CONSTEXPR (BLUE) {
-                            if(y>=unit and x>=unit){
-                                code -= s_ectrl[z][y-unit][x] + s_ectrl[z][y][x-unit] - s_ectrl[z][y-unit][x-unit]-radius;
-                            }
-                            else if(y>=unit){
-                                code -= s_ectrl[z][y-unit][x]-radius;
-                            }
-                            else if(x>=unit){
-                                code -= s_ectrl[z][y][x-unit]-radius;
-                            }
-
+                    code = s_ectrl[z][y][x];
+                    if CONSTEXPR (BLUE) {
+                        if(y>=unit and x>=unit){
+                            code -= s_ectrl[z][y-unit][x] + s_ectrl[z][y][x-unit] - s_ectrl[z][y-unit][x-unit]-radius;
                         }
-                        if CONSTEXPR (YELLOW) { 
-
-                            if(z>=unit and x>=unit){
-                                code -= s_ectrl[z-unit][y][x] + s_ectrl[z][y][x-unit] - s_ectrl[z-unit][y][x-unit]-radius;
-                            }
-                            else if(z>=unit){
-                                code -= s_ectrl[z-unit][y][x]-radius;
-                            }
-                            else if(x>=unit){
-                                code -= s_ectrl[z][y][x-unit]-radius;
-                            }
-
+                        else if(y>=unit){
+                            code -= s_ectrl[z][y-unit][x]-radius;
                         }
-                        if CONSTEXPR (HOLLOW){
-                            if(z>=unit and y>=unit){
-                                code -= s_ectrl[z-unit][y][x] + s_ectrl[z][y-unit][x] - s_ectrl[z-unit][y-unit][x]-radius;
-                            }
-                            else if(z>=unit){
-                                code -= s_ectrl[z-unit][y][x]-radius;
-                            }
-                            else if(y>=unit){
-                                code -= s_ectrl[z][y-unit][x]-radius;
-                            }
-
+                        else if(x>=unit){
+                            code -= s_ectrl[z][y][x-unit]-radius;
                         }
+
                     }
-                 __syncthreads();
-                 if(valid)
-                    s_ectrl[z][y][x] = code;
+                    if CONSTEXPR (YELLOW) { 
 
+                        if(z>=unit and x>=unit){
+                            code -= s_ectrl[z-unit][y][x] + s_ectrl[z][y][x-unit] - s_ectrl[z-unit][y][x-unit]-radius;
+                        }
+                        else if(z>=unit){
+                            code -= s_ectrl[z-unit][y][x]-radius;
+                        }
+                        else if(x>=unit){
+                            code -= s_ectrl[z][y][x-unit]-radius;
+                        }
 
+                    }
+                    if CONSTEXPR (HOLLOW){
+                        if(z>=unit and y>=unit){
+                            code -= s_ectrl[z-unit][y][x] + s_ectrl[z][y-unit][x] - s_ectrl[z-unit][y-unit][x]-radius;
+                        }
+                        else if(z>=unit){
+                            code -= s_ectrl[z-unit][y][x]-radius;
+                        }
+                        else if(y>=unit){
+                            code -= s_ectrl[z][y-unit][x]-radius;
+                        }
+
+                    }
+                    newcode[idx++]=code;
+                }
             }
+            __syncthreads();
+            idx=0;
+             for (auto _tix = TIX; _tix < TOTAL; _tix += LINEAR_BLOCK_SIZE) {
+                auto itix = (_tix % BLOCK_DIMX);
+                auto itiy = (_tix / BLOCK_DIMX) % BLOCK_DIMY;
+                auto itiz = (_tix / BLOCK_DIMX) / BLOCK_DIMY;
+                auto x    = xmap(itix, unit);
+                auto y    = ymap(itiy, unit);
+                auto z    = zmap(itiz, unit);
+                  T2 code;
+                  auto valid=xyz17x17x17_predicate<BORDER_INCLUSIVE>(x, y, z,data_size);
+
+                  if(WORKFLOW == SPLINE3_COMPR and valid){
+            
+                    s_ectrl[z][y][x]=newcodes[idx++];
+                }
+            }
+
         //}
         //may have bug    
         /*
