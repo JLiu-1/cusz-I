@@ -888,6 +888,8 @@ __forceinline__ __device__ void interpolate_stage(
                     code = int(code / 2) + radius;
                 }
                 s_ectrl[z][y][x] = code;  // TODO double check if unsigned type works
+
+
                 /*
                  if(BIX == 12 and BIY == 12 and BIZ == 8 and unit==4 and x==0 and y==0 and z==4)
                         printf("004pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[0][0][0],s_data[0][0][8],s_data[0][0][16]);
@@ -898,7 +900,50 @@ __forceinline__ __device__ void interpolate_stage(
                //     printf("%d %d %d %d %d %d %d %d %d %d %.2e %.2e %.2e\n",unit,CONSTEXPR (BLUE),CONSTEXPR (YELLOW),CONSTEXPR (HOLLOW),BIX,BIY,BIZ,x,y,z,pred,code,s_data[z][y][x]);
               
                 s_data[z][y][x]  = pred + (code - radius) * ebx2;
-                
+
+                 __syncthreads();
+
+                if CONSTEXPR (BLUE) {
+                    if(y>=unit and x>=unit){
+                        code -= s_ectrl[z][y-unit][x] + s_ectrl[z][y][x-unit] - s_ectrl[z][y-unit][x-unit]-unit;
+                    }
+                    else if(y>=unit){
+                        code -= s_ectrl[z][y-unit][x]-unit;
+                    }
+                    else if(x>=unit){
+                        code -= s_ectrl[z][y][x-unit]-unit;
+                    }
+
+                }
+                if CONSTEXPR (YELLOW) { 
+
+                    if(z>=unit and x>=unit){
+                        code -= s_ectrl[z-unit][y][x] + s_ectrl[z][y][x-unit] - s_ectrl[z-unit][y][x-unit]-unit;
+                    }
+                    else if(z>=unit){
+                        code -= s_ectrl[z-unit][y][x]-unit;
+                    }
+                    else if(x>=unit){
+                        code -= s_ectrl[z][y][x-unit]-unit;
+                    }
+
+                }
+                if CONSTEXPR (HOLLOW){
+                    if(z>=unit and y>=unit){
+                        code -= s_ectrl[z-unit][y][x] + s_ectrl[z][y-unit][x] - s_ectrl[z-unit][y-unit][x]-unit;
+                    }
+                    else if(z>=unit){
+                        code -= s_ectrl[z-unit][y][x]-unit;
+                    }
+                    else if(y>=unit){
+                        code -= s_ectrl[z][y-unit][x]-unit;
+                    }
+
+                }
+                 __syncthreads();
+                 s_ectrl[z][y][x] = code;
+
+
 
             }
             else {  // TODO == DECOMPRESSS and static_assert
