@@ -928,6 +928,7 @@ __forceinline__ __device__ void interpolate_stage(
 
     if CONSTEXPR (COARSEN) {
         constexpr auto TOTAL = BLOCK_DIMX * BLOCK_DIMY * BLOCK_DIMZ;
+        TOTAL = ((TOTAL-1)/LINEAR_BLOCK_SIZE + 1)*LINEAR_BLOCK_SIZE;
         //if( BLOCK_DIMX *BLOCK_DIMY<= LINEAR_BLOCK_SIZE){
             for (auto _tix = TIX; _tix < TOTAL; _tix += LINEAR_BLOCK_SIZE) {
                 auto itix = (_tix % BLOCK_DIMX);
