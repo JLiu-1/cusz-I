@@ -900,7 +900,7 @@ __forceinline__ __device__ void interpolate_stage(
                //     printf("%d %d %d %d %d %d %d %d %d %d %.2e %.2e %.2e\n",unit,CONSTEXPR (BLUE),CONSTEXPR (YELLOW),CONSTEXPR (HOLLOW),BIX,BIY,BIZ,x,y,z,pred,code,s_data[z][y][x]);
               
                 s_data[z][y][x]  = pred + (code - radius) * ebx2;
-                /*
+                
                  __syncthreads();
 
                 if CONSTEXPR (BLUE) {
@@ -942,7 +942,7 @@ __forceinline__ __device__ void interpolate_stage(
                 }
                  __syncthreads();
                  s_ectrl[z][y][x] = code;
-                */
+                
 
 
             }
