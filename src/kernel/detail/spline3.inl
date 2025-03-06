@@ -1867,6 +1867,53 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate(
 
     };
 
+    auto xyzmap_line_16b_2u = [] __device__(int _tix, int unit) -> std::tuple<int,int,int> {
+        constexpr auto N = 4;
+        constexpr auto L = N*(N+1)*(N+1); 
+        constexpr auto Q = (N+1)*(N+1); 
+        auto group = _tix / L ;
+        auto m = _tix % L ;
+        auto i = m / Q;
+        auto j = (m % Q) / (N+1);
+        auto k = (m % Q) % (N+1);
+        if(group==0)
+            return std::make_tuple(4*i+2,4*j,4*k);
+        else if (group==1)
+            return std::make_tuple(4*k,4*i+2,4*j);
+        else
+            return std::make_tuple(4*j,4*k,4*i+2);
+
+    };
+
+    auto xyzmap_face_16b_2u = [] __device__(int _tix, int unit) -> std::tuple<int,int,int> {
+        constexpr auto N = 4;
+        constexpr auto L = N*N*(N+1);
+        constexpr auto Q = N*N; 
+        auto group = _tix / L ;
+        auto m = _tix % L ;
+        auto i = m / Q;
+        auto j = (m % Q) / N;
+        auto k = (m % Q) % N;
+        if(group==0)
+            return std::make_tuple(4*i,4*j+2,4*k+2);
+        else if (group==1)
+            return std::make_tuple(4*k+2,4*i,4*j+2);
+        else
+            return std::make_tuple(4*j+2,4*k+1,4*i);
+
+    };
+
+     auto xyzmap_cube_16b_2u = [] __device__(int _tix, int unit) -> std::tuple<int,int,int> {
+        constexpr auto N = 4;
+        constexpr auto Q = N * N; 
+        auto i = _tix / Q;
+        auto j = (_tix % Q) / N;
+        auto k = (_tix % Q) % N;
+        return std::make_tuple(4*i+2,4*j+2,4*k+2);
+
+    };
+
+
     auto nan_cubic_interp = [] __device__ (T1 a, T1 b, T1 c, T1 d) -> T1{
         return (-a+9*b+9*c-9*d) / 16;
     };
@@ -2019,6 +2066,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate(
     //set_orders(reverse[1]);
 
     // iteration 2, TODO switch y-z order
+    /*
     if(intp_param.reverse[1]){
         interpolate_stage<
             T1, T2, FP, decltype(xhollow_reverse), decltype(yhollow_reverse), decltype(zhollow_reverse),  //
@@ -2047,7 +2095,46 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate(
             false, false, true, LINEAR_BLOCK_SIZE, 4, 9, NO_COARSEN, 9, BORDER_INCLUSIVE, WORKFLOW>(
             s_data, s_ectrl,data_size, xhollow, yhollow, zhollow, unit, cur_eb_r, cur_ebx2, radius, intp_param.interpolators[2]);
 
+    }*/
+
+    if(intp_param.interpolators[0]==0){
+
+        interpolate_stage_md<
+            T1, T2, FP, decltype(xyzmap_line_16b_2u), //
+            true, false, false, LINEAR_BLOCK_SIZE,300 ,NO_COARSEN, BORDER_INCLUSIVE, WORKFLOW>(
+            s_data, s_ectrl,data_size, xyzmap_line_16b_2u, unit, cur_eb_r, cur_ebx2, radius, nan_cubic_interp);
+
+        interpolate_stage_md<
+            T1, T2, FP, decltype(xyzmap_face_16b_2u), //
+            false, true, false, LINEAR_BLOCK_SIZE,240 ,NO_COARSEN, BORDER_INCLUSIVE, WORKFLOW>(
+            s_data, s_ectrl,data_size, xyzmap_face_16b_2u, unit, cur_eb_r, cur_ebx2, radius, nan_cubic_interp);
+
+        interpolate_stage_md<
+            T1, T2, FP, decltype(xyzmap_cube_16b_2u), //
+            false, false, true, LINEAR_BLOCK_SIZE,64 ,COARSEN, BORDER_INCLUSIVE, WORKFLOW>(
+            s_data, s_ectrl,data_size, xyzmap_cube_16b_2u, unit, cur_eb_r, cur_ebx2, radius, nan_cubic_interp);
+
     }
+    else{
+        interpolate_stage_md<
+            T1, T2, FP, decltype(xyzmap_line_16b_2u), //
+            true, false, false, LINEAR_BLOCK_SIZE,300 ,NO_COARSEN, BORDER_INCLUSIVE, WORKFLOW>(
+            s_data, s_ectrl,data_size, xyzmap_line_16b_2u, unit, cur_eb_r, cur_ebx2, radius, nat_cubic_interp);
+
+        interpolate_stage_md<
+            T1, T2, FP, decltype(xyzmap_face_16b_2u), //
+            false, true, false, LINEAR_BLOCK_SIZE,240 ,NO_COARSEN, BORDER_INCLUSIVE, WORKFLOW>(
+            s_data, s_ectrl,data_size, xyzmap_face_16b_2u, unit, cur_eb_r, cur_ebx2, radius, nat_cubic_interp);
+
+        interpolate_stage_md<
+            T1, T2, FP, decltype(xyzmap_cube_16b_2u), //
+            false, false, true, LINEAR_BLOCK_SIZE,64 ,NO_COARSEN, BORDER_INCLUSIVE, WORKFLOW>(
+            s_data, s_ectrl,data_size, xyzmap_cube_16b_2u, unit, cur_eb_r, cur_ebx2, radius, nat_cubic_interp);
+        
+
+    }
+
+
     //if(TIX==0 and TIY==0 and TIZ==0 and BIX==0 and BIY==0 and BIZ==0)
     //printf("lv2\n");
     unit = 1;
