@@ -1043,6 +1043,7 @@ __forceinline__ __device__ void interpolate_stage_md(
                 bool I_Z = z&1; 
 
                 if (I_Z){
+                    assert(x&1==0 and y&1==0);
 
                     if(BIZ!=GDZ-1){
 
@@ -1078,6 +1079,7 @@ __forceinline__ __device__ void interpolate_stage_md(
 
                 }
                 else if (I_Y){
+                    assert(x&1==0 and z&1==0);
                     if(BIY!=GDY-1){
                         if(y>=3*unit and y+3*unit<=BLOCK16 )
                             pred = cubic_interpolator(s_data[z ][y- 3*unit][x],s_data[z ][y- unit][x] ,s_data[z ][y+ unit][x],s_data[z][y + 3*unit][x]) ;
@@ -1109,7 +1111,7 @@ __forceinline__ __device__ void interpolate_stage_md(
                     }
                 }
                 else{//I_X
-
+                    assert(y&1==0 and z&1==0);
                     if(BIX!=GDX-1){
                         if(x>=3*unit and x+3*unit<=BLOCK16 )
                             pred = cubic_interpolator(s_data[z ][y][x- 3*unit],s_data[z ][y][x- unit],s_data[z ][y][x+ unit],s_data[z ][y][x + 3*unit]);
@@ -1174,6 +1176,7 @@ __forceinline__ __device__ void interpolate_stage_md(
                 bool I_YZ = x&1 == 0;
                 bool I_XZ = y&1 == 0;
                 if (I_YZ){
+
 
                     auto interp_z = get_interp_order(z,BDZ,GDZ,global_z,data_size.z);
                     auto interp_y = get_interp_order(y,BDY,GDY,global_y,data_size.y);
@@ -1325,7 +1328,8 @@ __forceinline__ __device__ void interpolate_stage_md(
                     }
 
                 }
-                else{//I_X
+                else{//I_XY
+                    assert(z&1==0);
 
                     auto interp_y = get_interp_order(y,BDY,GDY,global_y,data_size.y);
                     auto interp_x = get_interp_order(x,BDX,GDX,global_x,data_size.x);
