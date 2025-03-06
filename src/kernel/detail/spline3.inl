@@ -1540,10 +1540,16 @@ __forceinline__ __device__ void interpolate_stage_md(
                //     printf("%d %d %d %d %d %d %d %d %d %d %.2e %.2e %.2e\n",unit,CONSTEXPR (BLUE),CONSTEXPR (YELLOW),CONSTEXPR (HOLLOW),BIX,BIY,BIZ,x,y,z,pred,code,s_data[z][y][x]);
               
                 s_data[z][y][x]  = pred + (code - radius) * ebx2;
+
+                if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==6 and z==9)
+                    printf("cmp\n");
                 
 
             }
             else {  // TODO == DECOMPRESSS and static_assert
+
+                if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==6 and z==9)
+                    printf("dcmp\n");
                 auto code       = s_ectrl[z][y][x];
                 s_data[z][y][x] = pred + (code - radius) * ebx2;
                 //if(isnan(s_data[z][y][x])){
