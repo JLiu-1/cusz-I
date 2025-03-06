@@ -1176,8 +1176,8 @@ __forceinline__ __device__ void interpolate_stage_md(
                 bool I_YZ = (x&1) == 0;
                 bool I_XZ = (y&1) == 0;
 
-                if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==6 and z==9)
-                    printf("face %d %d\n", I_YZ,I_XZ);
+                //if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==6 and z==9)
+               //     printf("face %d %d\n", I_YZ,I_XZ);
 
                  
                 if (I_YZ){
@@ -1249,8 +1249,8 @@ __forceinline__ __device__ void interpolate_stage_md(
                     auto interp_z = get_interp_order(z,BDZ,GDZ,global_z,data_size.z);
                     auto interp_x = get_interp_order(x,BDX,GDX,global_x,data_size.x);
 
-                    if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==6 and z==9)
-                    printf("ixz %d %d\n", interp_x,interp_z);
+                    //if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==6 and z==9)
+                    //printf("ixz %d %d\n", interp_x,interp_z);
 
                     if(interp_z==4){
                         if(interp_x==4){
@@ -1560,13 +1560,13 @@ __forceinline__ __device__ void interpolate_stage_md(
                 //    printf("dcmp\n");
                 auto code       = s_ectrl[z][y][x];
                 s_data[z][y][x] = pred + (code - radius) * ebx2;
-                //if(isnan(s_data[z][y][x])){
-                //    printf("nan %d %d %d %d %d %d %d %d %d %.6e %.2e\n",BIX,BIY,BIZ,x,y,z,LINE,FACE,CUBE,pred,code);
-                //}
+                if(isnan(s_data[z][y][x])){
+                    printf("nan %d %d %d %d %d %d %d %d %d %.6e %.2e\n",BIX,BIY,BIZ,x,y,z,LINE,FACE,CUBE,pred,code);
+                }
                 //  
                 //    printf("NAN: %.6e %.2e %.6e %.6e %.6e %.6e %.6e %.6e\n",pred,code,s_data[z][y][x-3*unit],s_data[z][y][x+3*unit],s_data[z][y-3*unit][x],s_data[z][y+3*unit][x],s_data[z-3*unit][y][x],s_data[z+3*unit][y][x] );
-                if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==6 and z==9)
-                    printf("NAN: %.6e %.2e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e\n",pred,code,s_data[z][y][x-3*unit],s_data[z][y][x-unit],s_data[z][y][x+unit],s_data[z][y][x+3*unit],s_data[z-3*unit][y][x],s_data[z-unit][y][x],s_data[z+unit][y][x],s_data[z+3*unit][y][x] );
+                //if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==6 and z==9)
+                //    printf("NAN: %.6e %.2e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e\n",pred,code,s_data[z][y][x-3*unit],s_data[z][y][x-unit],s_data[z][y][x+unit],s_data[z][y][x+3*unit],s_data[z-3*unit][y][x],s_data[z-unit][y][x],s_data[z+unit][y][x],s_data[z+3*unit][y][x] );
                 /*
 
 
