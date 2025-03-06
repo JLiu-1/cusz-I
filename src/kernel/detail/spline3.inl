@@ -1016,8 +1016,8 @@ __forceinline__ __device__ void interpolate_stage_md(
         if (xyz17x17x17_predicate<BORDER_INCLUSIVE>(x, y, z,data_size)) {
             T1 pred = 0;
 
-            if(BIX == 23 and BIY == 23 and BIZ == 15 and unit==2)
-                printf("%d %d %d\n",x,y,z);
+            //if(BIX == 23 and BIY == 23 and BIZ == 15 and unit==2)
+            //    printf("%d %d %d\n",x,y,z);
             /*
              if(BIX == 7 and BIY == 47 and BIZ == 15 and unit==4 and x==4 and y==4 and z==4)
                         printf("444 %.2e %.2e \n",s_data[z - unit][y][x],s_data[z + unit][y][x]);
@@ -1039,8 +1039,8 @@ __forceinline__ __device__ void interpolate_stage_md(
            
             if CONSTEXPR (LINE) {  //
                 //bool I_X = x&1; 
-                bool I_Y = (y % unit) > 0; 
-                bool I_Z = (z % unit) > 0; 
+                bool I_Y = (y % 2*unit) > 0; 
+                bool I_Z = (z % 2*unit) > 0; 
 
                 if (I_Z){
                     //assert(x&1==0 and y&1==0);
@@ -1173,8 +1173,8 @@ __forceinline__ __device__ void interpolate_stage_md(
                //     printf("%.2e %.2e %.2e %.2e\n",s_data[z ][y- 3*unit][x],s_data[z ][y- unit][x],s_data[z ][y+ unit][x]);
               //  }
 
-                bool I_YZ = (x % unit) == 0;
-                bool I_XZ = (y % unit) == 0;
+                bool I_YZ = (x % 2*unit) == 0;
+                bool I_XZ = (y % 2*unit) == 0;
 
                 //if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==6 and z==9)
                //     printf("face %d %d\n", I_YZ,I_XZ);
