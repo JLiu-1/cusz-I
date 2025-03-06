@@ -1803,7 +1803,12 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate(
         auto i = m / Q;
         auto j = (m % Q) / (N+1);
         auto k = (m % Q) % (N+1);
-        return std::make_tuple(2*i+(group==0),2*j+(group==1),2*k+(group==2));
+        if(group==0)
+            return std::make_tuple(2*i+1,2*j,2*k);
+        else if (group==1)
+            return std::make_tuple(2*k,2*i+1,2*j);
+        else
+            return std::make_tuple(2*j,2*k,2*i+1);
 
     };
 
