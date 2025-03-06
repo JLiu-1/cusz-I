@@ -1430,7 +1430,7 @@ __forceinline__ __device__ void interpolate_stage_md(
                 auto interp_x = get_interp_order(x,BDX,GDX,global_x,data_size.x);
 
                 if(BIX == 23 and BIY == 15 and BIZ == 0 and x==13 and y==7 and z==11)
-                   printf("%d %d %d\n", interp_x,interp_y,interp_z);
+                   printf("%d %d %d %d %d %d %d\n", interp_x,interp_y,interp_z,BDX,GDX,global_x,data_size.x);
 
                 if(interp_z == 4){
                     if(interp_y == 4){
