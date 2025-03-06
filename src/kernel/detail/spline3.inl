@@ -1144,12 +1144,12 @@ __forceinline__ __device__ void interpolate_stage_md(
 
                 }
             }
-            auto get_interp_order = [&](auto x, auto BD, auto GD, auto gx, auto gs){
+            auto get_interp_order = [&](auto x, auto BI, auto GD, auto gx, auto gs){
                 int b = x >= 3*unit ? 3 : 1;
                 int f = 0;
-                if(x+3*unit<=BLOCK16 and (BD != GD-1 or gx+3*unit < gs) )
+                if(x+3*unit<=BLOCK16 and (BI != GD-1 or gx+3*unit < gs) )
                     f = 3;
-                else if (BD != GD-1 or gx+unit < gs)
+                else if (BI != GD-1 or gx+unit < gs)
                     f = 1;
                 if (b==3){
                     if(f==3)
