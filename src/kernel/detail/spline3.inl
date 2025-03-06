@@ -1039,8 +1039,8 @@ __forceinline__ __device__ void interpolate_stage_md(
            
             if CONSTEXPR (LINE) {  //
                 //bool I_X = x&1; 
-                bool I_Y = y % unit; 
-                bool I_Z = z % unit; 
+                bool I_Y = (y % unit) > 0; 
+                bool I_Z = (z % unit) > 0; 
 
                 if (I_Z){
                     //assert(x&1==0 and y&1==0);
