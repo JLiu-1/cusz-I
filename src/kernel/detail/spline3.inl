@@ -1544,7 +1544,7 @@ __forceinline__ __device__ void interpolate_stage_md(
                 auto code       = s_ectrl[z][y][x];
                 s_data[z][y][x] = pred + (code - radius) * ebx2;
                 if(BIX == 12 and BIY == 12 and BIZ == 8 and isnan(s_data[z][y][x])){
-                    printf("nan %d %d %d %d %d %d\n",z,y,x,LINE,FACE,CUBE);
+                    printf("nan %d %d %d %d %d %d %.6e %.2e\n",z,y,x,LINE,FACE,CUBE,pred,code);
                 }
                 /*
                 if(BIX == 12 and BIY == 12 and BIZ == 8 and unit==4 and x==0 and y==0 and z==4)
