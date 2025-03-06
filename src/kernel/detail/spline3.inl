@@ -1541,23 +1541,24 @@ __forceinline__ __device__ void interpolate_stage_md(
               
                 s_data[z][y][x]  = pred + (code - radius) * ebx2;
 
-                if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==6 and z==9)
-                    printf("cmp\n");
+                //if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==6 and z==9)
+                //    printf("cmp\n");
                 
 
             }
             else {  // TODO == DECOMPRESSS and static_assert
 
-                if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==6 and z==9)
-                    printf("dcmp\n");
+                //if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==6 and z==9)
+                //    printf("dcmp\n");
                 auto code       = s_ectrl[z][y][x];
                 s_data[z][y][x] = pred + (code - radius) * ebx2;
                 //if(isnan(s_data[z][y][x])){
                 //    printf("nan %d %d %d %d %d %d %d %d %d %.6e %.2e\n",BIX,BIY,BIZ,x,y,z,LINE,FACE,CUBE,pred,code);
                 //}
-                if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==9 and z==9)
-                    printf("NAN: %.6e %.2e %.6e %.6e %.6e %.6e %.6e %.6e\n",pred,code,s_data[z][y][x-3*unit],s_data[z][y][x+3*unit],s_data[z][y-3*unit][x],s_data[z][y+3*unit][x],s_data[z-3*unit][y][x],s_data[z+3*unit][y][x] );
-
+                //  
+                //    printf("NAN: %.6e %.2e %.6e %.6e %.6e %.6e %.6e %.6e\n",pred,code,s_data[z][y][x-3*unit],s_data[z][y][x+3*unit],s_data[z][y-3*unit][x],s_data[z][y+3*unit][x],s_data[z-3*unit][y][x],s_data[z+3*unit][y][x] );
+                if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==6 and z==9)
+                    printf("NAN: %.6e %.2e %.6e %.6e %.6e %.6e \n",pred,code,s_data[z][y][x-3*unit],s_data[z][y][x+3*unit],s_data[z-3*unit][y][x],s_data[z+3*unit][y][x] );
                 /*
 
 
