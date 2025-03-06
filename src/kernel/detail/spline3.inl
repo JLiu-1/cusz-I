@@ -1039,8 +1039,8 @@ __forceinline__ __device__ void interpolate_stage_md(
            
             if CONSTEXPR (LINE) {  //
                 //bool I_X = x&1; 
-                bool I_Y = y&1; 
-                bool I_Z = z&1; 
+                bool I_Y = y % unit; 
+                bool I_Z = z % unit; 
 
                 if (I_Z){
                     //assert(x&1==0 and y&1==0);
@@ -1173,8 +1173,8 @@ __forceinline__ __device__ void interpolate_stage_md(
                //     printf("%.2e %.2e %.2e %.2e\n",s_data[z ][y- 3*unit][x],s_data[z ][y- unit][x],s_data[z ][y+ unit][x]);
               //  }
 
-                bool I_YZ = (x&1) == 0;
-                bool I_XZ = (y&1) == 0;
+                bool I_YZ = (x % unit) == 0;
+                bool I_XZ = (y % unit) == 0;
 
                 //if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==6 and z==9)
                //     printf("face %d %d\n", I_YZ,I_XZ);
@@ -2128,7 +2128,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate(
 
         interpolate_stage_md<
             T1, T2, FP, decltype(xyzmap_cube_16b_2u), //
-            false, false, true, LINEAR_BLOCK_SIZE,64 ,NO_COARSEN, BORDER_INCLUSIVE, WORKFLOW>(
+            false, false, true, LINEAR_BLOCK_SIZE,64 ,NO_COARSEN, BORDER_EXCLUSIVE, WORKFLOW>(
             s_data, s_ectrl,data_size, xyzmap_cube_16b_2u, unit, cur_eb_r, cur_ebx2, radius, nat_cubic_interp);
         
 
@@ -2157,7 +2157,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate(
 
         interpolate_stage_md<
             T1, T2, FP, decltype(xyzmap_cube_16b_1u), //
-            false, false, true, LINEAR_BLOCK_SIZE,512 ,COARSEN, BORDER_INCLUSIVE, WORKFLOW>(
+            false, false, true, LINEAR_BLOCK_SIZE,512 ,COARSEN, BORDER_EXCLUSIVE, WORKFLOW>(
             s_data, s_ectrl,data_size, xyzmap_cube_16b_1u, unit, cur_eb_r, cur_ebx2, radius, nan_cubic_interp);
 
     }
@@ -2174,7 +2174,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate(
 
         interpolate_stage_md<
             T1, T2, FP, decltype(xyzmap_cube_16b_1u), //
-            false, false, true, LINEAR_BLOCK_SIZE,512 ,COARSEN, BORDER_INCLUSIVE, WORKFLOW>(
+            false, false, true, LINEAR_BLOCK_SIZE,512 ,COARSEN, BORDER_EXCLUSIVE, WORKFLOW>(
             s_data, s_ectrl,data_size, xyzmap_cube_16b_1u, unit, cur_eb_r, cur_ebx2, radius, nat_cubic_interp);
         
 
