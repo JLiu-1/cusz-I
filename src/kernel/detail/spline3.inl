@@ -1899,7 +1899,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate(
         else if (group==1)
             return std::make_tuple(4*k+2,4*i,4*j+2);
         else
-            return std::make_tuple(4*j+2,4*k+1,4*i);
+            return std::make_tuple(4*j+2,4*k+2,4*i);
 
     };
 
