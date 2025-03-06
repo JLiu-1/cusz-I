@@ -1145,7 +1145,7 @@ __forceinline__ __device__ void interpolate_stage_md(
                 }
             }
             auto get_interp_order = [&](auto x, auto BD, auto GD, auto gx, auto gs){
-                int b = x>=3*unit ? 3 : 1;
+                int b = x >= 3*unit ? 3 : 1;
                 int f = 0;
                 if(x+3*unit<=BLOCK16 and (BD != GD-1 or gx+3*unit < gs) )
                     f = 3;
@@ -1421,6 +1421,9 @@ __forceinline__ __device__ void interpolate_stage_md(
                 auto interp_y = get_interp_order(y,BDY,GDY,global_y,data_size.y);
                 auto interp_x = get_interp_order(x,BDX,GDX,global_x,data_size.x);
 
+                if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==9 and z==9)
+                    printf("%d %d %d\n", interp_x,interp_y,interp_z);
+
                 if(interp_z == 4){
                     if(interp_y == 4){
                         if(interp_x == 4){
@@ -1543,10 +1546,15 @@ __forceinline__ __device__ void interpolate_stage_md(
             else {  // TODO == DECOMPRESSS and static_assert
                 auto code       = s_ectrl[z][y][x];
                 s_data[z][y][x] = pred + (code - radius) * ebx2;
-                if(isnan(s_data[z][y][x])){
-                    printf("nan %d %d %d %d %d %d %d %d %d %.6e %.2e\n",BIX,BIY,BIZ,x,y,z,LINE,FACE,CUBE,pred,code);
-                }
+                //if(isnan(s_data[z][y][x])){
+                //    printf("nan %d %d %d %d %d %d %d %d %d %.6e %.2e\n",BIX,BIY,BIZ,x,y,z,LINE,FACE,CUBE,pred,code);
+                //}
+                if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==9 and z==9)
+                    printf("nan %.6e %.2e\n",pred,code);
+
                 /*
+
+
                 if(BIX == 12 and BIY == 12 and BIZ == 8 and unit==4 and x==0 and y==0 and z==4)
                         printf("004pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[0][0][0],s_data[0][0][8],s_data[0][0][16]);
                     if(BIX == 12 and BIY == 12 and BIZ == 8 and unit==4 and x==8 and y==8 and z==4)
