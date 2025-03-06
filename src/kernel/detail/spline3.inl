@@ -1151,6 +1151,8 @@ __forceinline__ __device__ void interpolate_stage_md(
                     f = 3;
                 else if (BD != GD-1 or gx+unit < gs)
                     f = 1;
+                if(BIX == 23 and BIY == 15 and BIZ == 0 and x==13 and y==7 and z==11)
+                   printf("%d %d %d %d %d\n", f,BD,GD,gx,gs);
                 if (b==3){
                     if(f==3)
                         return 4;
