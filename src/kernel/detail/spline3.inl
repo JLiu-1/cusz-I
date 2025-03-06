@@ -1175,6 +1175,8 @@ __forceinline__ __device__ void interpolate_stage_md(
 
                 bool I_YZ = x&1 == 0;
                 bool I_XZ = y&1 == 0;
+
+                 
                 if (I_YZ){
 
 
@@ -1243,6 +1245,9 @@ __forceinline__ __device__ void interpolate_stage_md(
                 else if (I_XZ){
                     auto interp_z = get_interp_order(z,BDZ,GDZ,global_z,data_size.z);
                     auto interp_x = get_interp_order(x,BDX,GDX,global_x,data_size.x);
+
+                    if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==6 and z==9)
+                    printf("%d %d\n", interp_x,interp_z);
 
                     if(interp_z==4){
                         if(interp_x==4){
