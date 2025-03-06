@@ -1151,8 +1151,6 @@ __forceinline__ __device__ void interpolate_stage_md(
                     f = 3;
                 else if (BD != GD-1 or gx+unit < gs)
                     f = 1;
-                if(BIX == 23 and BIY == 15 and BIZ == 0 and x==13 and y==7 and z==11)
-                   printf("%d %d %d %d %d\n", f,BD,GD,gx,gs);
                 if (b==3){
                     if(f==3)
                         return 4;
@@ -1248,8 +1246,8 @@ __forceinline__ __device__ void interpolate_stage_md(
 
                 }
                 else if (I_XZ){
-                    auto interp_z = get_interp_order(z,BDZ,GDZ,global_z,data_size.z);
-                    auto interp_x = get_interp_order(x,BDX,GDX,global_x,data_size.x);
+                    auto interp_z = get_interp_order(z,BIZ,GDZ,global_z,data_size.z);
+                    auto interp_x = get_interp_order(x,BIX,GDX,global_x,data_size.x);
 
                     //if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==6 and z==9)
                     //printf("ixz %d %d\n", interp_x,interp_z);
@@ -1427,12 +1425,9 @@ __forceinline__ __device__ void interpolate_stage_md(
             }
 
             if CONSTEXPR (CUBE) {  //
-                auto interp_z = get_interp_order(z,BDZ,GDZ,global_z,data_size.z);
-                auto interp_y = get_interp_order(y,BDY,GDY,global_y,data_size.y);
-                auto interp_x = get_interp_order(x,BDX,GDX,global_x,data_size.x);
-
-                if(BIX == 23 and BIY == 15 and BIZ == 0 and x==13 and y==7 and z==11)
-                   printf("%d %d %d %d %d %d %d\n", interp_x,interp_y,interp_z,BDX,GDX,global_x,data_size.x);
+                auto interp_z = get_interp_order(z,BIZ,GDZ,global_z,data_size.z);
+                auto interp_y = get_interp_order(y,BIY,GDY,global_y,data_size.y);
+                auto interp_x = get_interp_order(x,BIX,GDX,global_x,data_size.x);
 
                 if(interp_z == 4){
                     if(interp_y == 4){
@@ -1567,8 +1562,8 @@ __forceinline__ __device__ void interpolate_stage_md(
                 //}
                 //  
                 //    printf("NAN: %.6e %.2e %.6e %.6e %.6e %.6e %.6e %.6e\n",pred,code,s_data[z][y][x-3*unit],s_data[z][y][x+3*unit],s_data[z][y-3*unit][x],s_data[z][y+3*unit][x],s_data[z-3*unit][y][x],s_data[z+3*unit][y][x] );
-                if(BIX == 23 and BIY == 15 and BIZ == 0 and x==13 and y==7 and z==11)
-                    printf("NAN: %.6e %.2e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e\n",pred,code,s_data[z][y][x-3*unit],s_data[z][y][x-unit],s_data[z][y][x+unit],s_data[z][y][x+3*unit],s_data[z-3*unit][y][x],s_data[z-unit][y][x],s_data[z+unit][y][x],s_data[z+3*unit][y][x] );
+                //if(BIX == 23 and BIY == 15 and BIZ == 0 and x==13 and y==7 and z==11)
+                //    printf("NAN: %.6e %.2e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e\n",pred,code,s_data[z][y][x-3*unit],s_data[z][y][x-unit],s_data[z][y][x+unit],s_data[z][y][x+3*unit],s_data[z-3*unit][y][x],s_data[z-unit][y][x],s_data[z+unit][y][x],s_data[z+3*unit][y][x] );
                 /*
 
 
