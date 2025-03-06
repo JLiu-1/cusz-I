@@ -1421,8 +1421,8 @@ __forceinline__ __device__ void interpolate_stage_md(
                 auto interp_y = get_interp_order(y,BDY,GDY,global_y,data_size.y);
                 auto interp_x = get_interp_order(x,BDX,GDX,global_x,data_size.x);
 
-                if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==9 and z==9)
-                    printf("%d %d %d\n", interp_x,interp_y,interp_z);
+                //if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==9 and z==9)
+                //    printf("%d %d %d\n", interp_x,interp_y,interp_z);
 
                 if(interp_z == 4){
                     if(interp_y == 4){
@@ -1550,7 +1550,7 @@ __forceinline__ __device__ void interpolate_stage_md(
                 //    printf("nan %d %d %d %d %d %d %d %d %d %.6e %.2e\n",BIX,BIY,BIZ,x,y,z,LINE,FACE,CUBE,pred,code);
                 //}
                 if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==9 and z==9)
-                    printf("nan %.6e %.2e\n",pred,code);
+                    printf("NAN: %.6e %.2e %.6e %.6e %.6e %.6e %.6e %.6e\n",pred,code,s_data[z][y][x-3*unit],s_data[z][y][x+3*unit],s_data[z][y-3*unit][x],s_data[z][y+3*unit][x],s_data[z-3*unit][y][x],s_data[z+3*unit][y][x] );
 
                 /*
 
