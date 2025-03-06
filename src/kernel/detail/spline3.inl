@@ -1797,7 +1797,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate(
     auto xyzmap_line_16b_1u = [] __device__(int _tix, int unit) -> std::tuple<int,int,int> {
         constexpr auto N = 8;
         constexpr auto L = N*(N+1)*(N+1); 
-        constexpr auto Q = N * N; 
+        constexpr auto Q = (N+1)*(N+1); 
         auto group = _tix / L ;
         auto m = _tix % L ;
         auto i = m / Q;
