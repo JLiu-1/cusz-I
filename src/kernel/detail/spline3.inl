@@ -1183,8 +1183,8 @@ __forceinline__ __device__ void interpolate_stage_md(
                 if (I_YZ){
 
 
-                    auto interp_z = get_interp_order(z,BDZ,GDZ,global_z,data_size.z);
-                    auto interp_y = get_interp_order(y,BDY,GDY,global_y,data_size.y);
+                    auto interp_z = get_interp_order(z,BIZ,GDZ,global_z,data_size.z);
+                    auto interp_y = get_interp_order(y,BIY,GDY,global_y,data_size.y);
 
                     if(interp_z==4){
                         if(interp_y==4){
@@ -1339,8 +1339,8 @@ __forceinline__ __device__ void interpolate_stage_md(
                 else{//I_XY
                     //assert(z&1==0);
 
-                    auto interp_y = get_interp_order(y,BDY,GDY,global_y,data_size.y);
-                    auto interp_x = get_interp_order(x,BDX,GDX,global_x,data_size.x);
+                    auto interp_y = get_interp_order(y,BIY,GDY,global_y,data_size.y);
+                    auto interp_x = get_interp_order(x,BIX,GDX,global_x,data_size.x);
 
                     if(interp_y==4){
                         if(interp_x==4){
