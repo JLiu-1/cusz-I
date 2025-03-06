@@ -1412,7 +1412,7 @@ __forceinline__ __device__ void interpolate_stage_md(
                 }
             }
 
-            if CONSTEXPR (CUBIC) {  //
+            if CONSTEXPR (CUBE) {  //
                 auto interp_z = get_interp_order(z,BDZ,GDZ,global_z,data_size.z);
                 auto interp_y = get_interp_order(y,BDY,GDY,global_y,data_size.y);
                 auto interp_x = get_interp_order(x,BDX,GDX,global_x,data_size.x);
