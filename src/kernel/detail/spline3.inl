@@ -1173,8 +1173,8 @@ __forceinline__ __device__ void interpolate_stage_md(
                //     printf("%.2e %.2e %.2e %.2e\n",s_data[z ][y- 3*unit][x],s_data[z ][y- unit][x],s_data[z ][y+ unit][x]);
               //  }
 
-                bool I_YZ = x&1 == 0;
-                bool I_XZ = y&1 == 0;
+                bool I_YZ = (x&1) == 0;
+                bool I_XZ = (y&1) == 0;
 
                 if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==6 and z==9)
                     printf("face %d %d\n", I_YZ,I_XZ);
