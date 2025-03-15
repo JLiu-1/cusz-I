@@ -2785,8 +2785,8 @@ __device__ void global2shmem_17x17x17data_att(T1* data, DIM3 data_size, STRIDE3 
 {
     constexpr auto TOTAL = BLOCK17 * BLOCK17 * BLOCK17;
 
-    if(TIX==0){
-        printf("%d %d %d %d %d %d",data_size.x,data_size.y,data_size.z,data_leap.x,data_leap.y,data_leap.z);
+    //if(TIX==0){
+        printf("%d %d %d %d %d %d\n",data_size.x,data_size.y,data_size.z,data_leap.x,data_leap.y,data_leap.z);
     }
 
     for (auto _tix = TIX; _tix < TOTAL; _tix += LINEAR_BLOCK_SIZE) {
@@ -2807,6 +2807,9 @@ __device__ void global2shmem_17x17x17data_att(T1* data, DIM3 data_size, STRIDE3 
         if(BIX == 7 and BIY == 47 and BIZ == 15 and x==10 and y==4 and z==8){
             printf("g2s1048 %d %d %d %d %.2e %.2e \n",gx,gy,gz,gid,s_data[z][y][x],data[gid]);
         }*/
+    }
+    if(TIX==0){
+        printf("%d %d Done\n",BIX,BIY);
     }
     __syncthreads();
 }
