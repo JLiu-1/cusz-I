@@ -2789,7 +2789,7 @@ __device__ void global2shmem_17x17x17data_att(T1* data, DIM3 data_size, STRIDE3 
         auto z   = (_tix / BLOCK17) / BLOCK17;
         auto gx  = (x + global_starts.x);
         auto gy  = (y + global_starts.y);
-        auto gz  = (z + global_starts.Z);
+        auto gz  = (z + global_starts.z);
         auto gid = gx + gy * data_leap.y + gz * data_leap.z;
 
         if (gx < data_size.x and gy < data_size.y and gz < data_size.z) s_data[z][y][x] = data[gid];
@@ -2844,7 +2844,7 @@ __forceinline__ __device__ void interpolate_stage_att(
         
 
         if (xyz17x17x17_predicate_att<BORDER_INCLUSIVE>(x, y, z,data_size, global_starts)) {
-            T1 pred = 0;
+            T pred = 0;
 
             //if(BIX == 7 and BIY == 47 and BIZ == 15 and unit==4 and (CONSTEXPR (YELLOW)) )
             //    printf("%d %d %d\n",x,y,z);
@@ -2857,7 +2857,7 @@ __forceinline__ __device__ void interpolate_stage_att(
             if(BIX == 7 and BIY == 47 and BIZ == 15 and unit==4 and x==4 and y==8 and z==0)
                         printf("480 %.2e %.2e \n",s_data[z][y ][x- unit],s_data[z][y ][x+ unit]);*/
                   //  }
-            auto global_x=global_starts.x+x, global_y=global_starts.Y+y, global_z=global_starts.z+z;
+            auto global_x=global_starts.x+x, global_y=global_starts.y+y, global_z=global_starts.z+z;
             /*
             int interpolation_coeff_set1[2]={-1,-3};
             int interpolation_coeff_set2[2]={9,23};
@@ -3128,7 +3128,7 @@ __forceinline__ __device__ void interpolate_stage_att(
 }
 
 template <
-    typename T
+    typename T,
     typename FP,
     //typename LAMBDAX,
     //typename LAMBDAY,
@@ -3168,7 +3168,7 @@ __forceinline__ __device__ void interpolate_stage_md_att(
         
 
         if (xyz17x17x17_predicate_att<BORDER_INCLUSIVE>(x, y, z,data_size, global_starts)) {
-            T1 pred = 0;
+            T pred = 0;
 
             //if(BIX == 23 and BIY == 23 and BIZ == 15 and unit==2)
             //    printf("%d %d %d\n",x,y,z);
