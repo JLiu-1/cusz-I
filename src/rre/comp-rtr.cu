@@ -279,7 +279,7 @@ static void CheckCuda(const int line)
 }
 
 
-void RRE1_COMPRESS(uint8_t* input, size_t insize, uint8_t** output, int* outsize, float* time, void * strea,)
+void RRE1_COMPRESS(uint8_t* input, size_t insize, uint8_t** output, int* outsize, float* time, void * stream)
 {
   // get GPU info
   cudaSetDevice(0);
