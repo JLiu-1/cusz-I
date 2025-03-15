@@ -190,7 +190,7 @@ __forceinline__ __device__ bool xyz17x17x17_predicate(unsigned int x, unsigned i
 }
 
 template <bool INCLUSIVE = true>
-__forceinline__ __device__ bool xyz17x17x17_predicate_att(unsigned int x, unsigned int y, unsigned int z,const DIM3 &data_size, const STRIDE3 & global_starts)
+__forceinline__ __device__ bool xyz17x17x17_predicate_att(unsigned int x, unsigned int y, unsigned int z,const DIM3 &data_size, const DIM3 & global_starts)
 {
     if CONSTEXPR (INCLUSIVE) {  //
 
@@ -3076,7 +3076,7 @@ __forceinline__ __device__ void interpolate_stage_att(
                 }
             }
                 
-            atomicAdd(&error,fabs(s_data[z][y][x]-pred));
+            atomicAdd(const_cast<T*>(&error),fabs(s_data[z][y][x]-pred));
         }
     };
     // -------------------------------------------------------------------------------- //
@@ -3671,7 +3671,7 @@ __forceinline__ __device__ void interpolate_stage_md_att(
                 }
 
             }
-            atomicAdd(&error,fabs(s_data[z][y][x]-pred));
+            atomicAdd(const_cast<T*>(&error),fabs(s_data[z][y][x]-pred));
         }
     };
     // -------------------------------------------------------------------------------- //
@@ -4401,7 +4401,7 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
         //Just a copy back here
 
         if(TIX==0){
-            atomicAdd(errors+BIY,shmem.err);//BIY 0-17
+            atomicAdd(const_cast<T*>(errors+BIY),shmem.err);//BIY 0-17
         }
 
         //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
