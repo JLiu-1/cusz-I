@@ -267,7 +267,7 @@ static void CheckCuda(const int line)
 }
 
 
-void RRE1_COMPRESS(uint8_t* input, size_t insize, uint8_t** output, int* outsize, float* time)
+void RRE1_COMPRESS(uint8_t* input, size_t insize, uint8_t** output, int* outsize, float* time,void * stream)
 {
   // get GPU info
   cudaSetDevice(0);
@@ -303,10 +303,17 @@ void RRE1_COMPRESS(uint8_t* input, size_t insize, uint8_t** output, int* outsize
   cudaMalloc((void **)&d_fullcarry, chunks * sizeof(int));
   d_reset<<<1, 1>>>();
   cudaMemset(d_fullcarry, 0, chunks * sizeof(int));
-  GPUTimer dtimer;
-  dtimer.start();
+  //GPUTimer dtimer;
+  //dtimer.start();
+  CREATE_GPUEVENT_PAIR;
+  START_GPUEVENT_RECORDING(stream);
   d_encode<<<blocks, TPB>>>(input, (int)insize, d_encoded, d_encsize, d_fullcarry);
-   *time = (float)dtimer.stop();
+  // *time = (float)dtimer.stop();
+  STOP_GPUEVENT_RECORDING(stream);
+  CHECK_GPU(GpuStreamSync(stream));
+  TIME_ELAPSED_GPUEVENT(time);
+  DESTROY_GPUEVENT_PAIR;
+  
   cudaFree(d_fullcarry);
   CheckCuda(__LINE__);
  
