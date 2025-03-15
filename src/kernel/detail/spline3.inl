@@ -2825,7 +2825,7 @@ template <
 __forceinline__ __device__ void interpolate_stage_att(
     volatile T s_data[17][17][17],
     DIM3    data_size,
-    volatile DIM3    global_starts,
+    volatile DIM3    global_starts_v,
     LAMBDAX     xmap,
     LAMBDAY     ymap,
     LAMBDAZ     zmap,
@@ -2838,7 +2838,7 @@ __forceinline__ __device__ void interpolate_stage_att(
     static_assert((BLUE and YELLOW) == false, "must be only one hot (1)");
     static_assert((BLUE and YELLOW) == false, "must be only one hot (2)");
     static_assert((YELLOW and HOLLOW) == false, "must be only one hot (3)");
-
+    auto global_starts = global_starts_v;
     auto run = [&](auto x, auto y, auto z) {
 
         
@@ -3148,7 +3148,7 @@ template <
 __forceinline__ __device__ void interpolate_stage_md_att(
     volatile T s_data[17][17][17],
     DIM3    data_size,
-    volatile DIM3    global_starts,
+    volatile DIM3    global_starts_v,
     //LAMBDAX     xmap,
     //LAMBDAY     ymap,
     //LAMBDAZ     zmap,
@@ -3162,7 +3162,7 @@ __forceinline__ __device__ void interpolate_stage_md_att(
     static_assert((LINE and FACE) == false, "must be only one hot (1)");
     static_assert((LINE and CUBE) == false, "must be only one hot (2)");
     static_assert((FACE and CUBE) == false, "must be only one hot (3)");
-
+    auto global_starts = global_starts_v;
     auto run = [&](auto x, auto y, auto z) {
 
         
