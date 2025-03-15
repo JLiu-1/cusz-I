@@ -206,14 +206,17 @@ struct INTERPOLATION_PARAMS {
     double beta{4.0};
     
     //
-    bool interpolators[3];
+    //bool interpolators[3];
+
+    bool use_md[4];
+    bool use_natural[4];
     
     //
-    bool reverse[3];
-    uint8_t auto_tuning{2};
+    bool reverse[4];
+    uint8_t auto_tuning{3};
 
     //
-    INTERPOLATION_PARAMS() : interpolators{false, false, false}, reverse{false, false, false} {};
+    INTERPOLATION_PARAMS() : use_md{false, false, true,true},use_natural{false, false, false,false}, reverse{false, false, false, false} {};
 };
 
 

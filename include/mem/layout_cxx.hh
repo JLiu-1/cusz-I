@@ -74,7 +74,8 @@ TPL POOL::pszmempool_cxx(u4 x, int _radius, u4 y, u4 z)
 
   // for spline
   constexpr auto BLK = 16;
-  constexpr auto ERR_HISTO_LEN = 6;
+  //constexpr auto ERR_HISTO_LEN = 6;
+  constexpr auto ERR_HISTO_LEN = 18;
 
   _compressed = new pszmem_cxx<B>(len * 1.2, 1, 1, "compressed");
 
