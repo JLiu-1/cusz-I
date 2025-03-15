@@ -3927,11 +3927,11 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
     };
 
 
-    auto nan_cubic_interp = [] __device__ (T1 a, T1 b, T1 c, T1 d) -> T1{
+    auto nan_cubic_interp = [] __device__ (T a, T b, T1c, T d) -> T{
         return (-a+9*b+9*c-9*d) / 16;
     };
 
-    auto nat_cubic_interp = [] __device__ (T1 a, T1 b, T1 c, T1 d) -> T1{
+    auto nat_cubic_interp = [] __device__ (T a, T b, T c, T d) -> T{
         return (-3*a+23*b+23*c-3*d) / 40;
     };
 
@@ -3947,21 +3947,6 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
     FP cur_ebx2=ebx2,cur_eb_r=eb_r;
 
 
-    auto calc_eb = [&](auto unit) {
-        cur_ebx2=ebx2,cur_eb_r=eb_r;
-        int temp=1;
-        while(temp<unit){
-            temp*=2;
-            cur_eb_r *= intp_param.alpha;
-            cur_ebx2 /= intp_param.alpha;
-
-        }
-        if(cur_ebx2 < ebx2 / intp_param.beta){
-            cur_ebx2 = ebx2 / intp_param.beta;
-            cur_eb_r = eb_r * intp_param.beta;
-
-        }
-    };
     int unit;
     if(level==3){
         unit = 8;
@@ -4384,7 +4369,6 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
 {
     // compile time variables
     using T = typename std::remove_pointer<TITER>::type;
-    using E = typename std::remove_pointer<EITER>::type;
 
     {
         __shared__ struct {
@@ -4418,7 +4402,7 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
         //Just a copy back here
 
         if(TIX==0){
-            atomicAdd(errors+BIY,err);//BIY 0-17
+            atomicAdd(errors+BIY,sheme.err);//BIY 0-17
         }
 
         //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)

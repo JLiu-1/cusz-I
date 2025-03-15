@@ -115,7 +115,7 @@ int spline_construct(
       bool do_reverse=(errors[1]>3*errors[0]);
       intp_param.reverse[0]=intp_param.reverse[1]=intp_param.reverse[2]=intp_param.reverse[3]=do_reverse;
     }
-    else if (intp_param.auto_tuning==1){
+    else if (intp_param.auto_tuning==2){
        CREATE_GPUEVENT_PAIR;
        START_GPUEVENT_RECORDING(stream);
       cusz::c_spline3d_profiling_data_2<T*, DEFAULT_BLOCK_SIZE>  //
@@ -131,11 +131,11 @@ int spline_construct(
       CHECK_GPU(cudaMemcpy(profiling_errors->m->h, profiling_errors->m->d, profiling_errors->m->bytes, cudaMemcpyDeviceToHost));
       auto errors=profiling_errors->hptr();
 
-      intp_param.interpolators[0]=(errors[0]>errors[1]);
-      intp_param.interpolators[1]=(errors[2]>errors[3]);
-      intp_param.interpolators[2]=(errors[4]>errors[5]);
+      //intp_param.interpolators[0]=(errors[0]>errors[1]);
+      //intp_param.interpolators[1]=(errors[2]>errors[3]);
+      //intp_param.interpolators[2]=(errors[4]>errors[5]);
       
-      bool do_reverse=(errors[4+intp_param.interpolators[2]]>3*errors[intp_param.interpolators[0]]);
+     
       bool do_nat = errors[0] + errors[2] + errors[4] > errors[1] + errors[3] + errors[5];
       intp_param.use_natural[0]=intp_param.use_natural[1]=intp_param.use_natural[2]=intp_param.use_natural[3]=do_nat;
       //intp_param.interpolators[0]=(errors[0]>errors[1]);
@@ -143,6 +143,7 @@ int spline_construct(
       //intp_param.interpolators[2]=(errors[4]>errors[5]);
       //to revise: cubic spline selection for both axis-wise and global
        // bool do_reverse=(errors[1]>2*errors[0]);
+        bool do_reverse=(errors[4+do_nat]>3*errors[do_nat]);
        intp_param.reverse[0]=intp_param.reverse[1]=intp_param.reverse[2]=intp_param.reverse[3]=do_reverse;
     }
     else{
