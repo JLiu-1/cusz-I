@@ -64,8 +64,8 @@ int spline_construct(
   using Compact = typename CompactDram<PROPER_GPU_BACKEND, T>::Compact;
   auto ot = (Compact*)_outlier;
 
-  CREATE_GPUEVENT_PAIR;
-  START_GPUEVENT_RECORDING(stream);
+  //CREATE_GPUEVENT_PAIR;
+  //START_GPUEVENT_RECORDING(stream);
 
  if(intp_param.auto_tuning>0){
    //std::cout<<"att "<<(int)intp_param.auto_tuning<<std::endl;
@@ -138,7 +138,8 @@ int spline_construct(
     
   
   }
-
+  CREATE_GPUEVENT_PAIR;
+  START_GPUEVENT_RECORDING(stream);
 
   cusz::c_spline3d_infprecis_16x16x16data<T*, E*, float, DEFAULT_BLOCK_SIZE>  //
       <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>(
