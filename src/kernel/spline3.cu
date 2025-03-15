@@ -203,7 +203,7 @@ int spline_construct(
 
       intp_param.use_md[2] = errors[5] < best_error; 
 
-      best_error = errors[6]
+      best_error = errors[6];
       auto best_idx = 6; 
       for(auto i = 6;i<12;i++){
         if(errors[i]<best_error){
@@ -215,7 +215,7 @@ int spline_construct(
       intp_param.use_md[1] = (best_idx ==  8 or best_idx ==  11) ;
       intp_param.reverse[1] = best_idx%3;
 
-      best_error = errors[12]
+      best_error = errors[12];
       best_idx = 12; 
       for(auto i = 12;i<18;i++){
         if(errors[i]<best_error){
