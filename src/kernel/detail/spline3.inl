@@ -3927,7 +3927,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
     };
 
 
-    auto nan_cubic_interp = [] __device__ (T a, T b, Tc, T d) -> T{
+    auto nan_cubic_interp = [] __device__ (T a, T b, T c, T d) -> T{
         return (-a+9*b+9*c-9*d) / 16;
     };
 
