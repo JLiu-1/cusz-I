@@ -287,10 +287,11 @@ void RRE1_DECOMPRESS(uint8_t* input, uint8_t** output, int* pre_size, float* tim
   dtimer.start();
   d_reset<<<1, 1>>>();
   d_decode<<<blocks, TPB>>>(input, d_decoded, d_decsize);
+  *time = (float)dtimer.stop();
   cudaMemcpy(pre_size, d_decsize, sizeof(int), cudaMemcpyDeviceToHost);
   *output = d_decoded;
   cudaDeviceSynchronize();
-  *time = (float)dtimer.stop();
+  
 
   // get decoded GPU result
   // cudaMemcpy(ddecoded, d_decoded, ddecsize, cudaMemcpyDeviceToHost);
