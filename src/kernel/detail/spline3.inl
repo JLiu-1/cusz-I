@@ -3927,7 +3927,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
     };
 
 
-    auto nan_cubic_interp = [] __device__ (T a, T b, T1c, T d) -> T{
+    auto nan_cubic_interp = [] __device__ (T a, T b, Tc, T d) -> T{
         return (-a+9*b+9*c-9*d) / 16;
     };
 
@@ -3944,7 +3944,6 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
     constexpr auto BORDER_EXCLUSIVE = false;
 
     
-    FP cur_ebx2=ebx2,cur_eb_r=eb_r;
 
 
     int unit;
@@ -4402,7 +4401,7 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
         //Just a copy back here
 
         if(TIX==0){
-            atomicAdd(errors+BIY,sheme.err);//BIY 0-17
+            atomicAdd(errors+BIY,shmem.err);//BIY 0-17
         }
 
         //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
