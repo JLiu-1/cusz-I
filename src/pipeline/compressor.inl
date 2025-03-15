@@ -209,7 +209,7 @@ COR::compress_rre1(pszctx* ctx, void* stream)
 
   /* RRE1 lossless compression */
   RRE1_COMPRESS(mem->compressed(), psz_utils::filesize(&header), 
-      &mem->_compressed_rre1, &compressed_len_rre1, &time_rre1，stream);
+      &mem->_compressed_rre1, &compressed_len_rre1, &time_rre1, stream);
   header.compressed_len = compressed_len_rre1;
   if (spline_in_use()) { PSZDBG_LOG("RRE1: done"); }
   
