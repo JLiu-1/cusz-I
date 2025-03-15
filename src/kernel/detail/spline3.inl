@@ -2786,8 +2786,8 @@ __device__ void global2shmem_17x17x17data_att(T1* data, DIM3 data_size, STRIDE3 
     constexpr auto TOTAL = BLOCK17 * BLOCK17 * BLOCK17;
 
     //if(TIX==0){
-        printf("%d %d %d %d %d %d\n",data_size.x,data_size.y,data_size.z,data_leap.x,data_leap.y,data_leap.z);
-    }
+    //    printf("%d %d %d %d %d %d\n",data_size.x,data_size.y,data_size.z,data_leap.x,data_leap.y,data_leap.z);
+    //}
 
     for (auto _tix = TIX; _tix < TOTAL; _tix += LINEAR_BLOCK_SIZE) {
         auto x   = (_tix % BLOCK17);
