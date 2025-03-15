@@ -166,6 +166,8 @@ int spline_construct(
       calc_start_size(l3.y,s_start_y,s_size_y);
       calc_start_size(l3.z,s_start_z,s_size_z);
 
+      printf("%d %d %d %d %d %d\n",s_start_x,s_start_y,s_start_z,s_size_x,s_size_y,s_size_z);
+
       CREATE_GPUEVENT_PAIR;
        START_GPUEVENT_RECORDING(stream);
 
