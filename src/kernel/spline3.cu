@@ -118,11 +118,11 @@ int spline_construct(
       CHECK_GPU(cudaMemcpy(profiling_errors->m->h, profiling_errors->m->d, profiling_errors->m->bytes, cudaMemcpyDeviceToHost));
       auto errors=profiling_errors->hptr();
 
-      intp_param.interpolators[0]=(errors[0]>errors[1]);
-      intp_param.interpolators[1]=(errors[2]>errors[3]);
-      intp_param.interpolators[2]=(errors[4]>errors[5]);
+      //intp_param.interpolators[0]=(errors[0]>errors[1]);
+      //intp_param.interpolators[1]=(errors[2]>errors[3]);
+      //intp_param.interpolators[2]=(errors[4]>errors[5]);
       
-      bool do_reverse=(errors[4+intp_param.interpolators[2]]>3*errors[intp_param.interpolators[0]]);
+      
       bool do_nat = errors[0] + errors[2] + errors[4] > errors[1] + errors[3] + errors[5];
       intp_param.interpolators[0]=intp_param.interpolators[1]=intp_param.interpolators[2]=do_nat;
       //intp_param.interpolators[0]=(errors[0]>errors[1]);
@@ -130,6 +130,8 @@ int spline_construct(
       //intp_param.interpolators[2]=(errors[4]>errors[5]);
       //to revise: cubic spline selection for both axis-wise and global
        // bool do_reverse=(errors[1]>2*errors[0]);
+
+       bool do_reverse=(errors[4+do_nat]>3*errors[do_nat]);
        intp_param.reverse[0]=intp_param.reverse[1]=intp_param.reverse[2]=do_reverse;
     }
    
