@@ -267,7 +267,7 @@ static void CheckCuda(const int line)
 }
 
 
-void RRE1_COMPRESS(uint8_t* input, size_t insize, uint8_t** output, int* outsize, float* time,void * stream)
+void RRE1_COMPRESS(uint8_t* input, size_t insize, uint8_t** output, int* outsize, float* time, void * stream)
 {
   // get GPU info
   cudaSetDevice(0);
@@ -313,7 +313,6 @@ void RRE1_COMPRESS(uint8_t* input, size_t insize, uint8_t** output, int* outsize
   CHECK_GPU(GpuStreamSync(stream));
   TIME_ELAPSED_GPUEVENT(time);
   DESTROY_GPUEVENT_PAIR;
-  
   cudaFree(d_fullcarry);
   CheckCuda(__LINE__);
  
