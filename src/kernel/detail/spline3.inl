@@ -3982,12 +3982,12 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
                 interpolate_stage_md_att<
                     T, FP, decltype(xyzmap_face_16b_8u), //
                     false, true, false, LINEAR_BLOCK_SIZE,6 ,NO_COARSEN, BORDER_INCLUSIVE>(
-                    s_data,data_size,global_starts, xyzmap_line_16b_8u, unit, nat_cubic_interp,error);
+                    s_data,data_size,global_starts, xyzmap_face_16b_8u, unit, nat_cubic_interp,error);
 
                 interpolate_stage_md_att<
                     T, FP, decltype(xyzmap_cube_16b_8u), //
                     false, false, true, LINEAR_BLOCK_SIZE,1 ,NO_COARSEN, BORDER_EXCLUSIVE>(
-                    s_data,data_size,global_starts, xyzmap_line_16b_8u, unit, nat_cubic_interp,error);
+                    s_data,data_size,global_starts, xyzmap_cube_16b_8u, unit, nat_cubic_interp,error);
                 
 
             }
