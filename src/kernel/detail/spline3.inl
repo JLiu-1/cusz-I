@@ -2773,6 +2773,8 @@ __forceinline__ __device__ void pre_compute_att(DIM3 sam_starts, DIM3 sam_bgs, D
             use_md = (BIY == 14 or BIY ==17);
             reverse = BIY % 3;
         }
+
+        printf("%d %d %d %d %d %d %d\n",global_starts.x,global_starts.y,global_starts.z,level,use_natural,use_md,reverse);
     }
     __syncthreads(); 
     
