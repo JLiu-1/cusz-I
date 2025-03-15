@@ -279,7 +279,7 @@ static void CheckCuda(const int line)
 }
 
 
-void RRE1_COMPRESS(uint8_t* input, size_t insize, uint8_t** output, int* outsize, float* time)
+void RRE1_COMPRESS(uint8_t* input, size_t insize, uint8_t** output, int* outsize, float* time, void * strea,)
 {
   // get GPU info
   cudaSetDevice(0);
@@ -310,16 +310,18 @@ void RRE1_COMPRESS(uint8_t* input, size_t insize, uint8_t** output, int* outsize
   // cudaMemcpy(dpreencdata, d_input, insize, cudaMemcpyDeviceToDevice);
   // int dpreencsize = insize;
 
-  GPUTimer dtimer;
-  dtimer.start();
+  
   int* d_fullcarry;
   cudaMalloc((void **)&d_fullcarry, chunks * sizeof(int));
   d_reset<<<1, 1>>>();
   cudaMemset(d_fullcarry, 0, chunks * sizeof(int));
+  GPUTimer dtimer;
+  dtimer.start();
   d_encode<<<blocks, TPB>>>(input, (int)insize, d_encoded, d_encsize, d_fullcarry);
+   *time = (float)dtimer.stop();
   cudaFree(d_fullcarry);
   CheckCuda(__LINE__);
-  *time = (float)dtimer.stop();
+ 
 
   // get encoded GPU result
   // int dencsize = 0;
