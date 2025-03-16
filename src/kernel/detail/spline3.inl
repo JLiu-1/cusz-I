@@ -4627,16 +4627,16 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
                 intp_param.use_md[1]=true;
                 cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE,SPLINE3_PRED_ATT>(shmem.data, data_size,global_starts,eb_r,eb_x2,level,intp_param,shmem.err+2);
 
-                if(TIX<3){
-                    atomicAdd(const_cast<T*>(errors+3+BIY*3+TIX),shmem.err[TIX]);
-                }
+                //if(TIX<3){
+                //    atomicAdd(const_cast<T*>(errors+3+BIY*3+TIX),shmem.err[TIX]);
+                //}
 
             }
             else{
                 cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE,SPLINE3_PRED_ATT>(shmem.data, data_size,global_starts,eb_r,eb_x2,level,intp_param,shmem.err);
-                if(TIX==0){
-                    atomicAdd(const_cast<T*>(errors+9+BIY),shmem.err[0]);
-                }
+                //if(TIX==0){
+                //    atomicAdd(const_cast<T*>(errors+9+BIY),shmem.err[0]);
+               // }
             }
 
             if(TIX==0 and BIX == 10)
