@@ -64,8 +64,8 @@ int spline_construct(
   using Compact = typename CompactDram<PROPER_GPU_BACKEND, T>::Compact;
   auto ot = (Compact*)_outlier;
 
-  //CREATE_GPUEVENT_PAIR;
-  //START_GPUEVENT_RECORDING(stream);
+  CREATE_GPUEVENT_PAIR;
+  START_GPUEVENT_RECORDING(stream);
 
  if(intp_param.auto_tuning>0){
    //std::cout<<"att "<<(int)intp_param.auto_tuning<<std::endl;
@@ -118,20 +118,12 @@ int spline_construct(
       CHECK_GPU(cudaMemcpy(profiling_errors->m->h, profiling_errors->m->d, profiling_errors->m->bytes, cudaMemcpyDeviceToHost));
       auto errors=profiling_errors->hptr();
 
-      //intp_param.interpolators[0]=(errors[0]>errors[1]);
-      //intp_param.interpolators[1]=(errors[2]>errors[3]);
-      //intp_param.interpolators[2]=(errors[4]>errors[5]);
+      intp_param.interpolators[0]=(errors[0]>errors[1]);
+      intp_param.interpolators[1]=(errors[2]>errors[3]);
+      intp_param.interpolators[2]=(errors[4]>errors[5]);
       
-      
-      bool do_nat = errors[0] + errors[2] + errors[4] > errors[1] + errors[3] + errors[5];
-      intp_param.interpolators[0]=intp_param.interpolators[1]=intp_param.interpolators[2]=do_nat;
-      //intp_param.interpolators[0]=(errors[0]>errors[1]);
-      //intp_param.interpolators[1]=(errors[2]>errors[3]);
-      //intp_param.interpolators[2]=(errors[4]>errors[5]);
-      //to revise: cubic spline selection for both axis-wise and global
+      bool do_reverse=(errors[4+intp_param.interpolators[2]]>3*errors[intp_param.interpolators[0]]);
        // bool do_reverse=(errors[1]>2*errors[0]);
-
-       bool do_reverse=(errors[4+do_nat]>3*errors[do_nat]);
        intp_param.reverse[0]=intp_param.reverse[1]=intp_param.reverse[2]=do_reverse;
     }
    
@@ -140,8 +132,7 @@ int spline_construct(
     
   
   }
-  CREATE_GPUEVENT_PAIR;
-  START_GPUEVENT_RECORDING(stream);
+
 
   cusz::c_spline3d_infprecis_16x16x16data<T*, E*, float, DEFAULT_BLOCK_SIZE>  //
       <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>(
