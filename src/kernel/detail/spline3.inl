@@ -2737,9 +2737,10 @@ __global__ void cusz::reset_errors(TITER errors)
 }
 
 
-__forceinline__ __device__ void pre_compute_att(DIM3 sam_starts, DIM3 sam_bgs, DIM3 sam_strides,volatile DIM3 &global_starts,volatile uint8_t &level,volatile bool &use_natural, volatile bool &use_md, volatile bool &reverse){
+__forceinline__ __device__ void pre_compute_att(DIM3 sam_starts, DIM3 sam_bgs, DIM3 sam_strides,volatile DIM3 &global_starts,volatile uint8_t &level,volatile bool &use_natural, volatile bool &use_md, volatile bool &reverse,volatile T &err){
 
     if(TIX==0){
+        err = 0.0;
         auto grid_idx_x = BIX % sam_bgs.x;
         auto grid_idx_y = (BIX / sam_bgs.x) % sam_bgs.y;
         auto grid_idx_z = (BIX / sam_bgs.x) / sam_bgs.y;
@@ -4385,7 +4386,7 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
             bool use_natural;
             bool use_md;
             bool reverse;
-            T err = 0;
+            T err;
            // T global_errs[6];
         } shmem;
 
@@ -4401,7 +4402,7 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
         //}
         //__syncthreads();
 
-        pre_compute_att(sample_starts, sample_block_grid_sizes, sample_strides,shmem.global_starts,shmem.level,shmem.use_natural,shmem.use_md,shmem.reverse);
+        pre_compute_att(sample_starts, sample_block_grid_sizes, sample_strides,shmem.global_starts,shmem.level,shmem.use_natural,shmem.use_md,shmem.reverse,shmem.err);
         global2shmem_17x17x17data_att<T, T,LINEAR_BLOCK_SIZE>(data, data_size, data_leap, shmem.data,shmem.global_starts);
          if(BIX==10 and BIY == 10 and TIX==0){
             printf("%.4e\n",shmem.err);
@@ -4411,7 +4412,7 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
         cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE>(shmem.data, data_size,shmem.global_starts,shmem.level,shmem.use_natural,shmem.use_md,shmem.reverse,&shmem.err);
         
         //Just a copy back here
-        __syncthreads();
+        //__syncthreads();
         if(BIX==10 and BIY == 10 and TIX==0){
             printf("%.4e\n",shmem.err);
         }
