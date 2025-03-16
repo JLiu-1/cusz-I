@@ -3148,7 +3148,7 @@ __forceinline__ __device__ void interpolate_stage_att(
                //     printf("%d %d %d %d %d %d %d %d %d %d %.2e %.2e %.2e\n",unit,CONSTEXPR (BLUE),CONSTEXPR (YELLOW),CONSTEXPR (HOLLOW),BIX,BIY,BIZ,x,y,z,pred,code,s_data[z][y][x]);
               
                 s_data[z][y][x]  = pred + code * ebx2;
-                atomicAdd(const_cast<T*>(error),fabs(code));
+                atomicAdd(const_cast<T*>(error),code==0);
                 
 
             }
@@ -3778,7 +3778,7 @@ __forceinline__ __device__ void interpolate_stage_md_att(
                //     printf("%d %d %d %d %d %d %d %d %d %d %.2e %.2e %.2e\n",unit,CONSTEXPR (BLUE),CONSTEXPR (YELLOW),CONSTEXPR (HOLLOW),BIX,BIY,BIZ,x,y,z,pred,code,s_data[z][y][x]);
               
                 s_data[z][y][x]  = pred + code * ebx2;
-                atomicAdd(const_cast<T*>(error),fabs(code));
+                atomicAdd(const_cast<T*>(error),code==0);
                 
 
             }
