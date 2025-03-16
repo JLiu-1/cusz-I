@@ -181,6 +181,10 @@ int spline_construct(
       CHECK_GPU(cudaMemcpy(profiling_errors->m->h, profiling_errors->m->d, profiling_errors->m->bytes, cudaMemcpyDeviceToHost));
       auto errors=profiling_errors->hptr();
 
+      for(int i=0;i<18;i++){
+      printf("%d %.4e\n",i,errors[i]);
+      }
+
       T best_error;
       if(errors[0]>errors[1]){
         best_error = errors[1];
@@ -238,7 +242,7 @@ int spline_construct(
 
 
     }
-   
+
      printf("NAT: %d %d %d %d\n",intp_param.use_natural[3],intp_param.use_natural[2],intp_param.use_natural[1],intp_param.use_natural[0]);
           printf("MD: %d %d %d %d\n",intp_param.use_md[3],intp_param.use_md[2],intp_param.use_md[1],intp_param.use_md[0]);
           printf("REVERSE: %d %d %d %d\n",intp_param.reverse[3],intp_param.reverse[2],intp_param.reverse[1],intp_param.reverse[0]);
