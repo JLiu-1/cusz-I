@@ -1648,7 +1648,7 @@ __forceinline__ __device__ void interpolate_stage_md(
         
     }
     else {
-        if(TIX<TOTAL){
+        if(TIX<NUM_ELE){
             auto [x,y,z]    = xyzmap(TIX, unit);
             
 
@@ -3729,7 +3729,7 @@ __forceinline__ __device__ void interpolate_stage_md_att(
         
     }
     else {
-        if(TIX<TOTAL){
+        if(TIX<NUM_ELE){
             auto [x,y,z]    = xyzmap(TIX, unit);
             
 
