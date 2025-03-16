@@ -168,7 +168,7 @@ int spline_construct(
       calc_start_size(l3.z,s_start_z,s_size_z);
 
       //printf("%d %d %d %d %d %d\n",s_start_x,s_start_y,s_start_z,s_size_x,s_size_y,s_size_z);
-
+      float temp_time = 0;
       CREATE_GPUEVENT_PAIR;
        START_GPUEVENT_RECORDING(stream);
 
@@ -177,8 +177,9 @@ int spline_construct(
       (data->dptr(), data->template len3<dim3>(),data->template st3<dim3>(),dim3(s_start_x,s_start_y,s_start_z),dim3(s_size_x,s_size_y,s_size_z),dim3(S_STRIDE,S_STRIDE,S_STRIDE),eb_r,ebx2,intp_param,profiling_errors->dptr(),true);
        STOP_GPUEVENT_RECORDING(stream);
       CHECK_GPU(GpuStreamSync(stream));
-      TIME_ELAPSED_GPUEVENT(&att_time);
+      TIME_ELAPSED_GPUEVENT(&temp_time);
       DESTROY_GPUEVENT_PAIR;
+      att_time+=temp_time;
       CHECK_GPU(cudaMemcpy(profiling_errors->m->h, profiling_errors->m->d, profiling_errors->m->bytes, cudaMemcpyDeviceToHost));
       auto errors=profiling_errors->hptr();
 
@@ -233,6 +234,48 @@ int spline_construct(
       intp_param.use_natural[0] = best_idx >  14;
       intp_param.use_md[0] = (best_idx ==  14 or best_idx ==  17);
       intp_param.reverse[0] = best_idx%3;
+
+      if(intp_param.auto_tuning==4){
+         cusz::reset_errors<<<dim3(1, 1, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1),0, (GpuStreamT)stream >>>(profiling_errors->dptr());
+
+        float temp_time = 0;
+        CREATE_GPUEVENT_PAIR;
+         START_GPUEVENT_RECORDING(stream);
+
+        cusz::pa_spline3d_infprecis_16x16x16data<T*, float, DEFAULT_BLOCK_SIZE> //
+        <<<dim3(s_size_x*s_size_y*s_size_z, 11, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1),0, (GpuStreamT)stream  >>>
+        (data->dptr(), data->template len3<dim3>(),data->template st3<dim3>(),dim3(s_start_x,s_start_y,s_start_z),dim3(s_size_x,s_size_y,s_size_z),dim3(S_STRIDE,S_STRIDE,S_STRIDE),eb_r,ebx2,intp_param,profiling_errors->dptr(),false);
+         STOP_GPUEVENT_RECORDING(stream);
+        CHECK_GPU(GpuStreamSync(stream));
+        TIME_ELAPSED_GPUEVENT(&temp_time);
+        DESTROY_GPUEVENT_PAIR;
+        att_time+=temp_time;
+
+        auto errors=profiling_errors->hptr();
+
+        best_error = errors[0];
+        auto best_idx = 0; 
+        for(auto i = 1;i<11;i++){
+          if(errors[i]<best_error){
+            best_error=errors[i];
+            best_idx = i;
+          }
+        }
+
+        if(best_idx==0){
+            intp_param.alpha = 1.0;
+            intp_param.beta = 2.0;
+        }
+        else if (best_idx==1){
+            intp_param.alpha = 1.25;
+            intp_param.beta = 2.0;
+        }
+        else{
+            intp_param.alpha = 1.5+0.25*((best_idx-2)/3);
+            intp_param.beta = 2.0+((best_idx-2)%3);
+        }
+
+      }
 
 
 
