@@ -4403,19 +4403,22 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
         //__syncthreads();
 
         pre_compute_att<T>(sample_starts, sample_block_grid_sizes, sample_strides,shmem.global_starts,shmem.level,shmem.use_natural,shmem.use_md,shmem.reverse,shmem.err);
+         //if(BIX==10 and BIY == 10 and TIX==0){
+         //   printf("%.4e\n",shmem.err);
+        //}
         global2shmem_17x17x17data_att<T, T,LINEAR_BLOCK_SIZE>(data, data_size, data_leap, shmem.data,shmem.global_starts);
-         if(BIX==10 and BIY == 10 and TIX==0){
-            printf("%.4e\n",shmem.err);
-        }
+         //if(BIX==10 and BIY == 10 and TIX==0){
+         //   printf("%.4e\n",shmem.err);
+        //}
         //if(TIX==0 and BIX==0 and BIY==0)
          //   printf("gs\n");
         cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE>(shmem.data, data_size,shmem.global_starts,shmem.level,shmem.use_natural,shmem.use_md,shmem.reverse,&shmem.err);
         
         //Just a copy back here
         //__syncthreads();
-        if(BIX==10 and BIY == 10 and TIX==0){
-            printf("%.4e\n",shmem.err);
-        }
+        //if(BIX==10 and BIY == 10 and TIX==0){
+        //    printf("%.4e\n",shmem.err);
+        //}
 
         if(TIX==0){
             atomicAdd(const_cast<T*>(errors+BIY),shmem.err);//BIY 0-17
