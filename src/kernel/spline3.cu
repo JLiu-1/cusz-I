@@ -171,6 +171,7 @@ int spline_construct(
       float temp_time = 0;
       CREATE_GPUEVENT_PAIR;
        START_GPUEVENT_RECORDING(stream);
+      auto block_num = s_size_x*s_size_y*s_size_z;
 
       cusz::pa_spline3d_infprecis_16x16x16data<T*, float, DEFAULT_BLOCK_SIZE> //
       <<<dim3(s_size_x*s_size_y*s_size_z, 18, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1),0, (GpuStreamT)stream  >>>
@@ -187,6 +188,13 @@ int spline_construct(
       //printf("%d %.4e\n",i,errors[i]);
       //}
 
+
+      double best_ave_pre_error[4];
+      auto calcnum  = [&](auto N){
+        return N*(7*N*N+9*N+3);
+      };
+
+
       T best_error;
       if(errors[0]>errors[1]){
         best_error = errors[1];
@@ -196,8 +204,11 @@ int spline_construct(
         best_error = errors[0];
         intp_param.reverse[3] = false;
       }
+       
 
       intp_param.use_md[3] = errors[2] < best_error; 
+      best_arror = fmin(errors[2],best_error);
+      best_ave_pre_error[3]= best_error/(calcnum(1)*block_num);
 
 
       if(errors[3]>errors[4]){
@@ -210,6 +221,8 @@ int spline_construct(
       }
 
       intp_param.use_md[2] = errors[5] < best_error; 
+      best_arror = fmin(errors[5],best_error);
+      best_ave_pre_error[2]= best_error/(calcnum(2)*block_num);
 
       best_error = errors[6];
       auto best_idx = 6; 
@@ -223,8 +236,11 @@ int spline_construct(
       intp_param.use_md[1] = (best_idx ==  8 or best_idx ==  11) ;
       intp_param.reverse[1] = best_idx%3;
 
+      best_ave_pre_error[1]= best_error/(calcnum(4)*block_num);
+
       best_error = errors[12];
       best_idx = 12; 
+
       for(auto i = 12;i<18;i++){
         if(errors[i]<best_error){
           best_error=errors[i];
@@ -234,6 +250,8 @@ int spline_construct(
       intp_param.use_natural[0] = best_idx >  14;
       intp_param.use_md[0] = (best_idx ==  14 or best_idx ==  17);
       intp_param.reverse[0] = best_idx%3;
+
+      best_ave_pre_error[0]= best_error/(calcnum(8)*block_num);
 
       if(intp_param.auto_tuning==4){
          cusz::reset_errors<<<dim3(1, 1, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1),0, (GpuStreamT)stream >>>(profiling_errors->dptr());
@@ -280,6 +298,22 @@ int spline_construct(
         }
 
       }
+      else if(intp_param.auto_tuning >=5){
+        best_idx = intp_param.auto_tuning-5;
+        if(best_idx==0){
+            intp_param.alpha = 1.0;
+            intp_param.beta = 2.0;
+        }
+        else if (best_idx==1){
+            intp_param.alpha = 1.25;
+            intp_param.beta = 2.0;
+        }
+        else{
+            intp_param.alpha = 1.5+0.25*((best_idx-2)/3);
+            intp_param.beta = 2.0+((best_idx-2)%3);
+        }
+
+      }
 
 
 
@@ -292,9 +326,11 @@ int spline_construct(
     }
     //for(int i=0;i<4;i++)
     //intp_param.reverse[i]=false;
-     //printf("NAT: %d %d %d %d\n",intp_param.use_natural[3],intp_param.use_natural[2],intp_param.use_natural[1],intp_param.use_natural[0]);
-      //    printf("MD: %d %d %d %d\n",intp_param.use_md[3],intp_param.use_md[2],intp_param.use_md[1],intp_param.use_md[0]);
-      //    printf("REVERSE: %d %d %d %d\n",intp_param.reverse[3],intp_param.reverse[2],intp_param.reverse[1],intp_param.reverse[0]);
+     printf("NAT: %d %d %d %d\n",intp_param.use_natural[3],intp_param.use_natural[2],intp_param.use_natural[1],intp_param.use_natural[0]);
+      printf("MD: %d %d %d %d\n",intp_param.use_md[3],intp_param.use_md[2],intp_param.use_md[1],intp_param.use_md[0]);
+      printf("REVERSE: %d %d %d %d\n",intp_param.reverse[3],intp_param.reverse[2],intp_param.reverse[1],intp_param.reverse[0]);
+      printf("BESTERROR: %.4e %.4e %.4e %.4e\n",best_ave_pre_error[3],best_ave_pre_error[2],best_ave_pre_error[1],best_ave_pre_error[0]);
+      printf("A B: %.1f %.1f\n",intp_param.alpha,intp_param.beta);
     
   
   }
