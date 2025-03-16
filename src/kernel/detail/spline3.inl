@@ -4428,10 +4428,16 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
         //    printf("%.4e\n",shmem.err);
         //}
 
-        if(TIX==0){
-            atomicAdd(const_cast<T*>(errors+BIY),1.0);//BIY 0-17
+        if(TIX==0 and BIX ==30 and BIY >=12 and BIY < 15){
+            printf("%d %.4e\n",BIY,shmem.err);
         }
 
+
+        if(TIX==0){
+            atomicAdd(const_cast<T*>(errors+BIY),shmem.err);//BIY 0-17
+        }
+
+        
         //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
         //    printf("interp\n");
         //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
