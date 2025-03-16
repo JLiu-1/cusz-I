@@ -4587,13 +4587,6 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
                 uint8_t level3 = 3;
                 intp_param.use_natural[3]=false;
                 intp_param.use_natural[2]=false;
-                intp_param.use_md[3]=false;
-                intp_param.reverse[3]=false;
-                cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE,SPLINE3_PRED_ATT>(shmem.data, data_size,global_starts,eb_r,eb_x2,level3,intp_param,shmem.err);
-                intp_param.reverse[3]=true;
-                cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE,SPLINE3_PRED_ATT>(shmem.data, data_size,global_starts,eb_r,eb_x2,level3,intp_param,shmem.err+1);
-                intp_param.use_md[3]=true;
-                cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE,SPLINE3_PRED_ATT>(shmem.data, data_size,global_starts,eb_r,eb_x2,level3,intp_param,shmem.err+2);
                 intp_param.use_md[2]=false;
                 intp_param.reverse[2]=false;
                 cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE,SPLINE3_PRED_ATT>(shmem.data, data_size,global_starts,eb_r,eb_x2,level,intp_param,shmem.err+3);
@@ -4601,6 +4594,16 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
                 cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE,SPLINE3_PRED_ATT>(shmem.data, data_size,global_starts,eb_r,eb_x2,level,intp_param,shmem.err+4);
                 intp_param.use_md[2]=true;
                 cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE,SPLINE3_PRED_ATT>(shmem.data, data_size,global_starts,eb_r,eb_x2,level,intp_param,shmem.err+5);
+
+                
+                intp_param.use_md[3]=false;
+                intp_param.reverse[3]=false;
+                cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE,SPLINE3_PRED_ATT>(shmem.data, data_size,global_starts,eb_r,eb_x2,level3,intp_param,shmem.err);
+                intp_param.reverse[3]=true;
+                cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE,SPLINE3_PRED_ATT>(shmem.data, data_size,global_starts,eb_r,eb_x2,level3,intp_param,shmem.err+1);
+                intp_param.use_md[3]=true;
+                cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE,SPLINE3_PRED_ATT>(shmem.data, data_size,global_starts,eb_r,eb_x2,level3,intp_param,shmem.err+2);
+                
 
                 if(TIX<6){
                     atomicAdd(const_cast<T*>(errors+TIX),shmem.err[TIX]);
