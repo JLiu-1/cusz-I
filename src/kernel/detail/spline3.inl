@@ -3096,11 +3096,11 @@ __forceinline__ __device__ void interpolate_stage_att(
                 }
             }
             
-           // atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
+            atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
            // if(BIX ==30 and BIY>=0 and BIY < 3 and x == 8 and y ==8 and z ==8){
            //     printf("888 %d %.4e %.4e\n",BIY,s_data[z][y][x],pred);
            // }
-            atomicAdd(const_cast<T*>(error),1.0);
+           // atomicAdd(const_cast<T*>(error),1.0);
         }
     };
     // -------------------------------------------------------------------------------- //
@@ -3695,11 +3695,11 @@ __forceinline__ __device__ void interpolate_stage_md_att(
                 }
 
             }
-            //atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
+            atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
            // if(BIX == 30 and BIY>=0 and BIY < 3 and x == 8 and y == 8 and z == 8){
             //    printf("888 %d %.4e %.4e\n",BIY,s_data[z][y][x],pred);
             //}
-            atomicAdd(const_cast<T*>(error),1.0);
+            //atomicAdd(const_cast<T*>(error),1.0);
         }
     };
     // -------------------------------------------------------------------------------- //
