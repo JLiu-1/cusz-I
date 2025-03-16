@@ -4440,9 +4440,9 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
         //    printf("%.4e\n",shmem.err);
         //}
 
-        if(TIX==0 and BIX ==30 and BIY >=0 and BIY < 3){
-            printf("%d %.4e\n",BIY,shmem.err);
-        }
+        //if(TIX==0 and BIX ==30 and BIY >=0 and BIY < 3){
+        //    printf("%d %.4e\n",BIY,shmem.err);
+        //}
 
 
         if(TIX==0){
