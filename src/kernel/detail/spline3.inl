@@ -2838,7 +2838,7 @@ __device__ void global2shmem_17x17x17data_att(T1* data, DIM3 data_size, STRIDE3 
         auto gz  = (z + global_starts.z);
         auto gid = gx + gy * data_leap.y + gz * data_leap.z;
 
-        if (gx < data_size.x and gy < data_size.y and gz < data_size.z and x & (unit-1) == 0 and y & (unit-1) == 0 and z & (unit-1) == 0 ) s_data[z][y][x] = data[gid];
+        if (gx < data_size.x and gy < data_size.y and gz < data_size.z and (x & (unit-1)) == 0 and (y & (unit-1)) == 0 and (z & (unit-1)) == 0 ) s_data[z][y][x] = data[gid];
 /*
         if(BIX == 7 and BIY == 47 and BIZ == 15 and x==10 and y==8 and z==4){
             printf("g2s1084 %d %d %d %d %.2e %.2e \n",gx,gy,gz,gid,s_data[z][y][x],data[gid]);
