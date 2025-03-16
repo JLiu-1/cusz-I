@@ -174,7 +174,7 @@ int spline_construct(
       auto block_num = s_size_x*s_size_y*s_size_z;
 
       cusz::pa_spline3d_infprecis_16x16x16data<T*, float, DEFAULT_BLOCK_SIZE> //
-      <<<dim3(s_size_x*s_size_y*s_size_z, 18, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1),0, (GpuStreamT)stream  >>>
+      <<<dim3(s_size_x*s_size_y*s_size_z, 15, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1),0, (GpuStreamT)stream  >>>
       (data->dptr(), data->template len3<dim3>(),data->template st3<dim3>(),dim3(s_start_x,s_start_y,s_start_z),dim3(s_size_x,s_size_y,s_size_z),dim3(S_STRIDE,S_STRIDE,S_STRIDE),eb_r,ebx2,intp_param,profiling_errors->dptr(),true);
        STOP_GPUEVENT_RECORDING(stream);
       CHECK_GPU(GpuStreamSync(stream));
