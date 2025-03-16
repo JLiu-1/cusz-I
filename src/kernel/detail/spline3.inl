@@ -2736,7 +2736,7 @@ __global__ void cusz::reset_errors(TITER errors)
         errors[TIX]=0;
 }
 
-
+template <typename T>
 __forceinline__ __device__ void pre_compute_att(DIM3 sam_starts, DIM3 sam_bgs, DIM3 sam_strides,volatile DIM3 &global_starts,volatile uint8_t &level,volatile bool &use_natural, volatile bool &use_md, volatile bool &reverse,volatile T &err){
 
     if(TIX==0){
@@ -4402,7 +4402,7 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
         //}
         //__syncthreads();
 
-        pre_compute_att(sample_starts, sample_block_grid_sizes, sample_strides,shmem.global_starts,shmem.level,shmem.use_natural,shmem.use_md,shmem.reverse,shmem.err);
+        pre_compute_att<T>(sample_starts, sample_block_grid_sizes, sample_strides,shmem.global_starts,shmem.level,shmem.use_natural,shmem.use_md,shmem.reverse,shmem.err);
         global2shmem_17x17x17data_att<T, T,LINEAR_BLOCK_SIZE>(data, data_size, data_leap, shmem.data,shmem.global_starts);
          if(BIX==10 and BIY == 10 and TIX==0){
             printf("%.4e\n",shmem.err);
