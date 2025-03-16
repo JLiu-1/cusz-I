@@ -148,7 +148,7 @@ int spline_construct(
        intp_param.reverse[0]=intp_param.reverse[1]=intp_param.reverse[2]=intp_param.reverse[3]=do_reverse;
     }
     else{
-      const auto S_STRIDE = 5 * BLOCK;//80
+      const auto S_STRIDE = 6 * BLOCK;//96
       cusz::reset_errors<<<dim3(1, 1, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1),0, (GpuStreamT)stream >>>(profiling_errors->dptr());
 
       auto calc_start_size = [&](auto dim,auto & s_start,auto &s_size) {
