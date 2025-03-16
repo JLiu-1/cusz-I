@@ -2754,7 +2754,7 @@ __global__ void cusz::reset_errors(TITER errors)
 }
 
 template <typename T>
-__forceinline__ __device__ void pre_compute_att(DIM3 sam_starts, DIM3 sam_bgs, DIM3 sam_strides, DIM3 &global_starts,INTERPOLATION_PARAMS &intp_param,uint8_t &level,volatile T &err,bool workflow){
+__forceinline__ __device__ void pre_compute_att(DIM3 sam_starts, DIM3 sam_bgs, DIM3 sam_strides, DIM3 &global_starts,INTERPOLATION_PARAMS &intp_param,uint8_t &level,uint8_t &unit,volatile T &err,bool workflow){
 
     if(TIX==0)
         err = 0.0;
@@ -2812,6 +2812,7 @@ __forceinline__ __device__ void pre_compute_att(DIM3 sam_starts, DIM3 sam_bgs, D
             intp_param.beta = 2.0+((BIY-2)%3);
         }
     }
+    unit = 1<<level;
 
         //printf("%d %d %d %d %d %d %d\n",global_starts.x,global_starts.y,global_starts.z,level,use_natural,use_md,reverse);
     
@@ -4573,12 +4574,12 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
         //__syncthreads();
         DIM3 global_starts;
         uint8_t level = 0;
-
-        pre_compute_att<T>(sample_starts, sample_block_grid_sizes, sample_strides,global_starts,intp_param,level,shmem.err,workflow);
+        uint8_t unit = 1;
+        pre_compute_att<T>(sample_starts, sample_block_grid_sizes, sample_strides,global_starts,intp_param,level,unit,shmem.err,workflow);
          //if(BIX==10 and BIY == 10 and TIX==0){
          //   printf("%.4e\n",shmem.err);
         //}
-        auto unit = 1<<level;
+        
         global2shmem_17x17x17data_att<T, T,LINEAR_BLOCK_SIZE>(data, data_size, data_leap, shmem.data,global_starts,unit);
          //if(BIX==30 and BIY >=12 and BIY < 15 and TIX==0){
          //   printf("%d %.4e %d %d %d %d \n",BIY, shmem.err,shmem.level,shmem.use_natural,shmem.use_md,shmem.reverse);
