@@ -4043,7 +4043,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
             }
         }
     }
-
+    /*
     else if(level == 2){
         unit = 4;
         //int m = 2, n = 2, p = 2;//block8 nums;
@@ -4143,9 +4143,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
         //set_orders(reverse[1]);
 
         // iteration 2, TODO switch y-z order
-        /*
-       */
-
+       
         if(use_md){
 
 
@@ -4304,7 +4302,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
             }
         }
     }
-
+    */
     // iteration 3
     /*
     if(intp_param.reverse[0]){
