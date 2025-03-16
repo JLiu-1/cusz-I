@@ -331,7 +331,7 @@ int spline_construct(
      printf("NAT: %d %d %d %d\n",intp_param.use_natural[3],intp_param.use_natural[2],intp_param.use_natural[1],intp_param.use_natural[0]);
       printf("MD: %d %d %d %d\n",intp_param.use_md[3],intp_param.use_md[2],intp_param.use_md[1],intp_param.use_md[0]);
       printf("REVERSE: %d %d %d %d\n",intp_param.reverse[3],intp_param.reverse[2],intp_param.reverse[1],intp_param.reverse[0]);
-      printf("A B: %.1f %.1f\n",intp_param.alpha,intp_param.beta);
+      printf("A B: %.2f %.2f\n",intp_param.alpha,intp_param.beta);
     
   
   }
