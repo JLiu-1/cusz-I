@@ -2754,7 +2754,7 @@ __global__ void cusz::reset_errors(TITER errors)
 }
 
 template <typename T>
-__forceinline__ __device__ void pre_compute_att(DIM3 sam_starts, DIM3 sam_bgs, DIM3 sam_strides, DIM3 &global_starts,INTERPOLATION_PARAMS intp_param,uint8_t &level,volatile T &err,bool workflow){
+__forceinline__ __device__ void pre_compute_att(DIM3 sam_starts, DIM3 sam_bgs, DIM3 sam_strides, DIM3 &global_starts,INTERPOLATION_PARAMS &intp_param,uint8_t &level,volatile T &err,bool workflow){
 
     if(TIX==0)
         err = 0.0;
@@ -2820,7 +2820,7 @@ __forceinline__ __device__ void pre_compute_att(DIM3 sam_starts, DIM3 sam_bgs, D
 }
 
 template <typename T1, typename T2, int LINEAR_BLOCK_SIZE = DEFAULT_LINEAR_BLOCK_SIZE>
-__device__ void global2shmem_17x17x17data_att(T1* data, DIM3 data_size, STRIDE3 data_leap, volatile T2 s_data[17][17][17], volatile DIM3 global_starts)
+__device__ void global2shmem_17x17x17data_att(T1* data, DIM3 data_size, STRIDE3 data_leap, volatile T2 s_data[17][17][17], DIM3 global_starts)
 {
     constexpr auto TOTAL = BLOCK17 * BLOCK17 * BLOCK17;
 
@@ -4552,13 +4552,16 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
          //if(BIX==10 and BIY == 10 and TIX==0){
          //   printf("%.4e\n",shmem.err);
         //}
-        global2shmem_17x17x17data_att<T, T,LINEAR_BLOCK_SIZE>(data, data_size, data_leap, shmem.data,shmem.global_starts);
+        global2shmem_17x17x17data_att<T, T,LINEAR_BLOCK_SIZE>(data, data_size, data_leap, shmem.data,global_starts);
          //if(BIX==30 and BIY >=12 and BIY < 15 and TIX==0){
          //   printf("%d %.4e %d %d %d %d \n",BIY, shmem.err,shmem.level,shmem.use_natural,shmem.use_md,shmem.reverse);
         //}
         //if(TIX==0 and BIX==0 and BIY==0)
          //   printf("gs\n");
-        cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE,workflow>(shmem.data, data_size,global_starts,eb_r,eb_x2,level,intp_param,&shmem.err);
+        if(workflow)
+            cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE,SPLINE3_PRED_ATT>(shmem.data, data_size,global_starts,eb_r,eb_x2,level,intp_param,&shmem.err);
+        else
+            cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE,SPLINE3_AB_ATT>(shmem.data, data_size,global_starts,eb_r,eb_x2,level,intp_param,&shmem.err);
         
         //Just a copy back here
         //__syncthreads();
