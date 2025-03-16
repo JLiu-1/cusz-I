@@ -3151,7 +3151,7 @@ __forceinline__ __device__ void interpolate_stage_att(
 
 
             else{
-                atomicAdd(const_cast<T*>(error),1.0);//fabs(s_data[z][y][x]-pred));
+                atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
                 /*
                 auto          err = s_data[z][y][x] - pred;
                 atomicAdd(const_cast<T*>(error),fabs(err));
@@ -3789,7 +3789,7 @@ __forceinline__ __device__ void interpolate_stage_md_att(
 
             else{
 
-                atomicAdd(const_cast<T*>(error),1.0);//fabs(s_data[z][y][x]-pred));
+                atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
                 /*
                 auto          err = s_data[z][y][x] - pred;
                 atomicAdd(const_cast<T*>(error),fabs(err));
@@ -4583,7 +4583,7 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
          //   printf("gs\n");
 
         if(TIX==0 and BIX == 10){
-            printf("%d %d %d %d %d\n",BIY,level,intp_param.use_natural[level],intp_param.use_md[level],intp_param.reverse[level]);
+            printf("%d %d %d %d %d %d\n",GDX,BIY,level,intp_param.use_natural[level],intp_param.use_md[level],intp_param.reverse[level]);
         }
         if(workflow){
 
