@@ -216,7 +216,7 @@ struct INTERPOLATION_PARAMS {
     uint8_t auto_tuning{3};
 
     //
-    INTERPOLATION_PARAMS() : use_md{false, false, true,true},use_natural{false, false, false,false}, reverse{false, false, false, false} {};
+    INTERPOLATION_PARAMS() : use_md{true,true,false, false},use_natural{false, false, false,false}, reverse{false, false, false, false} {};
 };
 
 
