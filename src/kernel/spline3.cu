@@ -184,9 +184,9 @@ int spline_construct(
       CHECK_GPU(cudaMemcpy(profiling_errors->m->h, profiling_errors->m->d, profiling_errors->m->bytes, cudaMemcpyDeviceToHost));
       auto errors=profiling_errors->hptr();
 
-      for(int i=0;i<18;i++){
-      printf("%d %.4e\n",i,errors[i]);
-      }
+      //for(int i=0;i<18;i++){
+      //printf("%d %.4e\n",i,errors[i]);
+      //}
 
 
       double best_ave_pre_error[4];
