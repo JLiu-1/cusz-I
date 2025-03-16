@@ -2840,7 +2840,7 @@ __forceinline__ __device__ void interpolate_stage_att(
     LAMBDAZ     zmap,
     int         unit,
     bool interpolator,
-    volatile T error)
+    volatile T* error)
 {
     static_assert(BLOCK_DIMX * BLOCK_DIMY * (COARSEN ? 1 : BLOCK_DIMZ) <= 384, "block oversized");
     static_assert((BLUE or YELLOW or HOLLOW) == true, "must be one hot");
@@ -3085,7 +3085,7 @@ __forceinline__ __device__ void interpolate_stage_att(
                 }
             }
                 
-            atomicAdd(const_cast<T*>(&error),fabs(s_data[z][y][x]-pred));
+            atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
         }
     };
     // -------------------------------------------------------------------------------- //
@@ -3164,7 +3164,7 @@ __forceinline__ __device__ void interpolate_stage_md_att(
     LAMBDA xyzmap,
     int         unit,
     INTERP cubic_interpolator,
-    volatile T error)
+    volatile T* error)
 {
     static_assert(COARSEN or (NUM_ELE <= 384), "block oversized");
     static_assert((LINE or FACE or CUBE) == true, "must be one hot");
@@ -3680,7 +3680,7 @@ __forceinline__ __device__ void interpolate_stage_md_att(
                 }
 
             }
-            atomicAdd(const_cast<T*>(&error),fabs(s_data[z][y][x]-pred));
+            atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
         }
     };
     // -------------------------------------------------------------------------------- //
@@ -3724,7 +3724,7 @@ template <typename T, typename FP,int LINEAR_BLOCK_SIZE>
 __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
     volatile T s_data[17][17][17],
      DIM3    data_size,
-    volatile DIM3 global_starts,volatile uint8_t level,volatile bool use_natural, volatile bool use_md, volatile bool reverse,volatile T error)
+    volatile DIM3 global_starts,volatile uint8_t level,volatile bool use_natural, volatile bool use_md, volatile bool reverse,volatile T* error)
 {
     auto xblue = [] __device__(int _tix, int unit) -> int { return unit * (_tix * 2); };
     auto yblue = [] __device__(int _tiy, int unit) -> int { return unit * (_tiy * 2); };
@@ -4405,7 +4405,7 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
         global2shmem_17x17x17data_att<T, T,LINEAR_BLOCK_SIZE>(data, data_size, data_leap, shmem.data,shmem.global_starts);
         //if(TIX==0 and BIX==0 and BIY==0)
          //   printf("gs\n");
-        cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE>(shmem.data, data_size,shmem.global_starts,shmem.level,shmem.use_natural,shmem.use_md,shmem.reverse,shmem.err);
+        cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE>(shmem.data, data_size,shmem.global_starts,shmem.level,shmem.use_natural,shmem.use_md,shmem.reverse,&shmem.err);
         
         //Just a copy back here
 
