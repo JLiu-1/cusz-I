@@ -207,7 +207,7 @@ int spline_construct(
        
 
       intp_param.use_md[3] = errors[2] < best_error; 
-      best_arror = fmin(errors[2],best_error);
+      best_error = fmin(errors[2],best_error);
       best_ave_pre_error[3]= best_error/(calcnum(1)*block_num);
 
 
@@ -252,6 +252,8 @@ int spline_construct(
       intp_param.reverse[0] = best_idx%3;
 
       best_ave_pre_error[0]= best_error/(calcnum(8)*block_num);
+
+      printf("BESTERROR: %.4e %.4e %.4e %.4e\n",best_ave_pre_error[3],best_ave_pre_error[2],best_ave_pre_error[1],best_ave_pre_error[0]);
 
       if(intp_param.auto_tuning==4){
          cusz::reset_errors<<<dim3(1, 1, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1),0, (GpuStreamT)stream >>>(profiling_errors->dptr());
@@ -329,7 +331,6 @@ int spline_construct(
      printf("NAT: %d %d %d %d\n",intp_param.use_natural[3],intp_param.use_natural[2],intp_param.use_natural[1],intp_param.use_natural[0]);
       printf("MD: %d %d %d %d\n",intp_param.use_md[3],intp_param.use_md[2],intp_param.use_md[1],intp_param.use_md[0]);
       printf("REVERSE: %d %d %d %d\n",intp_param.reverse[3],intp_param.reverse[2],intp_param.reverse[1],intp_param.reverse[0]);
-      printf("BESTERROR: %.4e %.4e %.4e %.4e\n",best_ave_pre_error[3],best_ave_pre_error[2],best_ave_pre_error[1],best_ave_pre_error[0]);
       printf("A B: %.1f %.1f\n",intp_param.alpha,intp_param.beta);
     
   
