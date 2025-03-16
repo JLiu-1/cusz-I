@@ -3151,7 +3151,7 @@ __forceinline__ __device__ void interpolate_stage_att(
 
 
             else{
-                atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
+                //atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
                 /*
                 auto          err = s_data[z][y][x] - pred;
                 atomicAdd(const_cast<T*>(error),fabs(err));
@@ -3162,7 +3162,7 @@ __forceinline__ __device__ void interpolate_stage_att(
            // if(BIX ==30 and BIY>=0 and BIY < 3 and x == 8 and y ==8 and z ==8){
            //     printf("888 %d %.4e %.4e\n",BIY,s_data[z][y][x],pred);
            // }
-           // atomicAdd(const_cast<T*>(error),1.0);
+            atomicAdd(const_cast<T*>(error),1.0);
         }
     };
     // -------------------------------------------------------------------------------- //
@@ -3789,7 +3789,7 @@ __forceinline__ __device__ void interpolate_stage_md_att(
 
             else{
 
-                atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
+                //atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
                 /*
                 auto          err = s_data[z][y][x] - pred;
                 atomicAdd(const_cast<T*>(error),fabs(err));
@@ -3811,7 +3811,7 @@ __forceinline__ __device__ void interpolate_stage_md_att(
            // if(BIX == 30 and BIY>=0 and BIY < 3 and x == 8 and y == 8 and z == 8){
             //    printf("888 %d %.4e %.4e\n",BIY,s_data[z][y][x],pred);
             //}
-            //atomicAdd(const_cast<T*>(error),1.0);
+            atomicAdd(const_cast<T*>(error),1.0);
         }
     };
     // -------------------------------------------------------------------------------- //
@@ -4638,6 +4638,10 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
                     atomicAdd(const_cast<T*>(errors+9+BIY),shmem.err[0]);
                 }
             }
+
+            if(TIX==0 and BIX == 10)
+                printf("%d %.4e %.4e %.4e %.4e %.4e %.4e\n",BIY,shmem.err[0],shmem.err[1],shmem.err[2],shmem.err[3],shmem.err[4],shmem.err[5]);
+            
         }
         else{
             cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE,SPLINE3_AB_ATT>(shmem.data, data_size,global_starts,eb_r,eb_x2,level,intp_param,shmem.err);
