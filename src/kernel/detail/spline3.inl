@@ -2820,7 +2820,7 @@ __forceinline__ __device__ void pre_compute_att(DIM3 sam_starts, DIM3 sam_bgs, D
 }
 
 template <typename T1, typename T2, int LINEAR_BLOCK_SIZE = DEFAULT_LINEAR_BLOCK_SIZE>
-__device__ void global2shmem_17x17x17data_att(T1* data, DIM3 data_size, STRIDE3 data_leap, volatile T2 s_data[17][17][17], DIM3 global_starts)
+__device__ void global2shmem_17x17x17data_att(T1* data, DIM3 data_size, STRIDE3 data_leap, volatile T2 s_data[17][17][17], DIM3 global_starts, uint8_t unit)
 {
     constexpr auto TOTAL = BLOCK17 * BLOCK17 * BLOCK17;
 
@@ -2837,7 +2837,7 @@ __device__ void global2shmem_17x17x17data_att(T1* data, DIM3 data_size, STRIDE3 
         auto gz  = (z + global_starts.z);
         auto gid = gx + gy * data_leap.y + gz * data_leap.z;
 
-        if (gx < data_size.x and gy < data_size.y and gz < data_size.z) s_data[z][y][x] = data[gid];
+        if (gx < data_size.x and gy < data_size.y and gz < data_size.z and x & (unit-1) == 0 and y & (unit-1) == 0 and z & (unit-1) == 0 ) s_data[z][y][x] = data[gid];
 /*
         if(BIX == 7 and BIY == 47 and BIZ == 15 and x==10 and y==8 and z==4){
             printf("g2s1084 %d %d %d %d %.2e %.2e \n",gx,gy,gz,gid,s_data[z][y][x],data[gid]);
@@ -4578,7 +4578,8 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
          //if(BIX==10 and BIY == 10 and TIX==0){
          //   printf("%.4e\n",shmem.err);
         //}
-        global2shmem_17x17x17data_att<T, T,LINEAR_BLOCK_SIZE>(data, data_size, data_leap, shmem.data,global_starts);
+        auto unit = 1<<level;
+        global2shmem_17x17x17data_att<T, T,LINEAR_BLOCK_SIZE>(data, data_size, data_leap, shmem.data,global_starts,unit);
          //if(BIX==30 and BIY >=12 and BIY < 15 and TIX==0){
          //   printf("%d %.4e %d %d %d %d \n",BIY, shmem.err,shmem.level,shmem.use_natural,shmem.use_md,shmem.reverse);
         //}
