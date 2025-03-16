@@ -167,7 +167,7 @@ template <typename T, typename FP,int LINEAR_BLOCK_SIZE, bool WORKFLOW>
 __device__ void spline3d_layout2_interpolate_att(
     volatile T s_data[17][17][17],
      DIM3    data_size,
-    DIM3 global_starts,FP eb_r, FP ebx2,uint8_t level,INTERPOLATION_PARAMS intp_param,volatile T error);
+    DIM3 global_starts,FP eb_r, FP ebx2,uint8_t level,INTERPOLATION_PARAMS intp_param,volatile T *error);
 
 
 }  // namespace device_api
