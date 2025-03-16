@@ -1607,11 +1607,13 @@ __forceinline__ __device__ void interpolate_stage_md(
         
     }
     else {
-        auto [x,y,z]    = xyzmap(TIX, unit);
-        
+        if(TIX<NUM_ELE){
+            auto [x,y,z]    = xyzmap(TIX, unit);
+            
 
-     //   printf("%d %d %d\n", x,y,z);
-        run(x, y, z);
+         //   printf("%d %d %d\n", x,y,z);
+            run(x, y, z);
+        }
     }
     __syncthreads();
 }
