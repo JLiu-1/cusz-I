@@ -221,7 +221,7 @@ int spline_construct(
       }
 
       intp_param.use_md[2] = errors[5] < best_error; 
-      best_arror = fmin(errors[5],best_error);
+      best_error = fmin(errors[5],best_error);
       best_ave_pre_error[2]= best_error/(calcnum(2)*block_num);
 
       best_error = errors[6];
