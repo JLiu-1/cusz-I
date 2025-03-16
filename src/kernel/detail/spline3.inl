@@ -4516,7 +4516,7 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
     FP eb_x2,
     INTERPOLATION_PARAMS intp_param,
     TITER errors,
-    bool workflow = SPLINE3_PRED_ATT
+    bool workflow
     )
 {
     // compile time variables
