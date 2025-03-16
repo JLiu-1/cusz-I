@@ -3784,8 +3784,26 @@ __forceinline__ __device__ void interpolate_stage_md_att(
             }
 
 
-            else
-                atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
+            else{
+
+                //atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
+
+                auto          err = s_data[z][y][x] - pred;
+                atomicAdd(const_cast<T*>(error),fabs(err));
+                auto delta = ebx2 * int((fabs(err) * eb_r + 1) / 2) - err;
+                s_data[z][y][x] += delta;
+                //s_ectrl[z][y][x] = code;  // TODO double check if unsigned type works
+                /*
+                 if(BIX == 12 and BIY == 12 and BIZ == 8 and unit==4 and x==0 and y==0 and z==4)
+                        printf("004pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[0][0][0],s_data[0][0][8],s_data[0][0][16]);
+                    if(BIX == 12 and BIY == 12 and BIZ == 8 and unit==4 and x==8 and y==8 and z==4)
+                        printf("884pred %.2e %.2e %.2e %.2e %.2e %.2e\n",pred,code,s_data[z][y][x],s_data[8][8][0],s_data[8][8][8],s_data[8][8][16]);
+                  */      
+               // if(fabs(pred)>=3)
+               //     printf("%d %d %d %d %d %d %d %d %d %d %.2e %.2e %.2e\n",unit,CONSTEXPR (BLUE),CONSTEXPR (YELLOW),CONSTEXPR (HOLLOW),BIX,BIY,BIZ,x,y,z,pred,code,s_data[z][y][x]);
+              
+                
+            }
            // if(BIX == 30 and BIY>=0 and BIY < 3 and x == 8 and y == 8 and z == 8){
             //    printf("888 %d %.4e %.4e\n",BIY,s_data[z][y][x],pred);
             //}
