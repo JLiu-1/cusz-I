@@ -3094,8 +3094,8 @@ __forceinline__ __device__ void interpolate_stage_att(
                 }
             }
                 
-            //atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
-            atomicAdd(const_cast<T*>(error),1.0);
+            atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
+            //atomicAdd(const_cast<T*>(error),1.0);
         }
     };
     // -------------------------------------------------------------------------------- //
@@ -3690,8 +3690,8 @@ __forceinline__ __device__ void interpolate_stage_md_att(
                 }
 
             }
-           // atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
-            atomicAdd(const_cast<T*>(error),1.0);
+            atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
+           // atomicAdd(const_cast<T*>(error),1.0);
         }
     };
     // -------------------------------------------------------------------------------- //
@@ -4006,7 +4006,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
 
                 interpolate_stage_md_att<
                     T, FP, decltype(xyzmap_cube_16b_8u), //
-                    false, false, true, LINEAR_BLOCK_SIZE,1 ,NO_COARSEN, BORDER_EXCLUSIVE>(
+                    false, false, true, LINEAR_BLOCK_SIZE,1 ,NO_COARSEN, BORDER_INCLUSIVE>(
                     s_data,data_size,global_starts, xyzmap_cube_16b_8u, unit, nat_cubic_interp,error);
                 
 
@@ -4096,7 +4096,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
 
                 interpolate_stage_md_att<
                     T, FP, decltype(xyzmap_cube_16b_4u), //
-                    false, false, true, LINEAR_BLOCK_SIZE,8 ,NO_COARSEN, BORDER_EXCLUSIVE>(
+                    false, false, true, LINEAR_BLOCK_SIZE,8 ,NO_COARSEN, BORDER_INCLUSIVE>(
                     s_data,data_size,global_starts, xyzmap_cube_16b_4u, unit, nat_cubic_interp,error);
                 
 
@@ -4189,7 +4189,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
 
                 interpolate_stage_md_att<
                     T, FP, decltype(xyzmap_cube_16b_2u), //
-                    false, false, true, LINEAR_BLOCK_SIZE,64 ,NO_COARSEN, BORDER_EXCLUSIVE>(
+                    false, false, true, LINEAR_BLOCK_SIZE,64 ,NO_COARSEN, BORDER_INCLUSIVE>(
                     s_data,data_size,global_starts, xyzmap_cube_16b_2u, unit, nat_cubic_interp,error);
                 
 
@@ -4254,7 +4254,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
 
                 interpolate_stage_md_att<
                     T, FP, decltype(xyzmap_cube_16b_1u), //
-                    false, false, true, LINEAR_BLOCK_SIZE,512 ,COARSEN, BORDER_EXCLUSIVE>(
+                    false, false, true, LINEAR_BLOCK_SIZE,512 ,COARSEN, BORDER_INCLUSIVE>(
                     s_data,data_size,global_starts, xyzmap_cube_16b_1u, unit, nan_cubic_interp,error);
 
             }
@@ -4271,7 +4271,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
 
                 interpolate_stage_md_att<
                     T, FP, decltype(xyzmap_cube_16b_1u), //
-                    false, false, true, LINEAR_BLOCK_SIZE,512 ,COARSEN, BORDER_EXCLUSIVE>(
+                    false, false, true, LINEAR_BLOCK_SIZE,512 ,COARSEN, BORDER_INCLUSIVE>(
                     s_data,data_size,global_starts, xyzmap_cube_16b_1u, unit, nat_cubic_interp,error);
                 
 
@@ -4290,7 +4290,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
                     s_data,data_size,global_starts, xyellow_reverse, yyellow_reverse, zyellow_reverse, unit,use_natural,error);
                 interpolate_stage_att<
                     T, FP, decltype(xblue_reverse), decltype(yblue_reverse), decltype(zblue_reverse),  //
-                    true, false, false, LINEAR_BLOCK_SIZE, 17, 17, COARSEN, 8, BORDER_EXCLUSIVE>(
+                    true, false, false, LINEAR_BLOCK_SIZE, 17, 17, COARSEN, 8, BORDER_INCLUSIVE>(
                     s_data,data_size,global_starts, xblue_reverse, yblue_reverse, zblue_reverse, unit, use_natural,error);
 
                 //may have bug end
@@ -4307,7 +4307,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
                
                 interpolate_stage_att<
                     T, FP, decltype(xhollow), decltype(yhollow), decltype(zhollow),  //
-                    false, false, true, LINEAR_BLOCK_SIZE, 8, 17, COARSEN, 17, BORDER_EXCLUSIVE>(
+                    false, false, true, LINEAR_BLOCK_SIZE, 8, 17, COARSEN, 17, BORDER_INCLUSIVE>(
                     s_data,data_size,global_starts, xhollow, yhollow, zhollow, unit, use_natural,error);
 
             }
