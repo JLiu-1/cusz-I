@@ -3094,7 +3094,8 @@ __forceinline__ __device__ void interpolate_stage_att(
                 }
             }
                 
-            atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
+            //atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
+            atomicAdd(const_cast<T*>(error),1.0);
         }
     };
     // -------------------------------------------------------------------------------- //
@@ -3689,7 +3690,8 @@ __forceinline__ __device__ void interpolate_stage_md_att(
                 }
 
             }
-            atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
+           // atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
+            atomicAdd(const_cast<T*>(error),1.0);
         }
     };
     // -------------------------------------------------------------------------------- //
@@ -4415,9 +4417,9 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
          //   printf("%.4e\n",shmem.err);
         //}
         global2shmem_17x17x17data_att<T, T,LINEAR_BLOCK_SIZE>(data, data_size, data_leap, shmem.data,shmem.global_starts);
-         if(BIX==30 and BIY >=12 and BIY < 15 and TIX==0){
-            printf("%d %.4e %d %d %d %d \n",BIY, shmem.err,shmem.level,shmem.use_natural,shmem.use_md,shmem.reverse);
-        }
+         //if(BIX==30 and BIY >=12 and BIY < 15 and TIX==0){
+         //   printf("%d %.4e %d %d %d %d \n",BIY, shmem.err,shmem.level,shmem.use_natural,shmem.use_md,shmem.reverse);
+        //}
         //if(TIX==0 and BIX==0 and BIY==0)
          //   printf("gs\n");
         cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE>(shmem.data, data_size,shmem.global_starts,shmem.level,shmem.use_natural,shmem.use_md,shmem.reverse,&shmem.err);
