@@ -2629,11 +2629,12 @@ __global__ void cusz::c_spline3d_infprecis_16x16x16data(
         printf("reverse: %d %d %d\n",intp_param.reverse[0],intp_param.reverse[1],intp_param.reverse[2]);
        }
        */
+        /*
          if(TIX==0 and BIX==0 and BIY==0 and BIZ==0){
              printf("NAT: %d %d %d %d\n",intp_param.use_natural[3],intp_param.use_natural[2],intp_param.use_natural[1],intp_param.use_natural[0]);
           printf("MD: %d %d %d %d\n",intp_param.use_md[3],intp_param.use_md[2],intp_param.use_md[1],intp_param.use_md[0]);
           printf("REVERSE: %d %d %d %d\n",intp_param.reverse[3],intp_param.reverse[2],intp_param.reverse[1],intp_param.reverse[0]);
-      }
+      }*/
        
    
         pre_compute(ectrl_size,shmem.grid_leaps,shmem.prefix_nums);
