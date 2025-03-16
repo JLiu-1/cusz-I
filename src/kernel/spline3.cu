@@ -252,9 +252,13 @@ int spline_construct(
         att_time+=temp_time;
 
         auto errors=profiling_errors->hptr();
+        for(int i=0;i<11;i++){
+          printf("%d %.4e\n",i,errors[i]);
+        }
 
         best_error = errors[0];
         auto best_idx = 0; 
+        
         for(auto i = 1;i<11;i++){
           if(errors[i]<best_error){
             best_error=errors[i];
