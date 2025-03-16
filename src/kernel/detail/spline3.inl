@@ -4410,7 +4410,7 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
         //Just a copy back here
 
         if(BIX==10 and TIX==0){
-            prinf("%.4e\n",shmem.err);
+            printf("%.4e\n",shmem.err);
         }
 
         if(TIX==0){
