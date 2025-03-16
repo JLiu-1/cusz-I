@@ -3151,7 +3151,7 @@ __forceinline__ __device__ void interpolate_stage_att(
 
 
             else{
-                //atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
+                atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
                 /*
                 auto          err = s_data[z][y][x] - pred;
                 atomicAdd(const_cast<T*>(error),fabs(err));
@@ -3162,7 +3162,7 @@ __forceinline__ __device__ void interpolate_stage_att(
            // if(BIX ==30 and BIY>=0 and BIY < 3 and x == 8 and y ==8 and z ==8){
            //     printf("888 %d %.4e %.4e\n",BIY,s_data[z][y][x],pred);
            // }
-            atomicAdd(const_cast<T*>(error),1.0);
+            //atomicAdd(const_cast<T*>(error),1.0);
         }
     };
     // -------------------------------------------------------------------------------- //
@@ -3789,7 +3789,7 @@ __forceinline__ __device__ void interpolate_stage_md_att(
 
             else{
 
-                //atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
+                atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
                 /*
                 auto          err = s_data[z][y][x] - pred;
                 atomicAdd(const_cast<T*>(error),fabs(err));
@@ -3811,7 +3811,7 @@ __forceinline__ __device__ void interpolate_stage_md_att(
            // if(BIX == 30 and BIY>=0 and BIY < 3 and x == 8 and y == 8 and z == 8){
             //    printf("888 %d %.4e %.4e\n",BIY,s_data[z][y][x],pred);
             //}
-            atomicAdd(const_cast<T*>(error),1.0);
+            //atomicAdd(const_cast<T*>(error),1.0);
         }
     };
     // -------------------------------------------------------------------------------- //
@@ -4582,9 +4582,9 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
         //if(TIX==0 and BIX==0 and BIY==0)
          //   printf("gs\n");
 
-        if(TIX==0 and BIX == 10){
-            printf("%d %d %d %d %d %d\n",GDX,BIY,level,intp_param.use_natural[level],intp_param.use_md[level],intp_param.reverse[level]);
-        }
+        //if(TIX==0 and BIX == 10){
+        //    printf("%d %d %d %d %d %d\n",GDX,BIY,level,intp_param.use_natural[level],intp_param.use_md[level],intp_param.reverse[level]);
+        //}
         if(workflow){
 
             if(level==2){
@@ -4627,20 +4627,20 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
                 intp_param.use_md[1]=true;
                 cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE,SPLINE3_PRED_ATT>(shmem.data, data_size,global_starts,eb_r,eb_x2,level,intp_param,shmem.err+2);
 
-                //if(TIX<3){
-                //    atomicAdd(const_cast<T*>(errors+3+BIY*3+TIX),shmem.err[TIX]);
-                //}
+                if(TIX<3){
+                   atomicAdd(const_cast<T*>(errors+3+BIY*3+TIX),shmem.err[TIX]);
+                }
 
             }
             else{
                 cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE,SPLINE3_PRED_ATT>(shmem.data, data_size,global_starts,eb_r,eb_x2,level,intp_param,shmem.err);
-                //if(TIX==0){
-                //    atomicAdd(const_cast<T*>(errors+9+BIY),shmem.err[0]);
-               // }
+                if(TIX==0){
+                    atomicAdd(const_cast<T*>(errors+9+BIY),shmem.err[0]);
+                }
             }
 
-            if(TIX==0 and BIX == 10)
-                printf("%d %.4e %.4e %.4e %.4e %.4e %.4e\n",BIY,shmem.err[0],shmem.err[1],shmem.err[2],shmem.err[3],shmem.err[4],shmem.err[5]);
+            //if(TIX==0 and BIX == 10)
+             //   printf("%d %.4e %.4e %.4e %.4e %.4e %.4e\n",BIY,shmem.err[0],shmem.err[1],shmem.err[2],shmem.err[3],shmem.err[4],shmem.err[5]);
             
         }
         else{
@@ -4661,9 +4661,9 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
         //}
 
 
-        if(TIX<6){
-            atomicAdd(const_cast<T*>(errors+BIY),shmem.err[TIX]);//BIY 0-17
-        }
+        //if(TIX<6){
+        //    atomicAdd(const_cast<T*>(errors+BIY),shmem.err[TIX]);//BIY 0-17
+        //}
 
         
         //if(TIX==0 and BIX==0 and BIY==0 and BIZ==0)
