@@ -3151,7 +3151,7 @@ __forceinline__ __device__ void interpolate_stage_att(
 
 
             else{
-                atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
+                atomicAdd(const_cast<T*>(error),1.0);//fabs(s_data[z][y][x]-pred));
                 /*
                 auto          err = s_data[z][y][x] - pred;
                 atomicAdd(const_cast<T*>(error),fabs(err));
@@ -3789,7 +3789,7 @@ __forceinline__ __device__ void interpolate_stage_md_att(
 
             else{
 
-                atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
+                atomicAdd(const_cast<T*>(error),1.0);//fabs(s_data[z][y][x]-pred));
                 /*
                 auto          err = s_data[z][y][x] - pred;
                 atomicAdd(const_cast<T*>(error),fabs(err));
