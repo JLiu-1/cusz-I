@@ -124,7 +124,7 @@ template <typename TITER>
 __global__ void reset_errors(TITER errors);
 
 template <typename TITER, typename FP, int LINEAR_BLOCK_SIZE>
-__global__ void cusz::pa_spline3d_infprecis_16x16x16data(
+__global__ void pa_spline3d_infprecis_16x16x16data(
     TITER   data,
     DIM3    data_size,
     STRIDE3 data_leap,
@@ -2737,7 +2737,7 @@ __global__ void cusz::reset_errors(TITER errors)
 }
 
 
-__forceinline__ __device__ void pre_compute_att(DIM3 sam_starts, DIM3 sam_bgs, DIM3 sam_strides,volatile DIM3 global_starts,volatile uint8_t level,volatile bool use_natural, volatile bool use_md, volatile bool reverse){
+__forceinline__ __device__ void pre_compute_att(DIM3 sam_starts, DIM3 sam_bgs, DIM3 sam_strides,volatile DIM3 &global_starts,volatile uint8_t &level,volatile bool &use_natural, volatile bool &use_md, volatile bool &reverse){
 
     if(TIX==0){
         auto grid_idx_x = BIX % sam_bgs.x;
