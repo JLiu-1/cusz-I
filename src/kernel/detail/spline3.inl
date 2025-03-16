@@ -138,7 +138,7 @@ __global__ void pa_spline3d_infprecis_16x16x16data(
     FP      ebx2,
     INTERPOLATION_PARAMS intp_param,
     TITER errors,
-    bool workflow = SPLINE3_PRED_ATT,
+    bool workflow = SPLINE3_PRED_ATT
     );
 
 
@@ -2798,7 +2798,7 @@ __forceinline__ __device__ void pre_compute_att(DIM3 sam_starts, DIM3 sam_bgs, D
         intp_param.reverse[level]=reverse;
     }
     else{
-        level = -1;
+        level = 0;
         if(BIY==0){
             intp_param.alpha = 1.0;
             intp_param.beta = 2.0;
@@ -3227,7 +3227,7 @@ template <
     bool COARSEN,
     //int  BLOCK_DIMZ,
     bool BORDER_INCLUSIVE,
-    bool WORKFLOW
+    bool WORKFLOW,
     typename INTERP>
 __forceinline__ __device__ void interpolate_stage_md_att(
     volatile T s_data[17][17][17],
@@ -4145,16 +4145,16 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
                 interpolate_stage_att<
                     T, FP, decltype(xhollow_reverse), decltype(yhollow_reverse), decltype(zhollow_reverse),  //
                     false, false, true, LINEAR_BLOCK_SIZE, 1, 2, NO_COARSEN, 2, BORDER_INCLUSIVE,WORKFLOW>(
-                    s_data,data_size,global_starts, xhollow_reverse, yhollow_reverse, zhollow_reverse, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xhollow_reverse, yhollow_reverse, zhollow_reverse, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[3],error);
 
                 interpolate_stage_att<
                     T, FP, decltype(xyellow_reverse), decltype(yyellow_reverse), decltype(zyellow_reverse),  //
                     false, true, false, LINEAR_BLOCK_SIZE, 3, 1, NO_COARSEN, 2, BORDER_INCLUSIVE,WORKFLOW>(
-                    s_data,data_size,global_starts, xyellow_reverse, yyellow_reverse, zyellow_reverse, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xyellow_reverse, yyellow_reverse, zyellow_reverse, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[3],error);
                 interpolate_stage_att<
                     T, FP, decltype(xblue_reverse), decltype(yblue_reverse), decltype(zblue_reverse),  //
                     true, false, false, LINEAR_BLOCK_SIZE, 3, 3, NO_COARSEN, 1, BORDER_INCLUSIVE,WORKFLOW>(
-                    s_data,data_size,global_starts, xblue_reverse, yblue_reverse, zblue_reverse, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xblue_reverse, yblue_reverse, zblue_reverse, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[3],error);
 
 
             }
@@ -4164,19 +4164,19 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
                 interpolate_stage_att<
                     T, FP, decltype(xblue), decltype(yblue), decltype(zblue),  //
                     true, false, false, LINEAR_BLOCK_SIZE, 2, 2, NO_COARSEN, 1, BORDER_INCLUSIVE,WORKFLOW>(
-                    s_data,data_size,global_starts, xblue, yblue, zblue, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xblue, yblue, zblue, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[3],error);
                // if(BIX==0 and BIY==0 and BIZ==0)
                // printf("lv3s1\n");
                 interpolate_stage_att<
                     T, FP, decltype(xyellow), decltype(yyellow), decltype(zyellow),  //
                     false, true, false, LINEAR_BLOCK_SIZE, 2, 1, NO_COARSEN, 3, BORDER_INCLUSIVE,WORKFLOW>(
-                    s_data,data_size,global_starts, xyellow, yyellow, zyellow, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xyellow, yyellow, zyellow, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[3],error);
                 //if(BIX==0 and BIY==0 and BIZ==0)
               //  printf("lv3s2\n");
                 interpolate_stage_att<
                     T, FP, decltype(xhollow), decltype(yhollow), decltype(zhollow),  //
                     false, false, true, LINEAR_BLOCK_SIZE, 1, 3, NO_COARSEN, 3, BORDER_INCLUSIVE,WORKFLOW>(
-                    s_data,data_size,global_starts, xhollow, yhollow, zhollow, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xhollow, yhollow, zhollow, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[3],error);
             }
         }
     }
@@ -4236,16 +4236,16 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
                 interpolate_stage_att<
                     T, FP, decltype(xhollow_reverse), decltype(yhollow_reverse), decltype(zhollow_reverse),  //
                     false, false, true, LINEAR_BLOCK_SIZE, 2, 3, NO_COARSEN, 3, BORDER_INCLUSIVE,WORKFLOW>(
-                    s_data,data_size,global_starts, xhollow_reverse, yhollow_reverse, zhollow_reverse, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xhollow_reverse, yhollow_reverse, zhollow_reverse, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[2],error);
 
                 interpolate_stage_att<
                     T, FP, decltype(xyellow_reverse), decltype(yyellow_reverse), decltype(zyellow_reverse),  //
                     false, true, false, LINEAR_BLOCK_SIZE, 5, 2, NO_COARSEN, 3, BORDER_INCLUSIVE, WORKFLOW>(
-                    s_data,data_size,global_starts, xyellow_reverse, yyellow_reverse, zyellow_reverse, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xyellow_reverse, yyellow_reverse, zyellow_reverse, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[2],error);
                 interpolate_stage_att<
                     T, FP, decltype(xblue_reverse), decltype(yblue_reverse), decltype(zblue_reverse),  //
                     true, false, false, LINEAR_BLOCK_SIZE, 5, 5, NO_COARSEN, 2, BORDER_INCLUSIVE, WORKFLOW>(
-                    s_data,data_size,global_starts,  xblue_reverse, yblue_reverse, zblue_reverse, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts,  xblue_reverse, yblue_reverse, zblue_reverse, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[2],error);
 
 
             }
@@ -4255,19 +4255,19 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
                 interpolate_stage_att<
                     T, FP, decltype(xblue), decltype(yblue), decltype(zblue),  //
                     true, false, false, LINEAR_BLOCK_SIZE, 3, 3, NO_COARSEN, 2, BORDER_INCLUSIVE, WORKFLOW>(
-                    s_data,data_size,global_starts, xblue, yblue, zblue, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xblue, yblue, zblue, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[2],error);
                // if(BIX==0 and BIY==0 and BIZ==0)
                // printf("lv3s1\n");
                 interpolate_stage_att<
                     T, FP, decltype(xyellow), decltype(yyellow), decltype(zyellow),  //
                     false, true, false, LINEAR_BLOCK_SIZE, 3, 2, NO_COARSEN, 5, BORDER_INCLUSIVE, WORKFLOW>(
-                    s_data,data_size,global_starts, xyellow, yyellow, zyellow, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xyellow, yyellow, zyellow, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[2],error);
                 //if(BIX==0 and BIY==0 and BIZ==0)
               //  printf("lv3s2\n");
                 interpolate_stage_att<
                     T, FP, decltype(xhollow), decltype(yhollow), decltype(zhollow),  //
                     false, false, true, LINEAR_BLOCK_SIZE, 2, 5, NO_COARSEN, 5, BORDER_INCLUSIVE, WORKFLOW>(
-                    s_data,data_size,global_starts, xhollow, yhollow, zhollow, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xhollow, yhollow, zhollow, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[2],error);
             }
         }
     }
@@ -4330,29 +4330,29 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
                 interpolate_stage_att<
                     T, FP, decltype(xhollow_reverse), decltype(yhollow_reverse), decltype(zhollow_reverse),  //
                     false, false, true, LINEAR_BLOCK_SIZE, 4, 5, NO_COARSEN, 5, BORDER_INCLUSIVE, WORKFLOW>(
-                    s_data,data_size,global_starts, xhollow_reverse, yhollow_reverse, zhollow_reverse, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xhollow_reverse, yhollow_reverse, zhollow_reverse, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[1],error);
                 interpolate_stage_att<
                     T, FP, decltype(xyellow_reverse), decltype(yyellow_reverse), decltype(zyellow_reverse),  //
                     false, true, false, LINEAR_BLOCK_SIZE, 9, 4, NO_COARSEN, 5, BORDER_INCLUSIVE, WORKFLOW>(
-                    s_data,data_size,global_starts, xyellow_reverse, yyellow_reverse, zyellow_reverse, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xyellow_reverse, yyellow_reverse, zyellow_reverse, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[1],error);
                 interpolate_stage_att<
                     T, FP, decltype(xblue_reverse), decltype(yblue_reverse), decltype(zblue_reverse),  //
                     true, false, false, LINEAR_BLOCK_SIZE, 9, 9, NO_COARSEN, 4, BORDER_INCLUSIVE, WORKFLOW>(
-                    s_data,data_size,global_starts, xblue_reverse, yblue_reverse, zblue_reverse, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xblue_reverse, yblue_reverse, zblue_reverse, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[1],error);
             }
             else{
                 interpolate_stage_att<
                     T, FP, decltype(xblue), decltype(yblue), decltype(zblue),  //
                     true, false, false, LINEAR_BLOCK_SIZE, 5, 5, NO_COARSEN, 4, BORDER_INCLUSIVE, WORKFLOW>(
-                    s_data,data_size,global_starts, xblue, yblue, zblue, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xblue, yblue, zblue, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[1],error);
                 interpolate_stage_att<
                     T, FP, decltype(xyellow), decltype(yyellow), decltype(zyellow),  //
                     false, true, false, LINEAR_BLOCK_SIZE, 5, 4, NO_COARSEN, 9, BORDER_INCLUSIVE, WORKFLOW>(
-                    s_data,data_size,global_starts, xyellow, yyellow, zyellow, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xyellow, yyellow, zyellow, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[1],error);
                 interpolate_stage_att<
                     T, FP, decltype(xhollow), decltype(yhollow), decltype(zhollow),  //
                     false, false, true, LINEAR_BLOCK_SIZE, 4, 9, NO_COARSEN, 9, BORDER_INCLUSIVE, WORKFLOW>(
-                    s_data,data_size,global_starts, xhollow, yhollow, zhollow, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xhollow, yhollow, zhollow, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[1],error);
 
             }
 
@@ -4414,15 +4414,15 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
                 interpolate_stage_att<
                     T, FP, decltype(xhollow_reverse), decltype(yhollow_reverse), decltype(zhollow_reverse),  //
                     false, false, true, LINEAR_BLOCK_SIZE, 8, 9, COARSEN, 9, BORDER_INCLUSIVE, WORKFLOW>(
-                    s_data,data_size,global_starts, xhollow_reverse, yhollow_reverse, zhollow_reverse, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xhollow_reverse, yhollow_reverse, zhollow_reverse, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[0],error);
                 interpolate_stage_att<
                     T, FP, decltype(xyellow_reverse), decltype(yyellow_reverse), decltype(zyellow_reverse),  //
                     false, true, false, LINEAR_BLOCK_SIZE, 17, 8, COARSEN, 9, BORDER_INCLUSIVE, WORKFLOW>(
-                    s_data,data_size,global_starts, xyellow_reverse, yyellow_reverse, zyellow_reverse, unit,cur_eb_r,cur_ebx2,use_natural,error);
+                    s_data,data_size,global_starts, xyellow_reverse, yyellow_reverse, zyellow_reverse, unit,cur_eb_r,cur_ebx2,intp_param.use_natural[0],error);
                 interpolate_stage_att<
                     T, FP, decltype(xblue_reverse), decltype(yblue_reverse), decltype(zblue_reverse),  //
                     true, false, false, LINEAR_BLOCK_SIZE, 17, 17, COARSEN, 8, BORDER_INCLUSIVE, WORKFLOW>(
-                    s_data,data_size,global_starts, xblue_reverse, yblue_reverse, zblue_reverse, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xblue_reverse, yblue_reverse, zblue_reverse, unit,cur_eb_r,cur_ebx2,intp_param.use_natural[0],error);
 
                 //may have bug end
             }
@@ -4430,16 +4430,16 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
                 interpolate_stage_att<
                     T, FP, decltype(xblue), decltype(yblue), decltype(zblue),  //
                     true, false, false, LINEAR_BLOCK_SIZE, 9, 9, COARSEN, 8, BORDER_INCLUSIVE, WORKFLOW>(
-                    s_data,data_size,global_starts, xblue, yblue, zblue, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xblue, yblue, zblue, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[0],error);
                 interpolate_stage_att<
                     T, FP, decltype(xyellow), decltype(yyellow), decltype(zyellow),  //
                     false, true, false, LINEAR_BLOCK_SIZE, 9, 8, COARSEN, 17, BORDER_INCLUSIVE, WORKFLOW>(
-                    s_data,data_size,global_starts, xyellow, yyellow, zyellow, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xyellow, yyellow, zyellow, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[0],error);
                
                 interpolate_stage_att<
                     T, FP, decltype(xhollow), decltype(yhollow), decltype(zhollow),  //
                     false, false, true, LINEAR_BLOCK_SIZE, 8, 17, COARSEN, 17, BORDER_INCLUSIVE, WORKFLOW>(
-                    s_data,data_size,global_starts, xhollow, yhollow, zhollow, unit,cur_eb_r,cur_ebx2, use_natural,error);
+                    s_data,data_size,global_starts, xhollow, yhollow, zhollow, unit,cur_eb_r,cur_ebx2, intp_param.use_natural[0],error);
 
             }
         }
