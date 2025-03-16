@@ -3154,8 +3154,13 @@ __forceinline__ __device__ void interpolate_stage_att(
             }
 
 
-            else
-                atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
+            else{
+                //atomicAdd(const_cast<T*>(error),fabs(s_data[z][y][x]-pred));
+                auto          err = s_data[z][y][x] - pred;
+                atomicAdd(const_cast<T*>(error),fabs(err));
+                auto delta = ebx2 * int((fabs(err) * eb_r + 1) / 2) - err;
+                s_data[z][y][x] += delta;
+            }
            // if(BIX ==30 and BIY>=0 and BIY < 3 and x == 8 and y ==8 and z ==8){
            //     printf("888 %d %.4e %.4e\n",BIY,s_data[z][y][x],pred);
            // }
@@ -4113,7 +4118,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
     if(WORKFLOW==SPLINE3_AB_ATT or level==3){
         unit = 8;
         //int m = 2, n = 2, p = 2;//block8 nums;
-        if(WORKFLOW==SPLINE3_AB_ATT)
+        //if(WORKFLOW==SPLINE3_AB_ATT)
             calc_eb(unit);
         //set_orders(reverse[2]);
         if(intp_param.use_md[3]){
@@ -4203,7 +4208,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
     if(WORKFLOW==SPLINE3_AB_ATT or level == 2){
         unit = 4;
         //int m = 2, n = 2, p = 2;//block8 nums;
-        if(WORKFLOW==SPLINE3_AB_ATT)
+        //if(WORKFLOW==SPLINE3_AB_ATT)
             calc_eb(unit);
         //set_orders(reverse[2]);
 
@@ -4296,7 +4301,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
         //m*=2;
         //n*=2;
         //p*=2;
-        if(WORKFLOW==SPLINE3_AB_ATT)
+        //if(WORKFLOW==SPLINE3_AB_ATT)
             calc_eb(unit);
 
         //set_orders(reverse[1]);
@@ -4385,7 +4390,7 @@ __device__ void cusz::device_api::spline3d_layout2_interpolate_att(
         //m*=2;
         //n*=2;
         //p*=2;
-       if(WORKFLOW==SPLINE3_AB_ATT)
+       //if(WORKFLOW==SPLINE3_AB_ATT)
             calc_eb(unit);
        // set_orders(reverse[0]);
         if(intp_param.use_md[0]){
