@@ -4408,7 +4408,7 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
         cusz::device_api::spline3d_layout2_interpolate_att<T, FP,LINEAR_BLOCK_SIZE>(shmem.data, data_size,shmem.global_starts,shmem.level,shmem.use_natural,shmem.use_md,shmem.reverse,&shmem.err);
         
         //Just a copy back here
-
+        __syncthreads();
         if(BIX==10 and BIY == 10 and TIX==0){
             printf("%.4e\n",shmem.err);
         }
