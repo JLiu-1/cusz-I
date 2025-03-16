@@ -3127,7 +3127,7 @@ __forceinline__ __device__ void interpolate_stage_att(
                 }
             }
 
-             if CONSTEXPR (WORKFLOW == SPLINE3_PRED_ATT) {
+             if CONSTEXPR (WORKFLOW == SPLINE3_AB_ATT) {
                 
                 auto          err = s_data[z][y][x] - pred;
                 decltype(err) code;
@@ -3757,7 +3757,7 @@ __forceinline__ __device__ void interpolate_stage_md_att(
                 }
 
             }
-            if CONSTEXPR (WORKFLOW == SPLINE3_PRED_ATT) {
+            if CONSTEXPR (WORKFLOW == SPLINE3_AB_ATT) {
                 
                 auto          err = s_data[z][y][x] - pred;
                 decltype(err) code;
