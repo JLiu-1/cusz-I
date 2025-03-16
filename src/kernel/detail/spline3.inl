@@ -4546,7 +4546,7 @@ __global__ void cusz::pa_spline3d_infprecis_16x16x16data(
         //}
         //__syncthreads();
         DIM3 global_starts;
-        int level = -1;
+        uint8_t level = 0;
 
         pre_compute_att<T>(sample_starts, sample_block_grid_sizes, sample_strides,global_starts,intp_param,level,shmem.err,workflow);
          //if(BIX==10 and BIY == 10 and TIX==0){
