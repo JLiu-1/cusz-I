@@ -121,7 +121,8 @@ int spline_construct(
       cusz::c_spline3d_profiling_data_2<T*, DEFAULT_BLOCK_SIZE>  //
         <<<auto_tuning_grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>(
             data->dptr(), data->template len3<dim3>(),
-            data->template st3<dim3>(),  //
+            data->template st3<dim3>(),
+              //
             profiling_errors->dptr());
       STOP_GPUEVENT_RECORDING(stream);
       CHECK_GPU(GpuStreamSync(stream));
@@ -173,7 +174,7 @@ int spline_construct(
 
       cusz::pa_spline3d_infprecis_16x16x16data<T*, float, DEFAULT_BLOCK_SIZE> //
       <<<dim3(s_size_x*s_size_y*s_size_z, 18, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1),0, (GpuStreamT)stream  >>>
-      (data->dptr(), data->template len3<dim3>(),data->template st3<dim3>(),dim3(s_start_x,s_start_y,s_start_z),dim3(s_size_x,s_size_y,s_size_z),dim3(S_STRIDE,S_STRIDE,S_STRIDE),profiling_errors->dptr());
+      (data->dptr(), data->template len3<dim3>(),data->template st3<dim3>(),dim3(s_start_x,s_start_y,s_start_z),dim3(s_size_x,s_size_y,s_size_z),dim3(S_STRIDE,S_STRIDE,S_STRIDE),eb_r,eb_x2,intp_param,profiling_errors->dptr(),true);
        STOP_GPUEVENT_RECORDING(stream);
       CHECK_GPU(GpuStreamSync(stream));
       TIME_ELAPSED_GPUEVENT(&att_time);
