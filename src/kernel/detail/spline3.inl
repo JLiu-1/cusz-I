@@ -2562,6 +2562,7 @@ __global__ void cusz::x_spline3d_infprecis_16x16x16data(
     TITER   data,         // output
     DIM3    data_size,    //
     STRIDE3 data_leap,    //
+    TITER outlier_tmp,
     FP      eb_r,
     FP      ebx2,
     int     radius,
@@ -2590,7 +2591,7 @@ __global__ void cusz::x_spline3d_infprecis_16x16x16data(
     //        printf("esz: %d %d %d\n",ectrl_size.x,ectrl_size.y,ectrl_size.z);
 
     // global2shmem_33x9x9data<E, T, LINEAR_BLOCK_SIZE>(ectrl, ectrl_size, ectrl_leap, shmem.ectrl);
-    global2shmem_fuse<T, E, LINEAR_BLOCK_SIZE>(ectrl, ectrl_size, ectrl_leap, data, shmem.ectrl, shmem.grid_leaps,shmem.prefix_nums);
+    global2shmem_fuse<T, E, LINEAR_BLOCK_SIZE>(ectrl, ectrl_size, ectrl_leap, outlier_tmp, shmem.ectrl, shmem.grid_leaps,shmem.prefix_nums);
 
     cusz::device_api::spline3d_layout2_interpolate<T, T, FP, LINEAR_BLOCK_SIZE, SPLINE3_DECOMPR, false>(
         shmem.data, shmem.ectrl, data_size, eb_r, ebx2, radius, intp_param);

@@ -92,10 +92,10 @@ class Compressor {
   Compressor* compress_wrapup(BYTE** out, szt* outlen);
   Compressor* compress_collect_kerneltime();
 
-  Compressor* decompress(pszheader*, BYTE*, T*, uninit_stream_t);
+  Compressor* decompress(pszheader*, BYTE*, T*, T*, uninit_stream_t);
   Compressor* decompress_scatter(pszheader*, BYTE*, T*, uninit_stream_t);
   Compressor* decompress_decode(pszheader*, BYTE*, uninit_stream_t);
-  Compressor* decompress_predict(pszheader*, BYTE*, T*, T*, uninit_stream_t);
+  Compressor* decompress_predict(pszheader*, BYTE*, T*, T*, T*, uninit_stream_t);
   Compressor* decompress_collect_kerneltime();
 
   Compressor* clear_buffer();

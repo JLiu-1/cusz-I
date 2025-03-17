@@ -362,7 +362,7 @@ int spline_construct(
 
 template <typename T, typename E, typename FP>
 int spline_reconstruct(
-    pszmem_cxx<T>* anchor, pszmem_cxx<E>* ectrl, pszmem_cxx<T>* xdata,
+    pszmem_cxx<T>* anchor, pszmem_cxx<E>* ectrl, pszmem_cxx<T>* xdata, T* outlier_tmp,
     double eb, uint32_t radius, INTERPOLATION_PARAMS intp_param, float* time, void* stream)
 {
   constexpr auto BLOCK = 16;
@@ -387,6 +387,7 @@ int spline_reconstruct(
        anchor->template st3<dim3>(),  //
        xdata->dptr(), xdata->template len3<dim3>(),
        xdata->template st3<dim3>(),  //
+       outlier_tmp,
        eb_r, ebx2, radius, intp_param);
 
   STOP_GPUEVENT_RECORDING(stream);
@@ -402,7 +403,7 @@ int spline_reconstruct(
       pszmem_cxx<T> * data, pszmem_cxx<T> * anchor, pszmem_cxx<E> * ectrl,    \
       void* _outlier, double eb, double rel_eb, uint32_t radius, struct INTERPOLATION_PARAMS &intp_param, float* time, void* stream, pszmem_cxx<T> * profiling_errors); \
   template int spline_reconstruct<T, E>(                                      \
-      pszmem_cxx<T> * anchor, pszmem_cxx<E> * ectrl, pszmem_cxx<T> * xdata,   \
+      pszmem_cxx<T> * anchor, pszmem_cxx<E> * ectrl, pszmem_cxx<T> * xdata, T* outlier_tmp,  \
       double eb, uint32_t radius, struct INTERPOLATION_PARAMS intp_param, float* time, void* stream);
 
 INIT(f4, u1)

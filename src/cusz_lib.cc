@@ -110,13 +110,13 @@ pszerror psz_decompress_init(pszcompressor* comp, pszheader* header)
 
 pszerror psz_decompress(
     pszcompressor* comp, pszout compressed, size_t const comp_len,
-    void* decompressed, pszlen const decomp_len, void* record, void* stream)
+    void* decompressed, void* outlier_tmp, pszlen const decomp_len, void* record, void* stream)
 {
   if (comp->type == F4) {
     auto cor = (cusz::CompressorF4*)(comp->compressor);
 
     cor->decompress(
-        comp->header, compressed, (f4*)(decompressed), (GpuStreamT)stream);
+        comp->header, compressed, (f4*)(decompressed), (f4*)(outlier_tmp), (GpuStreamT)stream);
     cor->export_timerecord((psz::TimeRecord*)record);
   }
   else {

@@ -186,7 +186,9 @@ class CLI {
     header->compressed_len = compressed_len;
 
     auto decompressed = new pszmem_cxx<T>(len, 1, 1, "decompressed");
+    auto outlier_tmp = new pszmem_cxx<T>(len, 1, 1, "outlier_tmp");
     decompressed->control({MallocHost, Malloc});
+    outlier_tmp->control({MallocHost, Malloc});
 
     auto original = new pszmem_cxx<T>(len, 1, 1, "original-cmp");
 
@@ -199,7 +201,7 @@ class CLI {
     
     psz_decompress(
         compressor, compressed_before_rre1, psz_utils::filesize(header),
-        decompressed->dptr(), decomp_len, (void*)&timerecord, stream);
+        decompressed->dptr(), outlier_tmp->dptr(), decomp_len, (void*)&timerecord, stream);
 
     timerecord.push_back({"rre1", decompress_time_rre1});
 
