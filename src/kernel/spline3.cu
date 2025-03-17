@@ -22,8 +22,8 @@
 //#include "mem/memseg.h"
 //#include "mem/layout.h"
 //#include "mem/layout_cxx.hh"
-
-constexpr int DEFAULT_BLOCK_SIZE = 384;
+#define BLOCK_DIM_SIZE 384
+constexpr int DEFAULT_BLOCK_SIZE = BLOCK_DIM_SIZE;
 
 #define SETUP                                                   \
   auto div3 = [](dim3 len, dim3 sublen) {                       \
