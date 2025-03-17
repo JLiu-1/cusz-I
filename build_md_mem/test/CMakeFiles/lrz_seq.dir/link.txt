@@ -1,0 +1,1 @@
+/opt/cray/pe/gcc/12.2.0/bin/c++ -O3 -DNDEBUG CMakeFiles/lrz_seq.dir/src/test_lrz.seq.cc.o -o lrz_seq

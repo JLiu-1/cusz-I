@@ -252,9 +252,12 @@ int spline_construct(
       intp_param.reverse[0] = best_idx%3;
 
       best_ave_pre_error[0]= best_error/(calcnum(8)*block_num);
-
+      
       printf("BESTERROR: %.4e %.4e %.4e %.4e\n",best_ave_pre_error[3],best_ave_pre_error[2],best_ave_pre_error[1],best_ave_pre_error[0]);
-
+      // intp_param.use_md[0] = 1;
+      // intp_param.use_md[1] = 1;
+      // intp_param.use_md[2] = 1;
+      // intp_param.use_md[3] = 1;
       if(intp_param.auto_tuning==4){
          cusz::reset_errors<<<dim3(1, 1, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1),0, (GpuStreamT)stream >>>(profiling_errors->dptr());
 
