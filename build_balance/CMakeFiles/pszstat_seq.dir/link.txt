@@ -1,1 +1,0 @@
-/opt/cray/pe/gcc/12.2.0/bin/c++ -fPIC -O3 -DNDEBUG -shared -Wl,-soname,libpszstat_seq.so -o libpszstat_seq.so CMakeFiles/pszstat_seq.dir/src/stat/compare.stl.cc.o
