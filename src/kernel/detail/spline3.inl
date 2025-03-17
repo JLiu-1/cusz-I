@@ -1071,163 +1071,165 @@ __forceinline__ __device__ void interpolate_stage_md(
 
                 //if(BIX == 10 and BIY == 12 and BIZ == 0 and x==13 and y==6 and z==9)
                //     printf("face %d %d\n", I_YZ,I_XZ);
-
-                 
+                int x_1,BI_1,GD_1,gx_1,gs_1;
+                int x_2,BI_2,GD_2,gx_2,gs_2;
+                int s_id_1[4], s_id_2[4];
                 if (I_YZ){
-                    #pragma unroll
-                    for(int id_itr = 0; id_itr < 4; ++id_itr){
-                     tmp_z[id_itr] = s_data[id_z[id_itr]][y][x]; 
-                     tmp_y[id_itr] = s_data[z][id_y[id_itr]][x]; 
-                    }
-
-                    T1 pred_z[5], pred_y[5];
-                    pred_y[0] = tmp_y[1];
-                    pred_y[1] = cubic_interpolator(tmp_y[0],tmp_y[1],tmp_y[2],tmp_y[3]);
-                    pred_y[2] = (-tmp_y[0]+6*tmp_y[1] + 3*tmp_y[2]) / 8;
-                    pred_y[3] = (3*tmp_y[1] + 6*tmp_y[2]-tmp_y[3]) / 8;
-                    pred_y[4] = (tmp_y[1] + tmp_y[2]) / 2;
-
-                    pred_z[0] = tmp_z[1];
-                    pred_z[1] = cubic_interpolator(tmp_z[0],tmp_z[1],tmp_z[2],tmp_z[3]);
-                    pred_z[2] = (-tmp_z[0]+6*tmp_z[1] + 3*tmp_z[2]) / 8;
-                    pred_z[3] = (3*tmp_z[1] + 6*tmp_z[2]-tmp_z[3]) / 8;
-                    pred_z[4] = (tmp_z[1] + tmp_z[2]) / 2;
-
-                    auto interp_z = get_interp_order(z,BIZ,GDZ,global_z,data_size.z);
-                    auto interp_y = get_interp_order(y,BIY,GDY,global_y,data_size.y);
-                    
-                    pred = pred_z[0] + pred_y[0] - s_data[z - unit][y - unit][x];
-                    int case_num = interp_z + interp_y * 5;
-
-                    pred = (interp_z == 4 && interp_y == 4) ?  (pred_y[1] +  pred_z[1]) / 2 : pred;
-                    
-                    pred = (interp_z != 4 && interp_y == 4) ? pred_y[1] : pred;
-                    pred = (interp_z == 4 && interp_y != 4) ? pred_z[1] : pred;
-
-                    pred = (interp_z == 3 && interp_y == 3) ?  (pred_z[2] +  pred_y[2]) / 2 : pred;
-                    pred = (interp_z == 3 && interp_y == 2) ?  (pred_z[2] +  pred_y[3]) / 2 : pred;
-                    pred = (interp_z == 3 && interp_y < 2) ?  pred_z[2] : pred;
-                    
-                    pred = (interp_z == 2 && interp_y == 3) ?  (pred_z[3] +  pred_y[2]) / 2 : pred;
-                    pred = (interp_z == 2 && interp_y == 2) ?  (pred_z[3] +  pred_y[3]) / 2 : pred;
-                    pred = (interp_z == 2 && interp_y < 2) ?  pred_z[3] : pred;
-
-                    pred = (interp_z <= 1 && interp_y == 3) ?  pred_y[2] : pred;
-                    pred = (interp_z <= 1 && interp_y == 2) ?  pred_y[3] : pred;
-                    pred = (interp_z == 1 && interp_y == 1) ?  (pred_z[4] + pred_y[4]) / 2: pred;
-                    pred = (interp_z == 1 && interp_y < 1) ?  pred_z[4] : pred;
-
-                    
-                    pred = (interp_z == 0 && interp_y == 1) ?  pred_y[4]: pred;
-                    // pred = (interp_z == 0 && interp_y < 1) ?  pred_z[0] + pred_y[0] - s_data[z - unit][y - unit][x]: pred;
+                   
+                 x_1 = z,BI_1 = BIZ, GD_1 = GDZ, gx_1 = global_z,gs_1 = data_size.z;
+                 x_2 = y,BI_2 = BIY, GD_2 = GDY, gx_2 = global_y, gs_2 = data_size.y;
+                 s_id_1[0] = 17 * 17 * id_z[0] + 17 * y + x;
+                 s_id_1[1] = 17 * 17 * id_z[1] + 17 * y + x;
+                 s_id_1[2] = 17 * 17 * id_z[2] + 17 * y + x;
+                 s_id_1[3] = 17 * 17 * id_z[3] + 17 * y + x;
+                 s_id_2[0] = 17 * 17 * z + 17 * id_y[0] + x;
+                 s_id_2[1] = 17 * 17 * z + 17 * id_y[1] + x;
+                 s_id_2[2] = 17 * 17 * z + 17 * id_y[2] + x;
+                 s_id_2[3] = 17 * 17 * z + 17 * id_y[3] + x;
+                 pred = s_data[id_z[1]][id_y[1]][x];
 
                 }
                 else if (I_XZ){
-
-                    #pragma unroll
-                    for(int id_itr = 0; id_itr < 4; ++id_itr){
-                     tmp_z[id_itr] = s_data[id_z[id_itr]][y][x]; 
-                     tmp_x[id_itr] = s_data[z][y][id_x[id_itr]]; 
-                    }
-                    T1 pred_z[5], pred_x[5];
-                    pred_x[0] = tmp_x[1];
-                    pred_x[1] = cubic_interpolator(tmp_x[0],tmp_x[1],tmp_x[2],tmp_x[3]);
-                    pred_x[2] = (-tmp_x[0]+6*tmp_x[1] + 3*tmp_x[2]) / 8;
-                    pred_x[3] = (3*tmp_x[1] + 6*tmp_x[2]-tmp_x[3]) / 8;
-                    pred_x[4] = (tmp_x[1] + tmp_x[2]) / 2;
+                    x_1 = z,BI_1 = BIZ, GD_1 = GDZ, gx_1 = global_z,gs_1 = data_size.z;
+                    x_2 = x,BI_2 = BIX, GD_2 = GDX, gx_2 = global_x, gs_2 = data_size.x;
+                    s_id_1[0] = 17 * 17 * id_z[0] + 17 * y + x;
+                    s_id_1[1] = 17 * 17 * id_z[1] + 17 * y + x;
+                    s_id_1[2] = 17 * 17 * id_z[2] + 17 * y + x;
+                    s_id_1[3] = 17 * 17 * id_z[3] + 17 * y + x;
                     
-                    pred_z[0] = tmp_z[1];
-                    pred_z[1] = cubic_interpolator(tmp_z[0],tmp_z[1],tmp_z[2],tmp_z[3]);
-                    pred_z[2] = (-tmp_z[0]+6*tmp_z[1] + 3*tmp_z[2]) / 8;
-                    pred_z[3] = (3*tmp_z[1] + 6*tmp_z[2]-tmp_z[3]) / 8;
-                    pred_z[4] = (tmp_z[1] + tmp_z[2]) / 2;
-                    
-                    auto interp_z = get_interp_order(z,BIZ,GDZ,global_z,data_size.z);
-                    auto interp_x = get_interp_order(x,BIX,GDX,global_x,data_size.x);
-                    
-                    pred = pred_z[0] + pred_x[0] - s_data[z - unit][y][x - unit];
-
-                    int case_num = interp_z + interp_x * 5;
-                    
-                    pred = (case_num % 5 == 4 && case_num / 5 == 4) ?  (pred_x[1] +  pred_z[1]) / 2 : pred;
-                    
-                    pred = (case_num % 5 != 4 && case_num / 5 == 4) ? pred_x[1] : pred;
-                    pred = (case_num % 5 == 4 && case_num / 5 != 4) ? pred_z[1] : pred;
-                    
-                    pred = (case_num % 5 == 3 && case_num / 5 == 3) ?  (pred_z[2] +  pred_x[2]) / 2 : pred;
-                    pred = (case_num % 5 == 3 && case_num / 5 == 2) ?  (pred_z[2] +  pred_x[3]) / 2 : pred;
-                    pred = (case_num % 5 == 3 && case_num / 5 < 2) ?  pred_z[2] : pred;
-                    
-                    pred = (case_num % 5 == 2 && case_num / 5 == 3) ?  (pred_z[3] +  pred_x[2]) / 2 : pred;
-                    pred = (case_num % 5 == 2 && case_num / 5 == 2) ?  (pred_z[3] +  pred_x[3]) / 2 : pred;
-                    pred = (case_num % 5 == 2 && case_num / 5 < 2) ?  pred_z[3] : pred;
-                    
-                    pred = (case_num % 5 <= 1 && case_num / 5 == 3) ?  pred_x[2] : pred;
-                    pred = (case_num % 5 <= 1 && case_num / 5 == 2) ?  pred_x[3] : pred;
-                    pred = (case_num % 5 == 1 && case_num / 5 == 1) ?  (pred_z[4] + pred_x[4]) / 2: pred;
-                    pred = (case_num % 5 == 1 && case_num / 5 < 1) ?  pred_z[4] : pred;
-                    
-                    
-                    pred = (case_num % 5 == 0 && case_num / 5 == 1) ?  pred_x[4]: pred;
-                    // pred = (case_num % 5 == 0 && case_num / 5 < 1) ?  pred_z[0] + pred_x[0] - s_data[z - unit][y][x - unit]: pred;
+                    s_id_2[0] = 17 * 17 * z + 17 * y + id_x[0];
+                    s_id_2[1] = 17 * 17 * z + 17 * y + id_x[1];
+                    s_id_2[2] = 17 * 17 * z + 17 * y + id_x[2];
+                    s_id_2[3] = 17 * 17 * z + 17 * y + id_x[3];
+                    pred = s_data[id_z[1]][y][id_x[1]];
                     
                 }
-                else{//I_XY
-                    //assert(z&1==0);
-                    #pragma unroll
-                    for(int id_itr = 0; id_itr < 4; ++id_itr){
-                     tmp_y[id_itr] = s_data[z][id_y[id_itr]][x]; 
-                     tmp_x[id_itr] = s_data[z][y][id_x[id_itr]]; 
-                    }
-                    T1 pred_y[5], pred_x[5];
-                    pred_x[0] = tmp_x[1];
-                    pred_x[1] = cubic_interpolator(tmp_x[0],tmp_x[1],tmp_x[2],tmp_x[3]);
-                    pred_x[2] = (-tmp_x[0]+6*tmp_x[1] + 3*tmp_x[2]) / 8;
-                    pred_x[3] = (3*tmp_x[1] + 6*tmp_x[2]-tmp_x[3]) / 8;
-                    pred_x[4] = (tmp_x[1] + tmp_x[2]) / 2;
-                    
-                    pred_y[0] = tmp_y[1];
-                    pred_y[1] = cubic_interpolator(tmp_y[0],tmp_y[1],tmp_y[2],tmp_y[3]);
-                    pred_y[2] = (-tmp_y[0]+6*tmp_y[1] + 3*tmp_y[2]) / 8;
-                    pred_y[3] = (3*tmp_y[1] + 6*tmp_y[2]-tmp_y[3]) / 8;
-                    pred_y[4] = (tmp_y[1] + tmp_y[2]) / 2;
-                    
-                    auto interp_y = get_interp_order(y,BIY,GDY,global_y,data_size.y);
-                    auto interp_x = get_interp_order(x,BIX,GDX,global_x,data_size.x);
-                    
-                    pred = pred_y[0] + pred_x[0] - s_data[z][y - unit][x - unit];
-
-                    int case_num = interp_y + interp_x * 5;
-                    
-                    pred = (case_num % 5 == 4 && case_num / 5 == 4) ?  (pred_x[1] +  pred_y[1]) / 2 : pred;
-                    
-                    pred = (case_num % 5 != 4 && case_num / 5 == 4) ? pred_x[1] : pred;
-                    pred = (case_num % 5 == 4 && case_num / 5 != 4) ? pred_y[1] : pred;
-                    
-                    pred = (case_num % 5 == 3 && case_num / 5 == 3) ?  (pred_y[2] +  pred_x[2]) / 2 : pred;
-                    pred = (case_num % 5 == 3 && case_num / 5 == 2) ?  (pred_y[2] +  pred_x[3]) / 2 : pred;
-                    pred = (case_num % 5 == 3 && case_num / 5 < 2) ?  pred_y[2] : pred;
-                    
-                    pred = (case_num % 5 == 2 && case_num / 5 == 3) ?  (pred_y[3] +  pred_x[2]) / 2 : pred;
-                    pred = (case_num % 5 == 2 && case_num / 5 == 2) ?  (pred_y[3] +  pred_x[3]) / 2 : pred;
-                    pred = (case_num % 5 == 2 && case_num / 5 < 2) ?  pred_y[3] : pred;
-                    
-                    pred = (case_num % 5 <= 1 && case_num / 5 == 3) ?  pred_x[2] : pred;
-                    pred = (case_num % 5 <= 1 && case_num / 5 == 2) ?  pred_x[3] : pred;
-                    pred = (case_num % 5 == 1 && case_num / 5 == 1) ?  (pred_y[4] + pred_x[4]) / 2: pred;
-                    pred = (case_num % 5 == 1 && case_num / 5 < 1) ?  pred_y[4] : pred;
-                    
-                    
-                    pred = (case_num % 5 == 0 && case_num / 5 == 1) ?  pred_x[4]: pred;
-                    // pred = (case_num % 5 == 0 && case_num / 5 < 1) ?  pred_y[0] + pred_x[0] - s_data[z][y - unit][x - unit]: pred;
-                    
+                else{
+                    x_1 = y,BI_1 = BIY, GD_1 = GDY, gx_1 = global_y, gs_1 = data_size.y;
+                    x_2 = x,BI_2 = BIX, GD_2 = GDX, gx_2 = global_x, gs_2 = data_size.x;
+                    s_id_1[0] = 17 * 17 * z + 17 * id_y[0] + x;
+                    s_id_1[1] = 17 * 17 * z + 17 * id_y[1] + x;
+                    s_id_1[2] = 17 * 17 * z + 17 * id_y[2] + x;
+                    s_id_1[3] = 17 * 17 * z + 17 * id_y[3] + x;
+                    s_id_2[0] = 17 * 17 * z + 17 * y + id_x[0];
+                    s_id_2[1] = 17 * 17 * z + 17 * y + id_x[1];
+                    s_id_2[2] = 17 * 17 * z + 17 * y + id_x[2];
+                    s_id_2[3] = 17 * 17 * z + 17 * y + id_x[3];
+                    pred = s_data[z][id_y[1]][id_x[1]];
                 }
+
+
+                // T1 tmp_1[4], tmp_2[4];
+                // #pragma unroll
+                // for(int id_itr = 0; id_itr < 4; ++id_itr){
+                // tmp_1[id_itr] = *((T1*)s_data + s_id_1[id_itr]); 
+                // tmp_2[id_itr] = *((T1*)s_data + s_id_2[id_itr]); 
+                // }
+                
+                    // T1 pred_1[5], pred_2[5];
+                    // pred_2[0] = tmp_2[1];
+                    // pred_2[1] = cubic_interpolator(tmp_2[0],tmp_2[1],tmp_2[2],tmp_2[3]);
+                    // pred_2[2] = (-tmp_2[0]+6*tmp_2[1] + 3*tmp_2[2]) / 8;
+                    // pred_2[3] = (3*tmp_2[1] + 6*tmp_2[2]-tmp_2[3]) / 8;
+                    // pred_2[4] = (tmp_2[1] + tmp_2[2]) / 2;
+
+                    // pred_1[0] = tmp_1[1];
+                    // pred_1[1] = cubic_interpolator(tmp_1[0],tmp_1[1],tmp_1[2],tmp_1[3]);
+                    // pred_1[2] = (-tmp_1[0]+6*tmp_1[1] + 3*tmp_1[2]) / 8;
+                    // pred_1[3] = (3*tmp_1[1] + 6*tmp_1[2]-tmp_1[3]) / 8;
+                    // pred_1[4] = (tmp_1[1] + tmp_1[2]) / 2;
+
+                    auto interp_1 = get_interp_order(x_1,BI_1,GD_1,gx_1,gs_1);
+                    auto interp_2 = get_interp_order(x_2,BI_2,GD_2,gx_2,gs_2);
+
+                    // pred = pred_1[0] + pred_2[0] - pred;
+                    int case_num = interp_1 + interp_2 * 5;
+
+                    // pred = (interp_1 == 4 && interp_2 == 4) ?  (pred_2[1] +  pred_1[1]) / 2 : pred;
+
+                    // pred = (interp_1 != 4 && interp_2 == 4) ? pred_2[1] : pred;
+                    // pred = (interp_1 == 4 && interp_2 != 4) ? pred_1[1] : pred;
+
+                    // pred = (interp_1 == 3 && interp_2 == 3) ?  (pred_1[2] +  pred_2[2]) / 2 : pred;
+                    // pred = (interp_1 == 3 && interp_2 == 2) ?  (pred_1[2] +  pred_2[3]) / 2 : pred;
+                    // pred = (interp_1 == 3 && interp_2 < 2) ?  pred_1[2] : pred;
+
+                    // pred = (interp_1 == 2 && interp_2 == 3) ?  (pred_1[3] +  pred_2[2]) / 2 : pred;
+                    // pred = (interp_1 == 2 && interp_2 == 2) ?  (pred_1[3] +  pred_2[3]) / 2 : pred;
+                    // pred = (interp_1 == 2 && interp_2 < 2) ?  pred_1[3] : pred;
+
+                    // pred = (interp_1 <= 1 && interp_2 == 3) ?  pred_2[2] : pred;
+                    // pred = (interp_1 <= 1 && interp_2 == 2) ?  pred_2[3] : pred;
+                    // pred = (interp_1 == 1 && interp_2 == 1) ?  (pred_1[4] + pred_2[4]) / 2: pred;
+                    // pred = (interp_1 == 1 && interp_2 < 1) ?  pred_1[4] : pred;
+
+
+                    // pred = (interp_1 == 0 && interp_2 == 1) ?  pred_2[4]: pred;
+
+                    if (interp_1 == 4 && interp_2 == 4) {
+                        pred = (cubic_interpolator(*((T1*)s_data + s_id_1[0]), 
+                        *((T1*)s_data + s_id_1[1]), 
+                        *((T1*)s_data + s_id_1[2]), 
+                        *((T1*)s_data + s_id_1[3])) +
+                         cubic_interpolator(*((T1*)s_data + s_id_2[0]), 
+                        *((T1*)s_data + s_id_2[1]), 
+                        *((T1*)s_data + s_id_2[2]), 
+                        *((T1*)s_data + s_id_2[3]))) / 2;
+                    } else if (interp_1 != 4 && interp_2 == 4) {
+                        pred = cubic_interpolator(*((T1*)s_data + s_id_2[0]), 
+                        *((T1*)s_data + s_id_2[1]), 
+                        *((T1*)s_data + s_id_2[2]), 
+                        *((T1*)s_data + s_id_2[3]));
+                    } else if (interp_1 == 4 && interp_2 != 4) {
+                        pred = cubic_interpolator(*((T1*)s_data + s_id_1[0]), 
+                        *((T1*)s_data + s_id_1[1]), 
+                        *((T1*)s_data + s_id_1[2]), 
+                        *((T1*)s_data + s_id_1[3]));
+                    } else if (interp_1 == 3 && interp_2 == 3) {
+                        pred = (-(*((T1*)s_data + s_id_2[0]))+6*(*((T1*)s_data + s_id_2[1])) + 3*(*((T1*)s_data + s_id_2[2]))) / 8;
+                        pred += (-(*((T1*)s_data + s_id_1[0]))+6*(*((T1*)s_data + s_id_1[1])) + 3*(*((T1*)s_data + s_id_1[2]))) / 8;
+                        pred /= 2;
+                    } else if (interp_1 == 3 && interp_2 == 2) {
+                        pred = (3*(*((T1*)s_data + s_id_2[1]))+6*(*((T1*)s_data + s_id_2[2])) - (*((T1*)s_data + s_id_2[3]))) / 8;
+                        pred += (-(*((T1*)s_data + s_id_1[0]))+6*(*((T1*)s_data + s_id_1[1])) + 3*(*((T1*)s_data + s_id_1[2]))) / 8;
+                        pred /= 2;
+                    } else if (interp_1 == 3 && interp_2 < 2) {
+                        pred = (-(*((T1*)s_data + s_id_1[0]))+6*(*((T1*)s_data + s_id_1[1])) + 3*(*((T1*)s_data + s_id_1[2]))) / 8;
+                    } else if (interp_1 == 2 && interp_2 == 3) {
+                        pred = (3*(*((T1*)s_data + s_id_1[1]))+6*(*((T1*)s_data + s_id_1[2])) - (*((T1*)s_data + s_id_1[3]))) / 8;
+                        pred += (-(*((T1*)s_data + s_id_2[0]))+6*(*((T1*)s_data + s_id_2[1])) + 3*(*((T1*)s_data + s_id_2[2]))) / 8;
+                        pred /= 2;
+                    } else if (interp_1 == 2 && interp_2 == 2) {
+                        pred = (3*(*((T1*)s_data + s_id_1[1]))+6*(*((T1*)s_data + s_id_1[2])) - (*((T1*)s_data + s_id_1[3]))) / 8;
+                        pred += (3*(*((T1*)s_data + s_id_2[1]))+6*(*((T1*)s_data + s_id_2[2])) - (*((T1*)s_data + s_id_2[3]))) / 8;
+                        pred /= 2;
+                    } else if (interp_1 == 2 && interp_2 < 2) {
+                        pred = (3*(*((T1*)s_data + s_id_1[1]))+6*(*((T1*)s_data + s_id_1[2])) - (*((T1*)s_data + s_id_1[3]))) / 8;
+                    } else if (interp_1 <= 1 && interp_2 == 3) {
+                        pred = (-(*((T1*)s_data + s_id_2[0]))+6*(*((T1*)s_data + s_id_2[1])) + 3*(*((T1*)s_data + s_id_2[2]))) / 8;
+                    } else if (interp_1 <= 1 && interp_2 == 2) {
+                        pred = (3*(*((T1*)s_data + s_id_2[1]))+6*(*((T1*)s_data + s_id_2[2])) - (*((T1*)s_data + s_id_2[3]))) / 8;
+                    } else if (interp_1 == 1 && interp_2 == 1) {
+                        pred = ((*((T1*)s_data + s_id_2[1]))+(*((T1*)s_data + s_id_2[2]))) / 2;
+                        pred += ((*((T1*)s_data + s_id_1[1]))+(*((T1*)s_data + s_id_1[2]))) / 2;
+                        pred /= 2;
+                    } else if (interp_1 == 1 && interp_2 < 1) {
+                        
+                        pred = ((*((T1*)s_data + s_id_1[1]))+(*((T1*)s_data + s_id_1[2]))) / 2;
+                    } else if (interp_1 == 0 && interp_2 == 1) {
+                        pred = ((*((T1*)s_data + s_id_2[1]))+(*((T1*)s_data + s_id_2[2]))) / 2;
+                    }
+                    else{
+                        pred = (*((T1*)s_data + s_id_1[1])) + (*((T1*)s_data + s_id_2[1])) - pred;
+                    }
+                    
             }
 
             if CONSTEXPR (CUBE) {  //
                 auto interp_z = get_interp_order(z,BIZ,GDZ,global_z,data_size.z);
                 auto interp_y = get_interp_order(y,BIY,GDY,global_y,data_size.y);
                 auto interp_x = get_interp_order(x,BIX,GDX,global_x,data_size.x);
+                
                 #pragma unroll
                 for(int id_itr = 0; id_itr < 4; ++id_itr){
                  tmp_x[id_itr] = s_data[z][y][id_x[id_itr]]; 
@@ -1258,10 +1260,81 @@ __forceinline__ __device__ void interpolate_stage_md(
                 
                 pred_z[1] = cubic_interpolator(tmp_z[0],tmp_z[1],tmp_z[2],tmp_z[3]);
                 
-                pred = pred_x[0];
+                
                 // int case_num = interp_y + interp_x * 5;
                 
+      
+//                 if (interp_z == 4 && interp_y == 4 && interp_x == 4) {
+//                     pred = (cubic_interpolator(s_data[z - 3*unit][y][x],
+//                         s_data[z - unit][y][x],
+//                         s_data[z + unit][y][x],
+//                         s_data[z+ 3*unit][y][x]) +
+//    cubic_interpolator(s_data[z][y - 3*unit][x],
+//                         s_data[z][y - unit][x],
+//                         s_data[z][y + unit][x],
+//                         s_data[z][y + 3*unit][x]) +
+//    cubic_interpolator(s_data[z][y][x - 3*unit],
+//                         s_data[z][y][x - unit],
+//                         s_data[z][y][x + unit],
+//                         s_data[z][y][x + 3*unit])
+//    ) / 3;
+//                 } else if (interp_z == 4 && interp_y == 4 && interp_x != 4) {
+//                     pred = (cubic_interpolator(s_data[z - 3*unit][y][x],
+//                         s_data[z - unit][y][x],
+//                         s_data[z + unit][y][x],
+//                         s_data[z+ 3*unit][y][x]) +
+//    cubic_interpolator(s_data[z][y - 3*unit][x],
+//                         s_data[z][y - unit][x],
+//                         s_data[z][y + unit][x],
+//                         s_data[z][y + 3*unit][x])
+//    ) / 2;
+//                 } else if (interp_z == 4 && interp_y != 4 && interp_x == 4) {
+//                     pred = (cubic_interpolator(s_data[z - 3*unit][y][x],
+//                         s_data[z - unit][y][x],
+//                         s_data[z + unit][y][x],
+//                         s_data[z+ 3*unit][y][x]) +
+// cubic_interpolator(s_data[z][y][x - 3*unit],
+//                     s_data[z][y][x - unit],
+//                     s_data[z][y][x + unit],
+//                     s_data[z][y][x + 3*unit])
+// ) / 2;
+//                 } else if (interp_z != 4 && interp_y == 4 && interp_x == 4) {
+//                     pred = (cubic_interpolator(s_data[z][y - 3*unit][x],
+//                         s_data[z][y - unit][x],
+//                         s_data[z][y + unit][x],
+//                         s_data[z][y+ 3*unit][x]) +
+// cubic_interpolator(s_data[z][y][x - 3*unit],
+//                     s_data[z][y][x - unit],
+//                     s_data[z][y][x + unit],
+//                     s_data[z][y][x + 3*unit])
+// ) / 2;
+//                 } else if (interp_z == 4 && interp_y != 4 && interp_x != 4) {
+//                     pred = cubic_interpolator(s_data[z - 3*unit][y][x],
+//                         s_data[z - unit][y][x],
+//                         s_data[z + unit][y][x],
+//                         s_data[z+ 3*unit][y][x]);
+//                 } else if (interp_z != 4 && interp_y == 4 && interp_x != 4) {
+//                     pred = cubic_interpolator(s_data[z][y - 3*unit][x],
+//                         s_data[z][y - unit][x],
+//                         s_data[z][y + unit][x],
+//                         s_data[z][y+ 3*unit][x]);
+//                 } else if (interp_z != 4 && interp_y != 4 && interp_x == 4) {
+//                     pred = cubic_interpolator(s_data[z][y][x - 3*unit],
+//                         s_data[z][y][x - unit],
+//                         s_data[z][y][x + unit],
+//                         s_data[z][y][x + 3*unit]);
+//                 } else if (interp_z != 4 && interp_y != 4 && interp_x == 3) {
+//                     pred = (-s_data[z][y][x - 3*unit] + 6*s_data[z][y][x - unit] + 3*s_data[z][y][x + unit]) / 8;
+//                 } else if (interp_z != 4 && interp_y != 4 && interp_x == 2) {
+//                     pred = (3*s_data[z][y][x - unit] + 6*s_data[z][y][x + unit] - s_data[z][y][x + 3*unit]) / 8;
+//                 } else if (interp_z != 4 && interp_y != 4 && interp_x == 1) {
+//                     pred = (s_data[z][y][x - unit] + s_data[z][y][x + unit]) / 2;
+//                 } else {
+//                     pred = s_data[z][y][x - unit];
+//                 }
+            
                 
+                pred = pred_x[0];
                 pred = (interp_z == 4 && interp_y == 4 && interp_x == 4) ? (pred_x[1] +  pred_y[1] + pred_z[1]) / 3 : pred;
                 
                 pred = (interp_z == 4 && interp_y == 4 && interp_x != 4) ? (pred_z[1] + pred_y[1]) / 2 : pred;
@@ -1276,7 +1349,7 @@ __forceinline__ __device__ void interpolate_stage_md(
                 pred = (interp_z != 4 && interp_y != 4 && interp_x == 3) ? pred_x[2]: pred;
                 pred = (interp_z != 4 && interp_y != 4 && interp_x == 2) ? pred_x[3]: pred;
                 pred = (interp_z != 4 && interp_y != 4 && interp_x == 1) ? pred_x[4]: pred;
-                pred = (interp_z != 4 && interp_y != 4 && interp_x == 0) ? pred_x[0]: pred;
+                // pred = (interp_z != 4 && interp_y != 4 && interp_x == 0) ? pred_x[0]: pred;
             }
 
 
