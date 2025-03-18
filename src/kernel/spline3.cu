@@ -173,9 +173,9 @@ int spline_construct(
        START_GPUEVENT_RECORDING(stream);
       auto block_num = s_size_x*s_size_y*s_size_z;
 
-      cusz::pa_spline3d_infprecis_16x16x16data<T*, float, DEFAULT_BLOCK_SIZE> //
-      <<<dim3(s_size_x*s_size_y*s_size_z, 9, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1),0, (GpuStreamT)stream  >>>
-      (data->dptr(), data->template len3<dim3>(),data->template st3<dim3>(),dim3(s_start_x,s_start_y,s_start_z),dim3(s_size_x,s_size_y,s_size_z),dim3(S_STRIDE,S_STRIDE,S_STRIDE),eb_r,ebx2,intp_param,profiling_errors->dptr(),true);
+      // cusz::pa_spline3d_infprecis_16x16x16data<T*, float, DEFAULT_BLOCK_SIZE> //
+      // <<<dim3(s_size_x*s_size_y*s_size_z, 9, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1),0, (GpuStreamT)stream  >>>
+      // (data->dptr(), data->template len3<dim3>(),data->template st3<dim3>(),dim3(s_start_x,s_start_y,s_start_z),dim3(s_size_x,s_size_y,s_size_z),dim3(S_STRIDE,S_STRIDE,S_STRIDE),eb_r,ebx2,intp_param,profiling_errors->dptr(),true);
        STOP_GPUEVENT_RECORDING(stream);
       CHECK_GPU(GpuStreamSync(stream));
       TIME_ELAPSED_GPUEVENT(&temp_time);
@@ -254,10 +254,10 @@ int spline_construct(
       best_ave_pre_error[0]= best_error/(calcnum(8)*block_num);
       
       printf("BESTERROR: %.4e %.4e %.4e %.4e\n",best_ave_pre_error[3],best_ave_pre_error[2],best_ave_pre_error[1],best_ave_pre_error[0]);
-      // intp_param.use_md[0] = 1;
-      // intp_param.use_md[1] = 1;
-      // intp_param.use_md[2] = 1;
-      // intp_param.use_md[3] = 1;
+      intp_param.use_md[0] = 1;
+      intp_param.use_md[1] = 1;
+      intp_param.use_md[2] = 1;
+      intp_param.use_md[3] = 1;
       if(intp_param.auto_tuning==4){
          cusz::reset_errors<<<dim3(1, 1, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1),0, (GpuStreamT)stream >>>(profiling_errors->dptr());
 
