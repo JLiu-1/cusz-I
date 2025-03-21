@@ -1,0 +1,1 @@
+ -Wl,-rpath,/pscratch/sd/s/swu264/sc25_interp/workspace_cuSZ-i/cusz-interp/build_test ../libpszmem.so ../libpszstat_cu.so ../libpszkernel_cu.so ../libpszkernel_seq.so ../libpszstat_seq.so "/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/cuda/12.4/targets/x86_64-linux/lib/libcudart.so" -lpthread -ldl /usr/lib64/librt.so -lcudadevrt -lcudart_static -lrt -lpthread -ldl 
