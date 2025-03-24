@@ -433,7 +433,6 @@
  
      if (gx < buf_size.x and gy < buf_size.y and gz < buf_size.z)
        dram_buf[gid] = s_buf[z][y][x];
-     // if(BIX + BIY + BIZ == 0) printf("gid=%d data=%f\n", gid, dram_buf[gid]);
    }
    __syncthreads();
  }
