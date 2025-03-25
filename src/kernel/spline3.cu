@@ -20,10 +20,11 @@
 #include <cuda_runtime.h>
 
 #define BLOCK_DIM_SIZE 384
-#define SPLINE_DIM 3
-#define AnchorBlockSizeX 16
-#define AnchorBlockSizeY 16
-#define AnchorBlockSizeZ 16
+#define LEVEL 5
+#define SPLINE_DIM 2
+#define AnchorBlockSizeX 32
+#define AnchorBlockSizeY 32
+#define AnchorBlockSizeZ 1
 #define numAnchorBlockX 1  
 #define numAnchorBlockY 1  
 #define numAnchorBlockZ 1 
@@ -148,7 +149,7 @@ int spline_construct(
       
      
       bool do_nat = errors[0] + errors[2] + errors[4] > errors[1] + errors[3] + errors[5];
-      intp_param.use_natural[0]=intp_param.use_natural[1]=intp_param.use_natural[2]=intp_param.use_natural[3]=do_nat;
+      intp_param.use_natural[0] = intp_param.use_natural[1] = intp_param.use_natural[2] = intp_param.use_natural[3] = do_nat;
       //intp_param.interpolators[0]=(errors[0]>errors[1]);
       //intp_param.interpolators[1]=(errors[2]>errors[3]);
       //intp_param.interpolators[2]=(errors[4]>errors[5]);
@@ -158,55 +159,45 @@ int spline_construct(
        intp_param.reverse[0]=intp_param.reverse[1]=intp_param.reverse[2]=intp_param.reverse[3]=do_reverse;
     }
     else{
-      const auto S_STRIDE = 6 * AnchorBlockSizeX;//96
-      cusz::reset_errors<<<dim3(1, 1, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1),0, (GpuStreamT)stream >>>(profiling_errors->dptr());
+      const auto S_STRIDE = 6 * AnchorBlockSizeX;
+      cusz::reset_errors<<<dim3(1, 1, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream >>>(profiling_errors->dptr());
 
       auto calc_start_size = [&](auto dim,auto & s_start,auto &s_size) {
           auto mid = dim / 2;
-    
-          auto k = (mid - 8) / S_STRIDE;  
-          auto t = (dim - 8 - 1 - mid) / S_STRIDE;  
-
+          auto k = (mid - AnchorBlockSizeX / 2) / S_STRIDE;  
+          auto t = (dim - AnchorBlockSizeX / 2 - 1 - mid) / S_STRIDE;
           s_start = mid - k * S_STRIDE;
-          s_size = k+t+1;
+          s_size = k + t + 1;
       };
 
-      int s_start_x,s_start_y,s_start_z,s_size_x,s_size_y,s_size_z;
+      int s_start_x, s_start_y, s_start_z, s_size_x, s_size_y, s_size_z;
 
-      calc_start_size(l3.x,s_start_x,s_size_x);
-      calc_start_size(l3.y,s_start_y,s_size_y);
-      calc_start_size(l3.z,s_start_z,s_size_z);
+      calc_start_size(l3.x, s_start_x, s_size_x);
+      calc_start_size(l3.y, s_start_y, s_size_y);
+      calc_start_size(l3.z, s_start_z, s_size_z);
 
-      //printf("%d %d %d %d %d %d\n",s_start_x,s_start_y,s_start_z,s_size_x,s_size_y,s_size_z);
       float temp_time = 0;
       CREATE_GPUEVENT_PAIR;
        START_GPUEVENT_RECORDING(stream);
-      auto block_num = s_size_x*s_size_y*s_size_z;
-
-      // cusz::pa_spline3d_infprecis_16x16x16data<T*, float, DEFAULT_BLOCK_SIZE> //
-      // <<<dim3(s_size_x*s_size_y*s_size_z, 9, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1),0, (GpuStreamT)stream  >>>
-      // (data->dptr(), data->template len3<dim3>(),data->template st3<dim3>(),dim3(s_start_x,s_start_y,s_start_z),dim3(s_size_x,s_size_y,s_size_z),dim3(S_STRIDE,S_STRIDE,S_STRIDE),eb_r,ebx2,intp_param,profiling_errors->dptr(),true);
-       STOP_GPUEVENT_RECORDING(stream);
+      auto block_num = s_size_x * s_size_y * s_size_z;
+      // cusz::pa_spline_infprecis_data<T*, float, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, DEFAULT_BLOCK_SIZE><<<dim3(s_size_x * s_size_y * s_size_z, 9, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>> (data->dptr(), data->template len3<dim3>(), data->template st3<dim3>(), dim3(s_start_x, s_start_y, s_start_z), dim3(s_size_x, s_size_y, s_size_z), dim3(S_STRIDE, S_STRIDE, S_STRIDE), eb_r, ebx2, intp_param, profiling_errors->dptr(), true);
+      STOP_GPUEVENT_RECORDING(stream);
       CHECK_GPU(GpuStreamSync(stream));
       TIME_ELAPSED_GPUEVENT(&temp_time);
       DESTROY_GPUEVENT_PAIR;
-      att_time+=temp_time;
+      att_time += temp_time;
       CHECK_GPU(cudaMemcpy(profiling_errors->m->h, profiling_errors->m->d, profiling_errors->m->bytes, cudaMemcpyDeviceToHost));
-      auto errors=profiling_errors->hptr();
-
-      //for(int i=0;i<18;i++){
-      //printf("%d %.4e\n",i,errors[i]);
-     // }
+      auto errors = profiling_errors->hptr();
 
 
       double best_ave_pre_error[4];
       auto calcnum  = [&](auto N){
-        return N*(7*N*N+9*N+3);
+        return N * (7 * N * N + 9 * N + 3);
       };
 
 
       T best_error;
-      if(errors[0]>errors[1]){
+      if(errors[0] > errors[1]){
         best_error = errors[1];
         intp_param.reverse[3] = true;
       }
@@ -218,10 +209,10 @@ int spline_construct(
 
       intp_param.use_md[3] = errors[2] < best_error; 
       best_error = fmin(errors[2],best_error);
-      best_ave_pre_error[3]= best_error/(calcnum(1)*block_num);
+      best_ave_pre_error[3] = best_error / (calcnum(1) * block_num);
 
 
-      if(errors[3]>errors[4]){
+      if(errors[3] > errors[4]){
         best_error = errors[4];
         intp_param.reverse[2] = true;
       }
@@ -232,13 +223,13 @@ int spline_construct(
 
       intp_param.use_md[2] = errors[5] < best_error; 
       best_error = fmin(errors[5],best_error);
-      best_ave_pre_error[2]= best_error/(calcnum(2)*block_num);
+      best_ave_pre_error[2] = best_error / (calcnum(2) * block_num);
 
       best_error = errors[6];
       auto best_idx = 6; 
-      for(auto i = 6;i<12;i++){
-        if(errors[i]<best_error){
-          best_error=errors[i];
+      for(auto i = 6; i < 12; i++){
+        if(errors[i] < best_error){
+          best_error = errors[i];
           best_idx = i;
         }
       }
@@ -264,47 +255,58 @@ int spline_construct(
       best_ave_pre_error[0]= best_error/(calcnum(8)*block_num);
       
       printf("BESTERROR: %.4e %.4e %.4e %.4e\n",best_ave_pre_error[3],best_ave_pre_error[2],best_ave_pre_error[1],best_ave_pre_error[0]);
-      intp_param.use_md[0] = 1;
-      intp_param.use_md[1] = 1;
-      intp_param.use_md[2] = 1;
-      intp_param.use_md[3] = 1;
+      intp_param.use_md[0] = 0;
+      intp_param.use_md[1] = 0;
+      intp_param.use_md[2] = 0;
+      intp_param.use_md[3] = 0;
+      intp_param.use_md[4] = 0;
+      intp_param.use_md[5] = 0;
       if(intp_param.auto_tuning==4){
-         cusz::reset_errors<<<dim3(1, 1, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1),0, (GpuStreamT)stream >>>(profiling_errors->dptr());
+        //  cusz::reset_errors<<<dim3(1, 1, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1),0, (GpuStreamT)stream >>>(profiling_errors->dptr());
 
         float temp_time = 0;
         CREATE_GPUEVENT_PAIR;
          START_GPUEVENT_RECORDING(stream);
 
-        cusz::pa_spline_infprecis_data<T*, float, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ,
-        numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, DEFAULT_BLOCK_SIZE> //
-        <<<dim3(s_size_x * s_size_y * s_size_z, 11, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1),0, (GpuStreamT)stream  >>>
-        (data->dptr(), data->template len3<dim3>(),data->template st3<dim3>(),dim3(s_start_x,s_start_y,s_start_z),dim3(s_size_x,s_size_y,s_size_z),dim3(S_STRIDE,S_STRIDE,S_STRIDE),eb_r,ebx2,intp_param,profiling_errors->dptr(),false);
-         STOP_GPUEVENT_RECORDING(stream);
+        // cusz::pa_spline_infprecis_data<T*, float, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, DEFAULT_BLOCK_SIZE><<<dim3(s_size_x * s_size_y * s_size_z, 11, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1),0, (GpuStreamT)stream>>>(
+        //   data->dptr(),
+        //   data->template len3<dim3>(),
+        //   data->template st3<dim3>(),
+        //   dim3(s_start_x,s_start_y,s_start_z),
+        //   dim3(s_size_x,s_size_y,s_size_z),
+        //   dim3(S_STRIDE,S_STRIDE,S_STRIDE),
+        //   eb_r,
+        //   ebx2,
+        //   intp_param,
+        //   profiling_errors->dptr(),
+        //   false);
+        
+        STOP_GPUEVENT_RECORDING(stream);
         CHECK_GPU(GpuStreamSync(stream));
         TIME_ELAPSED_GPUEVENT(&temp_time);
         DESTROY_GPUEVENT_PAIR;
-        att_time+=temp_time;
+        att_time += temp_time;
 
-        auto errors=profiling_errors->hptr();
-        for(int i=0;i<11;i++){
-          printf("%d %.4e\n",i,errors[i]);
+        auto errors = profiling_errors->hptr();
+        for(int i = 0; i < 11; i++){
+          printf("%d %.4e\n", i, errors[i]);
         }
 
         best_error = errors[0];
         auto best_idx = 0; 
         
-        for(auto i = 1;i<11;i++){
-          if(errors[i]<best_error){
-            best_error=errors[i];
+        for(auto i = 1;i < 11;i++){
+          if(errors[i] < best_error){
+            best_error = errors[i];
             best_idx = i;
           }
         }
 
-        if(best_idx==0){
+        if(best_idx == 0){
             intp_param.alpha = 1.0;
             intp_param.beta = 2.0;
         }
-        else if (best_idx==1){
+        else if (best_idx == 1){
             intp_param.alpha = 1.25;
             intp_param.beta = 2.0;
         }
@@ -314,38 +316,38 @@ int spline_construct(
         }
 
       }
-      else if(intp_param.auto_tuning >=5){
-        best_idx = intp_param.auto_tuning-5;
-        if(best_idx==0){
+      else if(intp_param.auto_tuning >= 5){
+        best_idx = intp_param.auto_tuning - 5;
+        if(best_idx == 0){
             intp_param.alpha = 1.0;
             intp_param.beta = 2.0;
         }
-        else if (best_idx==1){
+        else if (best_idx == 1){
             intp_param.alpha = 1.25;
             intp_param.beta = 2.0;
         }
         else{
-            intp_param.alpha = 1.5+0.25*((best_idx-2)/3);
-            intp_param.beta = 2.0+((best_idx-2)%3);
+            intp_param.alpha = 1.5 + 0.25 * ((best_idx - 2) / 3);
+            intp_param.beta = 2.0 + ((best_idx - 2) % 3);
         }
 
       }
 
 
     }
-    //for(int i=0;i<4;i++)
-    //intp_param.reverse[i]=false;
-     printf("NAT: %d %d %d %d\n",intp_param.use_natural[3],intp_param.use_natural[2],intp_param.use_natural[1],intp_param.use_natural[0]);
-      printf("MD: %d %d %d %d\n",intp_param.use_md[3],intp_param.use_md[2],intp_param.use_md[1],intp_param.use_md[0]);
-      printf("REVERSE: %d %d %d %d\n",intp_param.reverse[3],intp_param.reverse[2],intp_param.reverse[1],intp_param.reverse[0]);
-      printf("A B: %.2f %.2f\n",intp_param.alpha,intp_param.beta);
-    
-  
+      printf("\nNAT:");
+      for(int i = 0; i < LEVEL; ++i) printf(" %d", intp_param.use_natural[LEVEL - i - 1]);
+      printf("\nMD:");
+      for(int i = 0; i < LEVEL; ++i) printf(" %d", intp_param.use_md[LEVEL - i - 1]);
+      printf("\nREVERSE:");
+      for(int i = 0; i < LEVEL; ++i) printf(" %d", intp_param.reverse[LEVEL - i - 1]);
+      
+      printf("\nA B: %.2f %.2f\n",intp_param.alpha,intp_param.beta);
   }
   CREATE_GPUEVENT_PAIR;
   START_GPUEVENT_RECORDING(stream);
 
-  cusz::c_spline_infprecis_data<T*, E*, float, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ,
+  cusz::c_spline_infprecis_data<T*, E*, float, LEVEL, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ,
   numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, DEFAULT_BLOCK_SIZE>  //
       <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>(
           data->dptr(), data->template len3<dim3>(),
@@ -370,7 +372,7 @@ int spline_reconstruct(
     pszmem_cxx<T>* anchor, pszmem_cxx<E>* ectrl, pszmem_cxx<T>* xdata, T* outlier_tmp,
     double eb, uint32_t radius, INTERPOLATION_PARAMS intp_param, float* time, void* stream)
 {
-  constexpr auto BLOCK = 16;
+
 
   auto div = [](auto _l, auto _subl) { return (_l - 1) / _subl + 1; };
 
@@ -379,12 +381,12 @@ int spline_reconstruct(
 
   auto l3 = xdata->template len3<dim3>();
   auto grid_dim =
-      dim3(div(l3.x, BLOCK ), div(l3.y, BLOCK ), div(l3.z, BLOCK ));
+      dim3(div(l3.x, AnchorBlockSizeX * numAnchorBlockX ), div(l3.y, AnchorBlockSizeY * numAnchorBlockY ), div(l3.z, AnchorBlockSizeZ * numAnchorBlockZ ));
 
   CREATE_GPUEVENT_PAIR;
   START_GPUEVENT_RECORDING(stream);
 
-  cusz::x_spline_infprecis_data<E*, T*, float, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ,
+  cusz::x_spline_infprecis_data<E*, T*, float, LEVEL, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ,
   numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, DEFAULT_BLOCK_SIZE>   //
       <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>  //
       (ectrl->dptr(), ectrl->template len3<dim3>(),
