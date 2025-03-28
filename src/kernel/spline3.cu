@@ -431,13 +431,22 @@ int spline_construct(
 
 
     }
+    if(l3.z != 1){
       printf("\nNAT:");
-      for(int i = 0; i < 4; ++i) printf(" %d", intp_param.use_natural[LEVEL - i - 1]);
+      for(int i = 0; i < 4; ++i) printf(" %d", intp_param.use_natural[4 - i - 1]);
       printf("\nMD:");
-      for(int i = 0; i < 4; ++i) printf(" %d", intp_param.use_md[LEVEL - i - 1]);
+      for(int i = 0; i < 4; ++i) printf(" %d", intp_param.use_md[4 - i - 1]);
       printf("\nREVERSE:");
-      for(int i = 0; i < 4; ++i) printf(" %d", intp_param.reverse[LEVEL - i - 1]);
-      
+      for(int i = 0; i < 4; ++i) printf(" %d", intp_param.reverse[4 - i - 1]);
+    }
+    else{
+      printf("\nNAT:");
+      for(int i = 0; i < LEVEL; ++i) printf(" %d", intp_param.use_natural[LEVEL - i - 1]);
+      printf("\nMD:");
+      for(int i = 0; i < LEVEL; ++i) printf(" %d", intp_param.use_md[LEVEL - i - 1]);
+      printf("\nREVERSE:");
+      for(int i = 0; i < LEVEL; ++i) printf(" %d", intp_param.reverse[LEVEL - i - 1]);
+    }
       printf("\nA B: %.2f %.2f\n",intp_param.alpha,intp_param.beta);
   }
   CREATE_GPUEVENT_PAIR;
