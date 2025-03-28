@@ -300,10 +300,20 @@ int spline_construct(
       }
       printf("\n");
     }
-      // intp_param.use_md[0] = 1;
-      // intp_param.use_md[1] = 1;
-      // intp_param.use_md[2] = 1;
-      // intp_param.use_md[3] = 1;
+      intp_param.use_md[0] = 1;
+      intp_param.use_md[1] = 1;
+      intp_param.use_md[2] = 0;
+      intp_param.use_md[3] = 1;
+      
+      intp_param.use_natural[0] = 0;
+      intp_param.use_natural[1] = 0;
+      intp_param.use_natural[2] = 1;
+      intp_param.use_natural[3] = 0;
+
+      intp_param.reverse[0] = 0;
+      intp_param.reverse[1] = 1;
+      intp_param.reverse[2] = 0;
+      intp_param.reverse[3] = 1;
       // intp_param.use_md[4] = 1;
       // intp_param.use_md[5] = 1;
       // intp_param.use_md[0] = 0;
@@ -400,11 +410,11 @@ int spline_construct(
 
     }
       printf("\nNAT:");
-      for(int i = 0; i < LEVEL; ++i) printf(" %d", intp_param.use_natural[LEVEL - i - 1]);
+      for(int i = 0; i < 4; ++i) printf(" %d", intp_param.use_natural[LEVEL - i - 1]);
       printf("\nMD:");
-      for(int i = 0; i < LEVEL; ++i) printf(" %d", intp_param.use_md[LEVEL - i - 1]);
+      for(int i = 0; i < 4; ++i) printf(" %d", intp_param.use_md[LEVEL - i - 1]);
       printf("\nREVERSE:");
-      for(int i = 0; i < LEVEL; ++i) printf(" %d", intp_param.reverse[LEVEL - i - 1]);
+      for(int i = 0; i < 4; ++i) printf(" %d", intp_param.reverse[LEVEL - i - 1]);
       
       printf("\nA B: %.2f %.2f\n",intp_param.alpha,intp_param.beta);
   }
