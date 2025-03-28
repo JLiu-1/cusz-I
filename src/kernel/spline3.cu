@@ -156,7 +156,9 @@ int spline_construct(
        intp_param.reverse[0]=intp_param.reverse[1]=intp_param.reverse[2]=intp_param.reverse[3]=do_reverse;
     }
     else{
-      const auto S_STRIDE = 6 * AnchorBlockSizeX;
+      int S_STRIDE;
+      if(l3.z == 1)S_STRIDE = 6 * AnchorBlockSizeX;
+      else S_STRIDE = 6 * BLOCK16;
 
       cusz::reset_errors<<<dim3(1, 1, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream >>>(profiling_errors->dptr());
 
@@ -170,10 +172,16 @@ int spline_construct(
 
       int s_start_x, s_start_y, s_start_z, s_size_x, s_size_y, s_size_z;
 
-      calc_start_size(l3.x, s_start_x, s_size_x, AnchorBlockSizeX);
-      calc_start_size(l3.y, s_start_y, s_size_y, AnchorBlockSizeY);
-      calc_start_size(l3.z, s_start_z, s_size_z, AnchorBlockSizeZ);
-
+      if(l3.z == 1){
+        calc_start_size(l3.x, s_start_x, s_size_x, AnchorBlockSizeX);
+        calc_start_size(l3.y, s_start_y, s_size_y, AnchorBlockSizeY);
+        calc_start_size(l3.z, s_start_z, s_size_z, AnchorBlockSizeZ);
+      }
+      else{
+        calc_start_size(l3.x, s_start_x, s_size_x, BLOCK16);
+        calc_start_size(l3.y, s_start_y, s_size_y, BLOCK16);
+        calc_start_size(l3.z, s_start_z, s_size_z, BLOCK16);
+      }
       float temp_time = 0;
       CREATE_GPUEVENT_PAIR;
       START_GPUEVENT_RECORDING(stream);
@@ -314,20 +322,20 @@ int spline_construct(
       // intp_param.reverse[1] = 1;
       // intp_param.reverse[2] = 0;
       // intp_param.reverse[3] = 1;
-      intp_param.use_md[3] = 1;
-      intp_param.use_md[2] = 1;
-      intp_param.use_md[1] = 0;
-      intp_param.use_md[0] = 1;
+      // intp_param.use_md[3] = 1;
+      // intp_param.use_md[2] = 1;
+      // intp_param.use_md[1] = 0;
+      // intp_param.use_md[0] = 1;
       
-      intp_param.use_natural[3] = 0;
-      intp_param.use_natural[2] = 0;
-      intp_param.use_natural[1] = 1;
-      intp_param.use_natural[0] = 0;
+      // intp_param.use_natural[3] = 0;
+      // intp_param.use_natural[2] = 0;
+      // intp_param.use_natural[1] = 1;
+      // intp_param.use_natural[0] = 0;
 
-      intp_param.reverse[3] = 0;
-      intp_param.reverse[2] = 1;
-      intp_param.reverse[1] = 0;
-      intp_param.reverse[0] = 1;
+      // intp_param.reverse[3] = 0;
+      // intp_param.reverse[2] = 1;
+      // intp_param.reverse[1] = 0;
+      // intp_param.reverse[0] = 1;
       // intp_param.use_md[4] = 1;
       // intp_param.use_md[5] = 1;
       // intp_param.use_md[0] = 0;
