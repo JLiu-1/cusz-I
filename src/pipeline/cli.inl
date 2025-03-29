@@ -205,6 +205,8 @@ class CLI {
 
     timerecord.push_back({"rre1", decompress_time_rre1});
 
+    timerecord.push_back({"rre1", decompress_time_rre1});
+
     if (ctx->report_time)
       psz::TimeRecordViewer::view_decompression(
           &timerecord, decompressed->m->bytes);

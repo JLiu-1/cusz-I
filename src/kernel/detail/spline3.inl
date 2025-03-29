@@ -1,4 +1,4 @@
-/**
+ /**
  * @file spline3.inl
  * @author Jinyang Liu, Shixun Wu, Jiannan Tian
  * @brief
@@ -261,6 +261,36 @@ __device__ void c_gather_anchor(
   }
   __syncthreads();
 }
+
+template <typename T1, int LINEAR_BLOCK_SIZE = DEFAULT_LINEAR_BLOCK_SIZE>
+__device__ void c_gather_anchor(T1* data, DIM3 data_size, STRIDE3 data_leap, T1* anchor, STRIDE3 anchor_leap)
+{
+    auto ax =  BIX;//1 is block16 by anchor stride
+    auto ay = BIY ;
+    auto az = BIZ ;
+
+    auto x = 16*ax;
+    auto y = 16*ay;
+    auto z = 16*az;
+
+    bool pred1 = TIX < 1;//1 is num of anchor
+    bool pred2 = x < data_size.x and y < data_size.y and z < data_size.z;
+
+    if (pred1 and pred2) {
+        auto data_id      = x + y * data_leap.y + z * data_leap.z;
+        auto anchor_id    = ax + ay * anchor_leap.y + az * anchor_leap.z;
+        anchor[anchor_id] = data[data_id];
+        /*
+        if(TIX == 7 and BIX == 12 and BIY == 12 and BIZ == 8){
+            printf("anchor: %d, %d, %.2e, %.2e,%d,%d,%d,%d\n", anchor_id,data_id,anchor[anchor_id],data[data_id],data_leap.y,data_leap.z,anchor_leap.y,anchor_leap.z);
+        }
+        if(TIX == 0 and BIX == 13 and BIY == 13 and BIZ == 9){
+            printf("13139anchor: %d, %d, %.2e, %.2e\n", anchor_id,data_id,anchor[anchor_id],data[data_id]);
+        }*/
+    }
+    __syncthreads();
+}
+
 
 /*
  * use shmem, erroneous
