@@ -67,8 +67,8 @@ struct psz_context {
   psz_mode mode{Rel};
   double eb{0.0};
   double rel_eb{0.0};
-  int dict_size{1024}, radius{512};
-  int quant_bytewidth{2}, huff_bytewidth{4};
+  int dict_size{256}, radius{128};
+  int quant_bytewidth{1}, huff_bytewidth{4};
 
   // spv gather-scatter config, tmp. unused
   float nz_density{0.2};

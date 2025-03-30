@@ -26,8 +26,8 @@ extern "C" {
 
 typedef struct alignas(128) psz_header {
   static const int HEADER = 0;
-  static const int ANCHOR = 1;
-  static const int VLE = 2;
+  static const int VLE = 1;
+  static const int ANCHOR = 2;
   static const int SPFMT = 3;
   static const int END = 4;
 
@@ -42,8 +42,10 @@ typedef struct alignas(128) psz_header {
   double eb;
   uint32_t radius : 16;
   int splen;
+  // size_t tcms_padding_bytes;
+  // size_t bitr_padding_bytes;
 
-  uint32_t entry[END + 1];
+  uint32_t entry[END + 2];
 
   psz_predtype pred_type;
 

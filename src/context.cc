@@ -181,15 +181,31 @@ void pszctx_parse_control_string(
     else if (optmatch({"beta"})) {
       ctx->intp_param.beta = psz_helper::str2fp(v);
     }
-    else if (optmatch({"intp_0"})) {
-      ctx->intp_param.interpolators[0] = psz_helper::str2int(v);
+    else if (optmatch({"md_0"})) {
+      ctx->intp_param.use_md[0] = psz_helper::str2int(v);
     }
-    else if (optmatch({"intp_1"})) {
-      ctx->intp_param.interpolators[1] = psz_helper::str2int(v);
+    else if (optmatch({"md_1"})) {
+      ctx->intp_param.use_md[1] = psz_helper::str2int(v);
     }
-    else if (optmatch({"intp_2"})) {
-      ctx->intp_param.interpolators[2] = psz_helper::str2int(v);
+    else if (optmatch({"md_2"})) {
+      ctx->intp_param.use_md[2] = psz_helper::str2int(v);
     }
+    else if (optmatch({"md_3"})) {
+      ctx->intp_param.use_md[3] = psz_helper::str2int(v);
+    }
+    else if (optmatch({"nat_0"})) {
+      ctx->intp_param.use_natural[0] = psz_helper::str2int(v);
+    }
+    else if (optmatch({"nat_1"})) {
+      ctx->intp_param.use_natural[1] = psz_helper::str2int(v);
+    }
+    else if (optmatch({"nat_2"})) {
+      ctx->intp_param.use_natural[2] = psz_helper::str2int(v);
+    }
+    else if (optmatch({"nat_3"})) {
+      ctx->intp_param.use_natural[3] = psz_helper::str2int(v);
+    }
+
     else if (optmatch({"rev_0"})) {
       ctx->intp_param.reverse[0] = psz_helper::str2int(v);
     }
@@ -198,6 +214,9 @@ void pszctx_parse_control_string(
     }
     else if (optmatch({"rev_2"})) {
       ctx->intp_param.reverse[2] = psz_helper::str2int(v);
+    }
+    else if (optmatch({"rev_3"})) {
+      ctx->intp_param.reverse[3] = psz_helper::str2int(v);
     }
   }
 }

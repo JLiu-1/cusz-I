@@ -155,6 +155,7 @@ struct TimeRecordViewer {
     if (h->dtype != F4 and h->dtype != F8)
       cout << "[psz::log::fatal_error] original length is is zero." << endl;
 
+    // compressed length before RRE1
     auto comp_bytes = [&]() {
       auto END = sizeof(h->entry) / sizeof(h->entry[0]);
       return h->entry[END - 1];
@@ -185,6 +186,8 @@ struct TimeRecordViewer {
     };
     auto __newline = []() { cout << '\n'; };
 
+    // final cr after RRE1
+    // printf("-- compression data with RRE1 --\n");
     if (comp_bytes() != 0) {
       auto cr = 1.0 * uncomp_bytes / comp_bytes();
       __newline();
@@ -198,17 +201,19 @@ struct TimeRecordViewer {
     __print("original::bytes", uncomp_bytes);
     __print("compressed::bytes", comp_bytes());
     __newline();
+
+    // compressed data before RRE1
+    // printf("-- compression data without RRE1 --\n");
     __print_perc("compressed::total::bytes", comp_bytes());
     printf("  ------------------------\n");
     __print_perc("compressed::HEADER::bytes", sizeof(pszheader));
-    __print_perc("compressed::ANCHOR::bytes", fieldsize(pszheader::ANCHOR));
+    __print_perc("compressed::ANCHOR+SPFMT::bytes", h->entry[pszheader::END+1] - h->entry[pszheader::ANCHOR]);
     __print_perc("compressed::VLE::bytes", fieldsize(pszheader::VLE));
-    __print_perc("compressed::SPFMT::bytes", fieldsize(pszheader::SPFMT));
     __newline();
     __print(
-        "compressed::ANCHOR:::len", fieldsize(pszheader::ANCHOR) / sizeof_T());
+        "uncompressed::ANCHOR:::len", fieldsize(pszheader::ANCHOR) / sizeof_T());
     __print(
-        "compressed::OUTLIER:::len",
+        "uncompressed::SPFMT:::len",
         fieldsize(pszheader::SPFMT) / (sizeof_T() + sizeof(uint32_t)));
   }
 
@@ -235,9 +240,9 @@ struct TimeRecordViewer {
           reflow.push_back(i);
         }
       }
-      reflow.push_back({const_cast<const char*>("(subtotal)"), subtotal_time});
-      printf("\e[2m");
-      reflow.push_back(book_tuple);
+      // reflow.push_back({const_cast<const char*>("(subtotal)"), subtotal_time});
+      // printf("\e[2m");
+      // reflow.push_back(book_tuple);
       reflow.push_back({const_cast<const char*>("(total)"), total_time});
       printf("\e[0m");
     }
