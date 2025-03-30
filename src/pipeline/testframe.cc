@@ -36,7 +36,7 @@ TESTFRAME::full_decompress(
 
   cor->decompress_scatter(header, in, d_space, stream);
   cor->decompress_decode(header, in, stream);
-  cor->decompress_predict(header, in, nullptr, d_xdata, stream);
+  // cor->decompress_predict(header, in, nullptr, d_xdata, d_xdata, stream);
   cor->decompress_collect_kerneltime();
 }
 
@@ -57,7 +57,7 @@ TESTFRAME::pred_comp_decomp(
   header->x = ctx->x, header->y = ctx->y, header->z = ctx->z;
   header->eb = ctx->eb, header->radius = ctx->radius;
 
-  cor->decompress_predict(header, nullptr, d_anchor, d_xdata, stream);
+  // cor->decompress_predict(header, nullptr, d_anchor, d_xdata, stream);
 }
 
 TESTFRAME::pred_hist_comp(

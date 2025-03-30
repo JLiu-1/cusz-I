@@ -57,10 +57,11 @@ class Compressor {
   // external codec that has standalone internals
   Codec* codec;
 
-  float time_pred, time_hist, time_sp;
+  float time_pred, time_hist, time_sp, time_rre1;
 
   size_t len;
   int splen;
+  int compressed_len_rre1;
 
   BYTE* comp_hf_out{nullptr};
   size_t comp_hf_outlen{0};
@@ -87,13 +88,14 @@ class Compressor {
   Compressor* compress_encode(pszctx*, uninit_stream_t);
   Compressor* compress_merge(pszctx*, void*);
   Compressor* compress_update_header(pszctx*, uninit_stream_t);
+  Compressor* compress_rre1(pszctx*, uninit_stream_t);
   Compressor* compress_wrapup(BYTE** out, szt* outlen);
   Compressor* compress_collect_kerneltime();
 
-  Compressor* decompress(pszheader*, BYTE*, T*, uninit_stream_t);
+  Compressor* decompress(pszheader*, BYTE*, T*, T*, uninit_stream_t);
   Compressor* decompress_scatter(pszheader*, BYTE*, T*, uninit_stream_t);
   Compressor* decompress_decode(pszheader*, BYTE*, uninit_stream_t);
-  Compressor* decompress_predict(pszheader*, BYTE*, T*, T*, uninit_stream_t);
+  Compressor* decompress_predict(pszheader*, BYTE*, T*, T*, T*, uninit_stream_t);
   Compressor* decompress_collect_kerneltime();
 
   Compressor* clear_buffer();

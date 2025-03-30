@@ -44,6 +44,8 @@ typedef struct alignas(128) psz_header {
   int splen;
 
   uint32_t entry[END + 1];
+  // final compressed length after RRE1 for viewing
+  size_t compressed_len;
 
   psz_predtype pred_type;
 

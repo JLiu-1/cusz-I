@@ -72,7 +72,7 @@ static void view(
     string const& compare)
 {
   auto len = psz_utils::uncompressed_len(header);
-  auto compressd_bytes = psz_utils::filesize(header);
+  auto compressd_bytes = header->compressed_len;
 
   auto compare_on_gpu = [&]() {
     cmp->control({MallocHost, Malloc})
@@ -85,7 +85,7 @@ static void view(
 
   auto compare_on_cpu = [&]() {
     cmp->control({MallocHost})->file(compare.c_str(), FromFile);
-    cmp->control({D2H});
+    // cmp->control({D2H});
     eval_dataquality_cpu(xdata->hptr(), cmp->hptr(), len, compressd_bytes);
     // cmp->control({FreeHost});
   };

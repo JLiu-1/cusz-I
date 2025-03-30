@@ -27,6 +27,7 @@
 #include "port.hh"
 #include "utils/config.hh"
 #include "utils/err.hh"
+#include "rre/rre.h"
 
 #define COR          \
   template <class C> \
@@ -202,13 +203,26 @@ COR::compress_update_header(pszctx* ctx, void* stream)
   return this;
 }
 
+COR::compress_rre1(pszctx* ctx, void* stream)
+{
+  auto spline_in_use = [&]() { return ctx->pred_type == Spline; };
+
+  /* RRE1 lossless compression */
+  RRE1_COMPRESS(mem->compressed(), psz_utils::filesize(&header), 
+      &mem->_compressed_rre1, &compressed_len_rre1, &time_rre1, stream);
+  header.compressed_len = compressed_len_rre1;
+  if (spline_in_use()) { PSZDBG_LOG("RRE1: done"); }
+  
+  return this;
+}
+
 COR::compress_wrapup(BYTE** out, szt* outlen)
 {
   /* output of this function */
-  *out = mem->_compressed->dptr();
-  *outlen = psz_utils::filesize(&header);
-  mem->_compressed->m->len = *outlen;
-  mem->_compressed->m->bytes = *outlen;
+  *out = mem->_compressed_rre1;
+  *outlen = compressed_len_rre1;
+  mem->_compressed->m->len = psz_utils::filesize(&header);
+  mem->_compressed->m->bytes = psz_utils::filesize(&header);
 
   return this;
 }
@@ -224,6 +238,7 @@ COR::compress(pszctx* ctx, T* in, BYTE** out, size_t* outlen, void* stream)
   compress_encode(ctx, stream);
   compress_merge(ctx, stream);
   compress_update_header(ctx, stream);
+  compress_rre1(ctx, stream);
   compress_wrapup(out, outlen);
   compress_collect_kerneltime();
 
@@ -342,7 +357,7 @@ COR::clear_buffer()
 }
 
 COR::decompress_predict(
-    pszheader* header, BYTE* in, T* ext_anchor, T* out, uninit_stream_t stream)
+    pszheader* header, BYTE* in, T* ext_anchor, T* out, T* outlier_tmp, uninit_stream_t stream)
 {
   auto access = [&](int FIELD, szt offset_nbyte = 0) {
     return (void*)(in + header->entry[FIELD] + offset_nbyte);
@@ -378,7 +393,7 @@ COR::decompress_predict(
     // [psz::TODO] throw exception
 
     spline_reconstruct(
-        &anchor, mem->e, mem->xd, eb, radius, intp_param, &time_pred, stream);
+        &anchor, mem->e, mem->xd, outlier_tmp,  eb, radius, intp_param, &time_pred, stream);
 #else
     throw runtime_error(
         "[psz::error] spline_reconstruct not implemented other than CUDA.");
@@ -420,7 +435,7 @@ COR::decompress_scatter(
   return this;
 }
 
-COR::decompress(pszheader* header, BYTE* in, T* out, void* stream)
+COR::decompress(pszheader* header, BYTE* in, T* out, T* outlier_tmp, void* stream)
 {
   // TODO host having copy of header when compressing
   if (not header) {
@@ -438,9 +453,9 @@ COR::decompress(pszheader* header, BYTE* in, T* out, void* stream)
   // wire and alias
   auto d_space = out, d_xdata = out;
 
-  decompress_scatter(header, in, d_space, stream);
+  decompress_scatter(header, in, outlier_tmp, stream);
   decompress_decode(header, in, stream);
-  decompress_predict(header, in, nullptr, d_xdata, stream);
+  decompress_predict(header, in, nullptr, d_xdata, outlier_tmp, stream);
   decompress_collect_kerneltime();
 
   return this;
@@ -476,6 +491,7 @@ COR::compress_collect_kerneltime()
   COLLECT_TIME("histogram", time_hist);
   COLLECT_TIME("book", codec->time_book());
   COLLECT_TIME("huff-enc", codec->time_lossless());
+  COLLECT_TIME("rre1", time_rre1);
   // COLLECT_TIME("outlier", time_sp);
 
   return this;
