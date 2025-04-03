@@ -1190,14 +1190,16 @@ volatile T2 s_ectrl[AnchorBlockSizeZ * numAnchorBlockZ + (SPLINE_DIM >= 3)]
             }
 
             if CONSTEXPR (CUBE) {  //
-                auto interp_z = get_interp_order(z,BIZ,GDZ,global_z,data_size.z);
-                auto interp_y = get_interp_order(y,BIY,GDY,global_y,data_size.y);
+              //  auto interp_z = get_interp_order(z,BIZ,GDZ,global_z,data_size.z);
+              //  auto interp_y = get_interp_order(y,BIY,GDY,global_y,data_size.y);
                 auto interp_x = get_interp_order(x,BIX,GDX,global_x,data_size.x);
                 
                 #pragma unroll
+
                 for(int id_itr = 0; id_itr < 4; ++id_itr){
                  tmp_x[id_itr] = s_data[z][y][id_x[id_itr]]; 
                 }
+                /*
                 if(interp_z == 4){
                     #pragma unroll
                     for(int id_itr = 0; id_itr < 4; ++id_itr){
@@ -1209,16 +1211,18 @@ volatile T2 s_ectrl[AnchorBlockSizeZ * numAnchorBlockZ + (SPLINE_DIM >= 3)]
                     for(int id_itr = 0; id_itr < 4; ++id_itr){
                      tmp_y[id_itr] = s_data[z][id_y[id_itr]][x]; 
                     }
-                }
+                }*/
 
 
-                T1 pred_z[5], pred_y[5], pred_x[5];
+                T1 pred_x[5];//pred_z[5], pred_y[5], pred_x[5];
                 pred_x[0] = tmp_x[1];
                 pred_x[1] = cubic_interpolator(tmp_x[0],tmp_x[1],tmp_x[2],tmp_x[3]);
                 pred_x[2] = (-tmp_x[0]+6*tmp_x[1] + 3*tmp_x[2]) / 8;
                 pred_x[3] = (3*tmp_x[1] + 6*tmp_x[2]-tmp_x[3]) / 8;
                 pred_x[4] = (tmp_x[1] + tmp_x[2]) / 2;
-                
+
+                pred = pred_x[interp_x];
+                /*
                 pred_y[1] = cubic_interpolator(tmp_y[0],tmp_y[1],tmp_y[2],tmp_y[3]);
 
                 
@@ -1239,6 +1243,7 @@ volatile T2 s_ectrl[AnchorBlockSizeZ * numAnchorBlockZ + (SPLINE_DIM >= 3)]
                 pred = (interp_z != 4 && interp_y != 4 && interp_x == 3) ? pred_x[2]: pred;
                 pred = (interp_z != 4 && interp_y != 4 && interp_x == 2) ? pred_x[3]: pred;
                 pred = (interp_z != 4 && interp_y != 4 && interp_x == 1) ? pred_x[4]: pred;
+                */
                 // pred = (interp_z != 4 && interp_y != 4 && interp_x == 0) ? pred_x[0]: pred;
             }
 
@@ -2481,14 +2486,15 @@ __forceinline__ __device__ void interpolate_stage_md_att(
             }
 
             if CONSTEXPR (CUBE) {  //
-                auto interp_z = get_interp_order(z,global_z,data_size.z);
-                auto interp_y = get_interp_order(y,global_y,data_size.y);
+                //auto interp_z = get_interp_order(z,global_z,data_size.z);
+                //auto interp_y = get_interp_order(y,global_y,data_size.y);
                 auto interp_x = get_interp_order(x,global_x,data_size.x);
                 
                 #pragma unroll
                 for(int id_itr = 0; id_itr < 4; ++id_itr){
                  tmp_x[id_itr] = s_data[z][y][id_x[id_itr]]; 
                 }
+                /*
                 if(interp_z == 4){
                     #pragma unroll
                     for(int id_itr = 0; id_itr < 4; ++id_itr){
@@ -2500,23 +2506,23 @@ __forceinline__ __device__ void interpolate_stage_md_att(
                     for(int id_itr = 0; id_itr < 4; ++id_itr){
                      tmp_y[id_itr] = s_data[z][id_y[id_itr]][x]; 
                     }
-                }
+                }*/
 
 
-                T pred_z[5], pred_y[5], pred_x[5];
+                T pred_x[5];//pred_z[5], pred_y[5], pred_x[5];
                 pred_x[0] = tmp_x[1];
                 pred_x[1] = cubic_interpolator(tmp_x[0],tmp_x[1],tmp_x[2],tmp_x[3]);
                 pred_x[2] = (-tmp_x[0]+6*tmp_x[1] + 3*tmp_x[2]) / 8;
                 pred_x[3] = (3*tmp_x[1] + 6*tmp_x[2]-tmp_x[3]) / 8;
                 pred_x[4] = (tmp_x[1] + tmp_x[2]) / 2;
                 
-                pred_y[1] = cubic_interpolator(tmp_y[0],tmp_y[1],tmp_y[2],tmp_y[3]);
+               // pred_y[1] = cubic_interpolator(tmp_y[0],tmp_y[1],tmp_y[2],tmp_y[3]);
 
                 
-                pred_z[1] = cubic_interpolator(tmp_z[0],tmp_z[1],tmp_z[2],tmp_z[3]);
+                //pred_z[1] = cubic_interpolator(tmp_z[0],tmp_z[1],tmp_z[2],tmp_z[3]);
                 
-            
-                
+                pred = pred_x[interp_x];
+                /*
                 pred = pred_x[0];
                 pred = (interp_z == 4 && interp_y == 4 && interp_x == 4) ? (pred_x[1] +  pred_y[1] + pred_z[1]) / 3 : pred;
                 
@@ -2531,7 +2537,7 @@ __forceinline__ __device__ void interpolate_stage_md_att(
 
                 pred = (interp_z != 4 && interp_y != 4 && interp_x == 3) ? pred_x[2]: pred;
                 pred = (interp_z != 4 && interp_y != 4 && interp_x == 2) ? pred_x[3]: pred;
-                pred = (interp_z != 4 && interp_y != 4 && interp_x == 1) ? pred_x[4]: pred;
+                pred = (interp_z != 4 && interp_y != 4 && interp_x == 1) ? pred_x[4]: pred;*/
                 // pred = (interp_z != 4 && interp_y != 4 && interp_x == 0) ? pred_x[0]: pred;
             }
 
