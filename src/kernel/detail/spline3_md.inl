@@ -923,7 +923,7 @@ volatile T2 s_ectrl[AnchorBlockSizeZ * numAnchorBlockZ + (SPLINE_DIM >= 3)]
     FP          eb_r,
     FP          ebx2,
     int         radius,
-    INTERP cubic_interpolator,
+    INTERP cubic_interpolator_holder,
     int NUM_ELE)
 {
     // static_assert(COARSEN or (NUM_ELE <= BLOCK_DIM_SIZE), "block oversized");
@@ -933,6 +933,10 @@ volatile T2 s_ectrl[AnchorBlockSizeZ * numAnchorBlockZ + (SPLINE_DIM >= 3)]
     static_assert((FACE and CUBE) == false, "must be only one hot (3)");
 
     auto run = [&](auto x, auto y, auto z) {
+
+        auto cubic_interpolator = [&] (auto a, auto b, auto c, auto d){
+            return (-3*a+23*b+23*c-3*d) / 40;
+        }
 
         if (xyz_predicate<SPLINE_DIM,
             AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ,
