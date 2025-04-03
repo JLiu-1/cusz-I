@@ -1216,10 +1216,10 @@ volatile T2 s_ectrl[AnchorBlockSizeZ * numAnchorBlockZ + (SPLINE_DIM >= 3)]
 
                 T1 pred_x[5];//pred_z[5], pred_y[5], pred_x[5];
                 pred_x[0] = tmp_x[1];
-                pred_x[1] = cubic_interpolator(tmp_x[0],tmp_x[1],tmp_x[2],tmp_x[3]);
-                pred_x[2] = (-tmp_x[0]+6*tmp_x[1] + 3*tmp_x[2]) / 8;
-                pred_x[3] = (3*tmp_x[1] + 6*tmp_x[2]-tmp_x[3]) / 8;
-                pred_x[4] = (tmp_x[1] + tmp_x[2]) / 2;
+                pred_x[4] = cubic_interpolator(tmp_x[0],tmp_x[1],tmp_x[2],tmp_x[3]);
+                pred_x[3] = (-tmp_x[0]+6*tmp_x[1] + 3*tmp_x[2]) / 8;
+                pred_x[2] = (3*tmp_x[1] + 6*tmp_x[2]-tmp_x[3]) / 8;
+                pred_x[1] = (tmp_x[1] + tmp_x[2]) / 2;
 
                 pred = pred_x[interp_x];
                 /*
@@ -2511,10 +2511,10 @@ __forceinline__ __device__ void interpolate_stage_md_att(
 
                 T pred_x[5];//pred_z[5], pred_y[5], pred_x[5];
                 pred_x[0] = tmp_x[1];
-                pred_x[1] = cubic_interpolator(tmp_x[0],tmp_x[1],tmp_x[2],tmp_x[3]);
-                pred_x[2] = (-tmp_x[0]+6*tmp_x[1] + 3*tmp_x[2]) / 8;
-                pred_x[3] = (3*tmp_x[1] + 6*tmp_x[2]-tmp_x[3]) / 8;
-                pred_x[4] = (tmp_x[1] + tmp_x[2]) / 2;
+                pred_x[4] = cubic_interpolator(tmp_x[0],tmp_x[1],tmp_x[2],tmp_x[3]);
+                pred_x[3] = (-tmp_x[0]+6*tmp_x[1] + 3*tmp_x[2]) / 8;
+                pred_x[2] = (3*tmp_x[1] + 6*tmp_x[2]-tmp_x[3]) / 8;
+                pred_x[1] = (tmp_x[1] + tmp_x[2]) / 2;
                 
                // pred_y[1] = cubic_interpolator(tmp_y[0],tmp_y[1],tmp_y[2],tmp_y[3]);
 
