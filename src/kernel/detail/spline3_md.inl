@@ -1190,8 +1190,8 @@ volatile T2 s_ectrl[AnchorBlockSizeZ * numAnchorBlockZ + (SPLINE_DIM >= 3)]
             }
 
             if CONSTEXPR (CUBE) {  //
-              //  auto interp_z = get_interp_order(z,BIZ,GDZ,global_z,data_size.z);
-              //  auto interp_y = get_interp_order(y,BIY,GDY,global_y,data_size.y);
+                auto interp_z = get_interp_order(z,BIZ,GDZ,global_z,data_size.z);
+                auto interp_y = get_interp_order(y,BIY,GDY,global_y,data_size.y);
                 auto interp_x = get_interp_order(x,BIX,GDX,global_x,data_size.x);
                 
                 #pragma unroll
