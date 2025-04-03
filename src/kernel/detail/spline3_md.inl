@@ -936,7 +936,7 @@ volatile T2 s_ectrl[AnchorBlockSizeZ * numAnchorBlockZ + (SPLINE_DIM >= 3)]
 
         auto cubic_interpolator = [&] (auto a, auto b, auto c, auto d){
             return (-3*a+23*b+23*c-3*d) / 40;
-        }
+        };
 
         if (xyz_predicate<SPLINE_DIM,
             AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ,
