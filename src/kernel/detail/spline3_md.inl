@@ -1214,9 +1214,9 @@ volatile T2 s_ectrl[AnchorBlockSizeZ * numAnchorBlockZ + (SPLINE_DIM >= 3)]
                 }
 
 
-               if (interp_z == 4 && interp_y == 4 && interp_x == 4) pred = (cubic_interpolator(tmp_x[0],tmp_x[1],tmp_x[2],tmp_x[3]) + cubic_interpolator(tmp_y[0],tmp_y[1],tmp_y[2],tmp_y[3]); +  cubic_interpolator(tmp_z[0],tmp_z[1],tmp_z[2],tmp_z[3])) / 3;
+               if (interp_z == 4 && interp_y == 4 && interp_x == 4) pred = (cubic_interpolator(tmp_x[0],tmp_x[1],tmp_x[2],tmp_x[3]) + cubic_interpolator(tmp_y[0],tmp_y[1],tmp_y[2],tmp_y[3]) +  cubic_interpolator(tmp_z[0],tmp_z[1],tmp_z[2],tmp_z[3])) / 3;
                 
-                else if (interp_z == 4 && interp_y == 4 && interp_x != 4) pred = (cubic_interpolator(tmp_y[0],tmp_y[1],tmp_y[2],tmp_y[3]); +  cubic_interpolator(tmp_z[0],tmp_z[1],tmp_z[2],tmp_z[3])) / 2 ;
+                else if (interp_z == 4 && interp_y == 4 && interp_x != 4) pred = (cubic_interpolator(tmp_y[0],tmp_y[1],tmp_y[2],tmp_y[3]) +  cubic_interpolator(tmp_z[0],tmp_z[1],tmp_z[2],tmp_z[3])) / 2 ;
                 else if (interp_z == 4 && interp_y != 4 && interp_x == 4) pred = (cubic_interpolator(tmp_x[0],tmp_x[1],tmp_x[2],tmp_x[3]) +  cubic_interpolator(tmp_z[0],tmp_z[1],tmp_z[2],tmp_z[3])) / 2 ;
                 else if (interp_z != 4 && interp_y == 4 && interp_x == 4) pred = (cubic_interpolator(tmp_x[0],tmp_x[1],tmp_x[2],tmp_x[3]) + cubic_interpolator(tmp_y[0],tmp_y[1],tmp_y[2],tmp_y[3])) / 2 ;
                 
@@ -2492,9 +2492,9 @@ __forceinline__ __device__ void interpolate_stage_md_att(
                     }
                 }
 
-                if (interp_z == 4 && interp_y == 4 && interp_x == 4) pred = (cubic_interpolator(tmp_x[0],tmp_x[1],tmp_x[2],tmp_x[3]) + cubic_interpolator(tmp_y[0],tmp_y[1],tmp_y[2],tmp_y[3]); +  cubic_interpolator(tmp_z[0],tmp_z[1],tmp_z[2],tmp_z[3])) / 3;
+                if (interp_z == 4 && interp_y == 4 && interp_x == 4) pred = (cubic_interpolator(tmp_x[0],tmp_x[1],tmp_x[2],tmp_x[3]) + cubic_interpolator(tmp_y[0],tmp_y[1],tmp_y[2],tmp_y[3]) +  cubic_interpolator(tmp_z[0],tmp_z[1],tmp_z[2],tmp_z[3])) / 3;
                 
-                else if (interp_z == 4 && interp_y == 4 && interp_x != 4) pred = (cubic_interpolator(tmp_y[0],tmp_y[1],tmp_y[2],tmp_y[3]); +  cubic_interpolator(tmp_z[0],tmp_z[1],tmp_z[2],tmp_z[3])) / 2 ;
+                else if (interp_z == 4 && interp_y == 4 && interp_x != 4) pred = (cubic_interpolator(tmp_y[0],tmp_y[1],tmp_y[2],tmp_y[3]) +  cubic_interpolator(tmp_z[0],tmp_z[1],tmp_z[2],tmp_z[3])) / 2 ;
                 else if (interp_z == 4 && interp_y != 4 && interp_x == 4) pred = (cubic_interpolator(tmp_x[0],tmp_x[1],tmp_x[2],tmp_x[3]) +  cubic_interpolator(tmp_z[0],tmp_z[1],tmp_z[2],tmp_z[3])) / 2 ;
                 else if (interp_z != 4 && interp_y == 4 && interp_x == 4) pred = (cubic_interpolator(tmp_x[0],tmp_x[1],tmp_x[2],tmp_x[3]) + cubic_interpolator(tmp_y[0],tmp_y[1],tmp_y[2],tmp_y[3])) / 2 ;
                 
