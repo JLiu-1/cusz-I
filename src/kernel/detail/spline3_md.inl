@@ -587,7 +587,7 @@ __device__ void global2shmem_fuse(E* ectrl, dim3 ectrl_size, dim3 ectrl_leap, T*
                 gid += prefix_nums[level] - ((gz + 1) >> 1) * grid_leaps[level + 1].z - (gz % 2 == 0) * ((gy + 1) >> 1) * grid_leaps[level + 1].y - (gz % 2 == 0 && gy % 2 == 0) * ((gx + 1) >> 1);
             }
 
-            s_ectrl[z][y][x] = static_cast<T>(ectrl[gid]) + scattered_outlier[data_gid];
+            s_ectrl[z][y][x] = static_cast<T>(ectrl[data_gid]) + scattered_outlier[data_gid];
         }
     }
     __syncthreads();
