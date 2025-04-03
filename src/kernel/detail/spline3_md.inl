@@ -926,8 +926,8 @@ volatile T2 s_ectrl[AnchorBlockSizeZ * numAnchorBlockZ + (SPLINE_DIM >= 3)]
     FP          ebx2,
     int         radius,
     INTERP cubic_interpolator,
-    INTERP cubic_interpolator_2,
-    INTERP cubic_interpolator_3,
+    INTERP2 cubic_interpolator_2,
+    INTERP3 cubic_interpolator_3,
     int NUM_ELE)
 {
     // static_assert(COARSEN or (NUM_ELE <= BLOCK_DIM_SIZE), "block oversized");
