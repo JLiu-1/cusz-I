@@ -132,7 +132,7 @@ COR::compress_predict(pszctx* ctx, T* in, void* stream)
     ctx->splen = mem->compact->num_outliers();
   }
 
-     mem->e->hptr()->file(
+     mem->e->control({D2H})->file(
           std::string("qcode_non_reorder.test").c_str(), ToFile);
 
   return this;
