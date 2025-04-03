@@ -927,7 +927,7 @@ volatile T2 s_ectrl[AnchorBlockSizeZ * numAnchorBlockZ + (SPLINE_DIM >= 3)]
     int         radius,
     INTERP cubic_interpolator,
     INTERP2 cubic_interpolator_2,
-    INTERP3 cubic_interpolator_3,
+    INTERP3s cubic_interpolator_3,
     int NUM_ELE)
 {
     // static_assert(COARSEN or (NUM_ELE <= BLOCK_DIM_SIZE), "block oversized");
@@ -1136,31 +1136,58 @@ volatile T2 s_ectrl[AnchorBlockSizeZ * numAnchorBlockZ + (SPLINE_DIM >= 3)]
 
 
                     if (interp_1 == 4 && interp_2 == 4) {
-                        pred = cubic_interpolator_2(*((T1*)s_data + s_id_1[0]), 
+                        pred = (cubic_interpolator(*((T1*)s_data + s_id_1[0]), 
                         *((T1*)s_data + s_id_1[1]), 
                         *((T1*)s_data + s_id_1[2]), 
-                        *((T1*)s_data + s_id_1[3]),
-                        *((T1*)s_data + s_id_2[0]), 
+                        *((T1*)s_data + s_id_1[3])) +
+                         cubic_interpolator(*((T1*)s_data + s_id_2[0]), 
                         *((T1*)s_data + s_id_2[1]), 
                         *((T1*)s_data + s_id_2[2]), 
-                        *((T1*)s_data + s_id_2[3]));
-                    } else if (interp_2 == 4) {
+                        *((T1*)s_data + s_id_2[3]))) / 2;
+                    } else if (interp_1 != 4 && interp_2 == 4) {
                         pred = cubic_interpolator(*((T1*)s_data + s_id_2[0]), 
                         *((T1*)s_data + s_id_2[1]), 
                         *((T1*)s_data + s_id_2[2]), 
                         *((T1*)s_data + s_id_2[3]));
-                    } else if (interp_1 == 4 ) {
+                    } else if (interp_1 == 4 && interp_2 != 4) {
                         pred = cubic_interpolator(*((T1*)s_data + s_id_1[0]), 
                         *((T1*)s_data + s_id_1[1]), 
                         *((T1*)s_data + s_id_1[2]), 
                         *((T1*)s_data + s_id_1[3]));
-                    } else if (interp_2 == 3) {
+                    } else if (interp_1 == 3 && interp_2 == 3) {
                         pred = (-(*((T1*)s_data + s_id_2[0]))+6*(*((T1*)s_data + s_id_2[1])) + 3*(*((T1*)s_data + s_id_2[2]))) / 8;
-                    } else if (interp_2 == 2) {
+                        pred += (-(*((T1*)s_data + s_id_1[0]))+6*(*((T1*)s_data + s_id_1[1])) + 3*(*((T1*)s_data + s_id_1[2]))) / 8;
+                        pred /= 2;
+                    } else if (interp_1 == 3 && interp_2 == 2) {
                         pred = (3*(*((T1*)s_data + s_id_2[1]))+6*(*((T1*)s_data + s_id_2[2])) - (*((T1*)s_data + s_id_2[3]))) / 8;
-                    } else if (interp_2 == 1) {
+                        pred += (-(*((T1*)s_data + s_id_1[0]))+6*(*((T1*)s_data + s_id_1[1])) + 3*(*((T1*)s_data + s_id_1[2]))) / 8;
+                        pred /= 2;
+                    } else if (interp_1 == 3 && interp_2 < 2) {
+                        pred = (-(*((T1*)s_data + s_id_1[0]))+6*(*((T1*)s_data + s_id_1[1])) + 3*(*((T1*)s_data + s_id_1[2]))) / 8;
+                    } else if (interp_1 == 2 && interp_2 == 3) {
+                        pred = (3*(*((T1*)s_data + s_id_1[1]))+6*(*((T1*)s_data + s_id_1[2])) - (*((T1*)s_data + s_id_1[3]))) / 8;
+                        pred += (-(*((T1*)s_data + s_id_2[0]))+6*(*((T1*)s_data + s_id_2[1])) + 3*(*((T1*)s_data + s_id_2[2]))) / 8;
+                        pred /= 2;
+                    } else if (interp_1 == 2 && interp_2 == 2) {
+                        pred = (3*(*((T1*)s_data + s_id_1[1]))+6*(*((T1*)s_data + s_id_1[2])) - (*((T1*)s_data + s_id_1[3]))) / 8;
+                        pred += (3*(*((T1*)s_data + s_id_2[1]))+6*(*((T1*)s_data + s_id_2[2])) - (*((T1*)s_data + s_id_2[3]))) / 8;
+                        pred /= 2;
+                    } else if (interp_1 == 2 && interp_2 < 2) {
+                        pred = (3*(*((T1*)s_data + s_id_1[1]))+6*(*((T1*)s_data + s_id_1[2])) - (*((T1*)s_data + s_id_1[3]))) / 8;
+                    } else if (interp_1 <= 1 && interp_2 == 3) {
+                        pred = (-(*((T1*)s_data + s_id_2[0]))+6*(*((T1*)s_data + s_id_2[1])) + 3*(*((T1*)s_data + s_id_2[2]))) / 8;
+                    } else if (interp_1 <= 1 && interp_2 == 2) {
+                        pred = (3*(*((T1*)s_data + s_id_2[1]))+6*(*((T1*)s_data + s_id_2[2])) - (*((T1*)s_data + s_id_2[3]))) / 8;
+                    } else if (interp_1 == 1 && interp_2 == 1) {
                         pred = ((*((T1*)s_data + s_id_2[1]))+(*((T1*)s_data + s_id_2[2]))) / 2;
-                    } 
+                        pred += ((*((T1*)s_data + s_id_1[1]))+(*((T1*)s_data + s_id_1[2]))) / 2;
+                        pred /= 2;
+                    } else if (interp_1 == 1 && interp_2 < 1) {
+                        
+                        pred = ((*((T1*)s_data + s_id_1[1]))+(*((T1*)s_data + s_id_1[2]))) / 2;
+                    } else if (interp_1 == 0 && interp_2 == 1) {
+                        pred = ((*((T1*)s_data + s_id_2[1]))+(*((T1*)s_data + s_id_2[2]))) / 2;
+                    }
                     else{
                         pred = (*((T1*)s_data + s_id_1[1])) + (*((T1*)s_data + s_id_2[1])) - pred;
                     }
