@@ -909,7 +909,9 @@ template <
     bool COARSEN,
     bool BORDER_INCLUSIVE,
     bool WORKFLOW,
-    typename INTERP>
+    typename INTERP,
+    typename INTERP2,
+    typename INTERP3>
 __forceinline__ __device__ void interpolate_stage_md(
     volatile T1 s_data[AnchorBlockSizeZ * numAnchorBlockZ + (SPLINE_DIM >= 3)]
     [AnchorBlockSizeY * numAnchorBlockY + (SPLINE_DIM >= 2)]
