@@ -546,52 +546,57 @@ __device__ void global2shmem_profiling_data_2(T1* data, DIM3 data_size, STRIDE3 
 }
 
 template <typename T = float, typename E = u4, int LEVEL = 4,
-int SPLINE_DIM = 2, int AnchorBlockSizeX = 8,
-int AnchorBlockSizeY = 8, int AnchorBlockSizeZ = 8,
-int numAnchorBlockX = 4,  // Number of Anchor blocks along X
-int numAnchorBlockY = 1,  // Number of Anchor blocks along Y
-int numAnchorBlockZ = 1,  // Number of Anchor blocks along Z
-int LINEAR_BLOCK_SIZE = DEFAULT_LINEAR_BLOCK_SIZE>
-__device__ void global2shmem_fuse(E* ectrl, dim3 ectrl_size, dim3 ectrl_leap, T* scattered_outlier, 
+          int SPLINE_DIM = 2, int AnchorBlockSizeX = 8,
+          int AnchorBlockSizeY = 8, int AnchorBlockSizeZ = 8,
+          int numAnchorBlockX = 4,  // Number of Anchor blocks along X
+          int numAnchorBlockY = 1,  // Number of Anchor blocks along Y
+          int numAnchorBlockZ = 1,  // Number of Anchor blocks along Z
+          int LINEAR_BLOCK_SIZE = DEFAULT_LINEAR_BLOCK_SIZE>
+__device__ void global2shmem_fuse(const E* __restrict__ ectrl, dim3 ectrl_size, const STRIDE3 ectrl_leap,
+                                  const T* __restrict__ scattered_outlier,
     volatile T s_ectrl[AnchorBlockSizeZ * numAnchorBlockZ + (SPLINE_DIM >= 3)]
-    [AnchorBlockSizeY * numAnchorBlockY + (SPLINE_DIM >= 2)]
-    [AnchorBlockSizeX * numAnchorBlockX + (SPLINE_DIM >= 1)],
-    volatile STRIDE3 grid_leaps[LEVEL + 1],volatile size_t prefix_nums[LEVEL + 1])
+                      [AnchorBlockSizeY * numAnchorBlockY + (SPLINE_DIM >= 2)]
+                      [AnchorBlockSizeX * numAnchorBlockX + (SPLINE_DIM >= 1)],
+    volatile STRIDE3 grid_leaps[LEVEL + 1], volatile size_t prefix_nums[LEVEL + 1])
 {
-    
     constexpr auto TOTAL = (AnchorBlockSizeX * numAnchorBlockX + (SPLINE_DIM >= 1)) *
-    (AnchorBlockSizeY * numAnchorBlockY + (SPLINE_DIM >= 2)) *
-    (AnchorBlockSizeZ * numAnchorBlockZ + (SPLINE_DIM >= 3));
+                           (AnchorBlockSizeY * numAnchorBlockY + (SPLINE_DIM >= 2)) *
+                           (AnchorBlockSizeZ * numAnchorBlockZ + (SPLINE_DIM >= 3));
 
     for (auto _tix = TIX; _tix < TOTAL; _tix += LINEAR_BLOCK_SIZE) {
-        auto x   = (_tix % (AnchorBlockSizeX * numAnchorBlockX + (SPLINE_DIM >= 1)));
-        auto y   = (_tix / (AnchorBlockSizeX * numAnchorBlockX + (SPLINE_DIM >= 1))) % (AnchorBlockSizeY * numAnchorBlockY + (SPLINE_DIM >= 2));
-        auto z   = (_tix / (AnchorBlockSizeX * numAnchorBlockX + (SPLINE_DIM >= 1))) / (AnchorBlockSizeY * numAnchorBlockY + (SPLINE_DIM >= 2));
-        auto gx  = (x + BIX * (AnchorBlockSizeX * numAnchorBlockX));
-        auto gy  = (y + BIY * (AnchorBlockSizeY * numAnchorBlockY));
-        auto gz  = (z + BIZ * (AnchorBlockSizeZ * numAnchorBlockZ));
-        if (gx < ectrl_size.x and gy < ectrl_size.y and gz < ectrl_size.z) {
-            //todo: pre-compute the leaps and their halves
+        auto x = (_tix % (AnchorBlockSizeX * numAnchorBlockX + (SPLINE_DIM >= 1)));
+        auto y = (_tix / (AnchorBlockSizeX * numAnchorBlockX + (SPLINE_DIM >= 1)))
+                 % (AnchorBlockSizeY * numAnchorBlockY + (SPLINE_DIM >= 2));
+        auto z = (_tix / (AnchorBlockSizeX * numAnchorBlockX + (SPLINE_DIM >= 1)))
+                 / (AnchorBlockSizeY * numAnchorBlockY + (SPLINE_DIM >= 2));
 
+        auto gx = (x + BIX * (AnchorBlockSizeX * numAnchorBlockX));
+        auto gy = (y + BIY * (AnchorBlockSizeY * numAnchorBlockY));
+        auto gz = (z + BIZ * (AnchorBlockSizeZ * numAnchorBlockZ));
+
+        if (gx < ectrl_size.x && gy < ectrl_size.y && gz < ectrl_size.z) {
             int level = 0;
             auto data_gid = gx + gy * ectrl_leap.y + gz * ectrl_leap.z;
-            while(gx % 2 == 0 and gy % 2 == 0 and gz % 2 == 0 and level < LEVEL){
-                gx = gx >> 1;
-                gy = gy >> 1;
-                gz = gz >> 1;
+            while (gx % 2 == 0 && gy % 2 == 0 && gz % 2 == 0 && level < LEVEL) {
+                gx >>= 1;
+                gy >>= 1;
+                gz >>= 1;
                 level++;
             }
-            auto gid = gx + gy*grid_leaps[level].y+gz*grid_leaps[level].z;
-
-            if(level < LEVEL){//non-anchor
-                gid += prefix_nums[level] - ((gz + 1) >> 1) * grid_leaps[level + 1].z - (gz % 2 == 0) * ((gy + 1) >> 1) * grid_leaps[level + 1].y - (gz % 2 == 0 && gy % 2 == 0) * ((gx + 1) >> 1);
+            auto gid = gx + gy * grid_leaps[level].y + gz * grid_leaps[level].z;
+            if (level < LEVEL) { 
+                gid += prefix_nums[level]
+                       - ((gz + 1) >> 1) * grid_leaps[level + 1].z
+                       - (gz % 2 == 0 ? (((gy + 1) >> 1) * grid_leaps[level + 1].y) : 0)
+                       - ((gz % 2 == 0 && gy % 2 == 0) ? ((gx + 1) >> 1) : 0);
             }
-
-            s_ectrl[z][y][x] = static_cast<T>(ectrl[gid]) + scattered_outlier[data_gid];
+            s_ectrl[z][y][x] = static_cast<T>(__ldg(&ectrl[gid]))
+                                + __ldg(&scattered_outlier[data_gid]);
         }
     }
     __syncthreads();
 }
+
 
 // dram_outlier should be the same in type with shared memory buf
 template <typename T1, typename T2,
