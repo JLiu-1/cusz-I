@@ -594,7 +594,7 @@ int spline_reconstruct(
         switch (selector) {
             case 0b0000: CALL_KERNEL_X(false, false, false, false); break;
             case 0b0001: CALL_KERNEL_X(false, false, false, true);  break;
-            case 0b0010: CALL_KERNEL_X_X(false, false, true, false);  break;
+            case 0b0010: CALL_KERNEL_X(false, false, true, false);  break;
             case 0b0011: CALL_KERNEL_X(false, false, true, true);   break;
             case 0b0100: CALL_KERNEL_X(false, true, false, false);  break;
             case 0b0101: CALL_KERNEL_X(false, true, false, true);   break;
