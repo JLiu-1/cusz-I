@@ -1576,6 +1576,8 @@ __device__ void cusz::device_api::spline_layout_interpolate(
             
         //if(intp_param.use_md[level_id]){
         if constexpr (L3_MD){
+            if(BIX==0 and TIX==0)
+                printf("l3_md\n");
             int N_x = AnchorBlockSizeX / (unit * 2);
             int N_y = AnchorBlockSizeY / (unit * 2);
             int N_z = AnchorBlockSizeZ / (unit * 2);
@@ -1639,6 +1641,8 @@ __device__ void cusz::device_api::spline_layout_interpolate(
             
         //if(intp_param.use_md[level_id]){
         if constexpr (L2_MD){
+            if(BIX==0 and TIX==0)
+                printf("l2_md\n");
             int N_x = AnchorBlockSizeX / (unit * 2);
             int N_y = AnchorBlockSizeY / (unit * 2);
             int N_z = AnchorBlockSizeZ / (unit * 2);
@@ -1702,6 +1706,8 @@ __device__ void cusz::device_api::spline_layout_interpolate(
             
         //if(intp_param.use_md[level_id]){
         if constexpr (L1_MD){
+            if(BIX==0 and TIX==0)
+                printf("l1_md\n");
             int N_x = AnchorBlockSizeX / (unit * 2);
             int N_y = AnchorBlockSizeY / (unit * 2);
             int N_z = AnchorBlockSizeZ / (unit * 2);
@@ -1771,6 +1777,8 @@ __device__ void cusz::device_api::spline_layout_interpolate(
     
     //if(intp_param.use_md[level_id]){
      if constexpr (L0_MD){
+        if(BIX==0 and TIX==0)
+                printf("l0_md\n");
         int N_x = AnchorBlockSizeX / (unit * 2);
         int N_y = AnchorBlockSizeY / (unit * 2);
         int N_z = AnchorBlockSizeZ / (unit * 2);
