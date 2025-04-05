@@ -1570,7 +1570,7 @@ __device__ void cusz::device_api::spline_layout_interpolate(
         unit_z = (SPLINE_DIM >= 3) ? unit * 2 : 1;
         //if(level_id != 0){
             
-        if(intp_param.use_md[level_id]){
+        /*if(intp_param.use_md[level_id]){
             int N_x = AnchorBlockSizeX / (unit * 2);
             int N_y = AnchorBlockSizeY / (unit * 2);
             int N_z = AnchorBlockSizeZ / (unit * 2);
@@ -1593,8 +1593,8 @@ __device__ void cusz::device_api::spline_layout_interpolate(
                 if constexpr (SPLINE_DIM >= 3)
                 interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_cube<SPLINE_DIM, AnchorBlockSizeX>), false, false, true, LINEAR_BLOCK_SIZE, COARSEN, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_cube<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nat_cubic_interp, N_cube);
             }
-        }
-        else{
+        }*/
+        //else{
             if(intp_param.reverse[level_id]){
                 if constexpr (SPLINE_DIM >= 1) {
                 interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xhollow_reverse), decltype(yhollow_reverse), decltype(zhollow_reverse), false, false, true, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xhollow_reverse, yhollow_reverse, zhollow_reverse, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x, numAnchorBlockY * AnchorBlockSizeY / unit_y + (SPLINE_DIM >= 2), numAnchorBlockZ * AnchorBlockSizeZ / unit_z + (SPLINE_DIM >= 3));
@@ -1623,7 +1623,7 @@ __device__ void cusz::device_api::spline_layout_interpolate(
                 unit_x /= 2;
                 }
            }
-        }
+        //}
     }
 
         //}
@@ -1633,7 +1633,7 @@ __device__ void cusz::device_api::spline_layout_interpolate(
     unit_x = (SPLINE_DIM >= 1) ? unit * 2 : 1;
     unit_y = (SPLINE_DIM >= 2) ? unit * 2 : 1;
     unit_z = (SPLINE_DIM >= 3) ? unit * 2 : 1;
-    
+    /*
     if(intp_param.use_md[level_id]){
         int N_x = AnchorBlockSizeX / (unit * 2);
         int N_y = AnchorBlockSizeY / (unit * 2);
@@ -1657,8 +1657,8 @@ __device__ void cusz::device_api::spline_layout_interpolate(
             if constexpr (SPLINE_DIM >= 3)
             interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_cube<SPLINE_DIM, AnchorBlockSizeX>), false, false, true, LINEAR_BLOCK_SIZE, COARSEN, BORDER_EXCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_cube<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nat_cubic_interp, N_cube);
         }
-    }
-    else{
+    }*/
+    //else{
         if(intp_param.reverse[level_id]){
             if constexpr (SPLINE_DIM >= 1) {
             interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xhollow_reverse), decltype(yhollow_reverse), decltype(zhollow_reverse), false, false, true, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xhollow_reverse, yhollow_reverse, zhollow_reverse, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x, numAnchorBlockY * AnchorBlockSizeY / unit_y + (SPLINE_DIM >= 2), numAnchorBlockZ * AnchorBlockSizeZ / unit_z + (SPLINE_DIM >= 3));
@@ -1687,7 +1687,7 @@ __device__ void cusz::device_api::spline_layout_interpolate(
             unit_x /= 2;
             }
         }
-      }
+      //}
 
 }
 
