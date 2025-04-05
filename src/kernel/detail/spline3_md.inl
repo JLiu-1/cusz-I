@@ -1967,7 +1967,7 @@ __global__ void cusz::c_spline_infprecis_data(
         
 
 
-        cusz::device_api::spline_layout_interpolate<T, T, FP, LEVEL, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, L3_MD, L2_MD, L1_MD, L0_MD, LINEAR_BLOCK_SIZE, SPLINE3_COMPR, false, >(
+        cusz::device_api::spline_layout_interpolate<T, T, FP, LEVEL, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, L3_MD, L2_MD, L1_MD, L0_MD, LINEAR_BLOCK_SIZE, SPLINE3_COMPR, false>(
             shmem.data, shmem.ectrl, data_size, eb_r, ebx2, radius, intp_param);
 
         shmem2global_data_with_compaction<T, E, LEVEL, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY,  numAnchorBlockZ, LINEAR_BLOCK_SIZE>(shmem.ectrl, ectrl, ectrl_size, ectrl_leap, radius, shmem.grid_leaps,shmem.prefix_nums, compact_val, compact_idx, compact_num);
