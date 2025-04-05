@@ -483,7 +483,7 @@ int spline_construct(
     cusz::c_spline_infprecis_data<T*, E*, float, 4, SPLINE_DIM_3,                              \
         BLOCK16, BLOCK16, BLOCK16, 1, 1, 1,                                                    \
         MD3, MD2, MD1, MD0, DEFAULT_BLOCK_SIZE>                                                 \
-        <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, stream>>>(                              \
+        <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>(                              \
             data->dptr(), data->template len3<dim3>(), data->template st3<dim3>(),              \
             ectrl->dptr(), ectrl->template len3<dim3>(), ectrl->template st3<dim3>(),             \
             anchor->dptr(), anchor->template st3<dim3>(),                                       \
@@ -571,17 +571,17 @@ int spline_reconstruct(
     };
 
     #define CALL_KERNEL_X(MD3, MD2, MD1, MD0)                                                       \
-    cusz::x_spline_infprecis_data<E*, T*, float, 4, SPLINE_DIM_3, BLOCK16, BLOCK16, BLOCK16,
-  1, 1, 1,MD3, MD2, MD1, MD0, DEFAULT_BLOCK_SIZE>   //
-      <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>  //
-      (ectrl->dptr(), ectrl->template len3<dim3>(),
-       ectrl->template st3<dim3>(),  //
-       anchor->dptr(), anchor->template len3<dim3>(),
-       anchor->template st3<dim3>(),  //
-       xdata->dptr(), xdata->template len3<dim3>(),
-       xdata->template st3<dim3>(),  //
-       outlier_tmp,
-       eb_r, ebx2, radius, intp_param);
+    cusz::x_spline_infprecis_data<E*, T*, float, 4, SPLINE_DIM_3, BLOCK16, BLOCK16, BLOCK16,       \
+  1, 1, 1,MD3, MD2, MD1, MD0, DEFAULT_BLOCK_SIZE>                                                  \
+      <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>       \ 
+      (ectrl->dptr(), ectrl->template len3<dim3>(), \
+       ectrl->template st3<dim3>(),   \
+       anchor->dptr(), anchor->template len3<dim3>(), \
+       anchor->template st3<dim3>(),   \
+       xdata->dptr(), xdata->template len3<dim3>(), \
+       xdata->template st3<dim3>(),   \
+       outlier_tmp, \
+       eb_r, ebx2, radius, intp_param); \
 
   
         int selector = md_mask(
