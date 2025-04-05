@@ -219,7 +219,7 @@ int spline_construct(
         }
         
         //printf("use_md[3] errors[2]=%f, best_error=%f\n", errors[2], best_error);
-        intp_param.use_md[3] = errors[2] < best_error; 
+        intp_param.use_md[3] = false;//errors[2] < best_error; 
         best_error = fmin(errors[2],best_error);
         best_ave_pre_error[3] = best_error / (calcnum(1) * block_num);
 
@@ -459,7 +459,7 @@ int spline_construct(
           div(l3.y, AnchorBlockSizeY * numAnchorBlockY),
           div(l3.z, AnchorBlockSizeZ * numAnchorBlockZ));
       cusz::c_spline_infprecis_data<T*, E*, float, LEVEL, SPLINE_DIM_2, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ,
-    numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, DEFAULT_BLOCK_SIZE>  //
+    numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, DEFAULT_BLOCK_SIZE >  //
         <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>(
             data->dptr(), data->template len3<dim3>(),
             data->template st3<dim3>(),  //
