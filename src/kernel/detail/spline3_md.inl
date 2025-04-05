@@ -1628,7 +1628,7 @@ __device__ void cusz::device_api::spline_layout_interpolate(
 
         //}
         //else{
-    unit = 1;
+    int unit = 1;
     calc_eb(unit);
     unit_x = (SPLINE_DIM >= 1) ? unit * 2 : 1;
     unit_y = (SPLINE_DIM >= 2) ? unit * 2 : 1;
