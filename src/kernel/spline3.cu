@@ -451,13 +451,6 @@ int spline_construct(
       printf("\nA B: %.2f %.2f\n",intp_param.alpha,intp_param.beta);
   }
 
-  constexpr int md_mask() {
-    return (md3 << 3) | (md2 << 2) | (md1 << 1) | (md0 << 0);
-  }
-
-
-
-
 
   CREATE_GPUEVENT_PAIR;
   START_GPUEVENT_RECORDING(stream);
