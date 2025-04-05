@@ -1984,7 +1984,7 @@ template <
     int numAnchorBlockX,  // Number of Anchor blocks along X
     int numAnchorBlockY,  // Number of Anchor blocks along Y
     int numAnchorBlockZ,  // Number of Anchor blocks along Z
-    ool L3_MD, bool L2_MD, bool L1_MD, bool L0_MD,
+    bool L3_MD, bool L2_MD, bool L1_MD, bool L0_MD,
     int LINEAR_BLOCK_SIZE>
 __global__ void cusz::x_spline_infprecis_data(
     EITER   ectrl,        // input 1
