@@ -1563,126 +1563,128 @@ __device__ void cusz::device_api::spline_layout_interpolate(
     int level_id = LEVEL;
     level_id -= 1;
     #pragma unroll
-    for(int unit = max_unit; unit >= 1; unit /= 2, level_id--){
+    for(int unit = max_unit; unit >= 2; unit /= 2, level_id--){
         calc_eb(unit);
         unit_x = (SPLINE_DIM >= 1) ? unit * 2 : 1;
         unit_y = (SPLINE_DIM >= 2) ? unit * 2 : 1;
         unit_z = (SPLINE_DIM >= 3) ? unit * 2 : 1;
-        if(level_id != 0){
+        //if(level_id != 0){
             
-            if(intp_param.use_md[level_id]){
-                int N_x = AnchorBlockSizeX / (unit * 2);
-                int N_y = AnchorBlockSizeY / (unit * 2);
-                int N_z = AnchorBlockSizeZ / (unit * 2);
-                int N_line = N_x * (N_y + 1) * (N_z + 1) + (N_x + 1) * N_y * (N_z + 1) + (N_x + 1) * (N_y + 1) * N_z;
-                int N_face = N_x * N_y * (N_z + 1) + N_x * (N_y + 1) * N_z + (N_x + 1) * N_y * N_z; 
-                int N_cube = N_x * N_y * N_z;
-                if(intp_param.use_natural[level_id]==0){
-                    if constexpr (SPLINE_DIM >= 1)
-                    interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_line<SPLINE_DIM, AnchorBlockSizeX>), true, false, false, LINEAR_BLOCK_SIZE, COARSEN, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_line<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nan_cubic_interp, N_line);
-                    if constexpr (SPLINE_DIM >= 2)
-                    interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_face<SPLINE_DIM, AnchorBlockSizeX>), false, true, false, LINEAR_BLOCK_SIZE, COARSEN, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_face<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nan_cubic_interp, N_face);
-                    if constexpr (SPLINE_DIM >= 3)
-                    interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_cube<SPLINE_DIM, AnchorBlockSizeX>), false, false, true, LINEAR_BLOCK_SIZE, COARSEN, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_cube<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nan_cubic_interp, N_cube);
-                }
-                else{
-                    if constexpr (SPLINE_DIM >= 1)
-                    interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_line<SPLINE_DIM, AnchorBlockSizeX>), true, false, false, LINEAR_BLOCK_SIZE, COARSEN, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_line<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nat_cubic_interp, N_line);
-                    if constexpr (SPLINE_DIM >= 2)
-                    interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_face<SPLINE_DIM, AnchorBlockSizeX>), false, true, false, LINEAR_BLOCK_SIZE, COARSEN, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_face<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nat_cubic_interp, N_face);
-                    if constexpr (SPLINE_DIM >= 3)
-                    interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_cube<SPLINE_DIM, AnchorBlockSizeX>), false, false, true, LINEAR_BLOCK_SIZE, COARSEN, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_cube<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nat_cubic_interp, N_cube);
-                }
+        if(intp_param.use_md[level_id]){
+            int N_x = AnchorBlockSizeX / (unit * 2);
+            int N_y = AnchorBlockSizeY / (unit * 2);
+            int N_z = AnchorBlockSizeZ / (unit * 2);
+            int N_line = N_x * (N_y + 1) * (N_z + 1) + (N_x + 1) * N_y * (N_z + 1) + (N_x + 1) * (N_y + 1) * N_z;
+            int N_face = N_x * N_y * (N_z + 1) + N_x * (N_y + 1) * N_z + (N_x + 1) * N_y * N_z; 
+            int N_cube = N_x * N_y * N_z;
+            if(intp_param.use_natural[level_id]==0){
+                if constexpr (SPLINE_DIM >= 1)
+                interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_line<SPLINE_DIM, AnchorBlockSizeX>), true, false, false, LINEAR_BLOCK_SIZE, COARSEN, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_line<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nan_cubic_interp, N_line);
+                if constexpr (SPLINE_DIM >= 2)
+                interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_face<SPLINE_DIM, AnchorBlockSizeX>), false, true, false, LINEAR_BLOCK_SIZE, COARSEN, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_face<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nan_cubic_interp, N_face);
+                if constexpr (SPLINE_DIM >= 3)
+                interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_cube<SPLINE_DIM, AnchorBlockSizeX>), false, false, true, LINEAR_BLOCK_SIZE, COARSEN, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_cube<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nan_cubic_interp, N_cube);
             }
             else{
-                if(intp_param.reverse[level_id]){
-                    if constexpr (SPLINE_DIM >= 1) {
-                    interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xhollow_reverse), decltype(yhollow_reverse), decltype(zhollow_reverse), false, false, true, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xhollow_reverse, yhollow_reverse, zhollow_reverse, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x, numAnchorBlockY * AnchorBlockSizeY / unit_y + (SPLINE_DIM >= 2), numAnchorBlockZ * AnchorBlockSizeZ / unit_z + (SPLINE_DIM >= 3));
-                    unit_x /= 2;
-                    }
-                    if constexpr (SPLINE_DIM >= 2) {
-                    interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyellow_reverse), decltype(yyellow_reverse), decltype(zyellow_reverse), false, true, false, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyellow_reverse, yyellow_reverse, zyellow_reverse, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x + (SPLINE_DIM >= 1), numAnchorBlockY * AnchorBlockSizeY / unit_y,numAnchorBlockZ * AnchorBlockSizeZ / unit_z + (SPLINE_DIM >= 3));
-                    unit_y /= 2;
-                    }
-                    if constexpr (SPLINE_DIM >= 3) {
-                    interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xblue_reverse), decltype(yblue_reverse), decltype(zblue_reverse), true, false, false, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xblue_reverse, yblue_reverse, zblue_reverse, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x + (SPLINE_DIM >= 1), numAnchorBlockY * AnchorBlockSizeY / unit_y + (SPLINE_DIM >= 2), numAnchorBlockZ * AnchorBlockSizeZ / unit_z);
-                    unit_z /= 2;
-                    }
-                }
-                else{
-                    if constexpr (SPLINE_DIM >= 3) {
-                    interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xblue), decltype(yblue), decltype(zblue), true, false, false, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xblue, yblue, zblue, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x + (SPLINE_DIM >= 1), numAnchorBlockY * AnchorBlockSizeY / unit_y + (SPLINE_DIM >= 2), numAnchorBlockZ * AnchorBlockSizeZ / unit_z);
-                    unit_z /= 2;
-                    }
-                    if constexpr (SPLINE_DIM >= 2) {
-                    interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyellow), decltype(yyellow), decltype(zyellow), false, true, false, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyellow, yyellow, zyellow, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x + (SPLINE_DIM >= 1), numAnchorBlockY * AnchorBlockSizeY / unit_y, numAnchorBlockZ * AnchorBlockSizeZ / unit_z + (SPLINE_DIM >= 3));
-                    unit_y /= 2;
-                    }
-                    if constexpr (SPLINE_DIM >= 1) {
-                    interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xhollow), decltype(yhollow), decltype(zhollow), false, false, true, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xhollow, yhollow, zhollow, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x, numAnchorBlockY * AnchorBlockSizeY / unit_y + (SPLINE_DIM >= 2), numAnchorBlockZ * AnchorBlockSizeZ / unit_z + (SPLINE_DIM >= 3));
-                    unit_x /= 2;
-                    }
+                if constexpr (SPLINE_DIM >= 1)
+                interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_line<SPLINE_DIM, AnchorBlockSizeX>), true, false, false, LINEAR_BLOCK_SIZE, COARSEN, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_line<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nat_cubic_interp, N_line);
+                if constexpr (SPLINE_DIM >= 2)
+                interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_face<SPLINE_DIM, AnchorBlockSizeX>), false, true, false, LINEAR_BLOCK_SIZE, COARSEN, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_face<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nat_cubic_interp, N_face);
+                if constexpr (SPLINE_DIM >= 3)
+                interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_cube<SPLINE_DIM, AnchorBlockSizeX>), false, false, true, LINEAR_BLOCK_SIZE, COARSEN, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_cube<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nat_cubic_interp, N_cube);
             }
-        }
-
         }
         else{
-            
-            if(intp_param.use_md[level_id]){
-                int N_x = AnchorBlockSizeX / (unit * 2);
-                int N_y = AnchorBlockSizeY / (unit * 2);
-                int N_z = AnchorBlockSizeZ / (unit * 2);
-                int N_line = N_x * (N_y + 1) * (N_z + 1) + (N_x + 1) * N_y * (N_z + 1) + (N_x + 1) * (N_y + 1) * N_z;
-                int N_face = N_x * N_y * (N_z + 1) + N_x * (N_y + 1) * N_z + (N_x + 1) * N_y * N_z; 
-                int N_cube = N_x * N_y * N_z;
-                if(intp_param.use_natural[level_id]==0){
-                    if constexpr (SPLINE_DIM >= 1)
-                    interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_line<SPLINE_DIM, AnchorBlockSizeX>), true, false, false, LINEAR_BLOCK_SIZE, COARSEN, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_line<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nan_cubic_interp, N_line);
-                    if constexpr (SPLINE_DIM >= 2)
-                    interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_face<SPLINE_DIM, AnchorBlockSizeX>), false, true, false, LINEAR_BLOCK_SIZE, COARSEN, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_face<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nan_cubic_interp, N_face);
-                    if constexpr (SPLINE_DIM >= 3)
-                    interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_cube<SPLINE_DIM, AnchorBlockSizeX>), false, false, true, LINEAR_BLOCK_SIZE, COARSEN, BORDER_EXCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_cube<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nan_cubic_interp, N_cube);
+            if(intp_param.reverse[level_id]){
+                if constexpr (SPLINE_DIM >= 1) {
+                interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xhollow_reverse), decltype(yhollow_reverse), decltype(zhollow_reverse), false, false, true, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xhollow_reverse, yhollow_reverse, zhollow_reverse, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x, numAnchorBlockY * AnchorBlockSizeY / unit_y + (SPLINE_DIM >= 2), numAnchorBlockZ * AnchorBlockSizeZ / unit_z + (SPLINE_DIM >= 3));
+                unit_x /= 2;
                 }
-                else{
-                    if constexpr (SPLINE_DIM >= 1)
-                    interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_line<SPLINE_DIM, AnchorBlockSizeX>), true, false, false, LINEAR_BLOCK_SIZE, COARSEN, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_line<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nat_cubic_interp, N_line);
-                    if constexpr (SPLINE_DIM >= 2)
-                    interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_face<SPLINE_DIM, AnchorBlockSizeX>), false, true, false, LINEAR_BLOCK_SIZE, COARSEN, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_face<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nat_cubic_interp, N_face);
-                    if constexpr (SPLINE_DIM >= 3)
-                    interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_cube<SPLINE_DIM, AnchorBlockSizeX>), false, false, true, LINEAR_BLOCK_SIZE, COARSEN, BORDER_EXCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_cube<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nat_cubic_interp, N_cube);
+                if constexpr (SPLINE_DIM >= 2) {
+                interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyellow_reverse), decltype(yyellow_reverse), decltype(zyellow_reverse), false, true, false, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyellow_reverse, yyellow_reverse, zyellow_reverse, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x + (SPLINE_DIM >= 1), numAnchorBlockY * AnchorBlockSizeY / unit_y,numAnchorBlockZ * AnchorBlockSizeZ / unit_z + (SPLINE_DIM >= 3));
+                unit_y /= 2;
+                }
+                if constexpr (SPLINE_DIM >= 3) {
+                interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xblue_reverse), decltype(yblue_reverse), decltype(zblue_reverse), true, false, false, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xblue_reverse, yblue_reverse, zblue_reverse, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x + (SPLINE_DIM >= 1), numAnchorBlockY * AnchorBlockSizeY / unit_y + (SPLINE_DIM >= 2), numAnchorBlockZ * AnchorBlockSizeZ / unit_z);
+                unit_z /= 2;
                 }
             }
             else{
-                if(intp_param.reverse[level_id]){
-                    if constexpr (SPLINE_DIM >= 1) {
-                    interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xhollow_reverse), decltype(yhollow_reverse), decltype(zhollow_reverse), false, false, true, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xhollow_reverse, yhollow_reverse, zhollow_reverse, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x, numAnchorBlockY * AnchorBlockSizeY / unit_y + (SPLINE_DIM >= 2), numAnchorBlockZ * AnchorBlockSizeZ / unit_z + (SPLINE_DIM >= 3));
-                    unit_x /= 2;
-                    }
-                    if constexpr (SPLINE_DIM >= 2) {
-                    interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyellow_reverse), decltype(yyellow_reverse), decltype(zyellow_reverse), false, true, false, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyellow_reverse, yyellow_reverse, zyellow_reverse, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x + (SPLINE_DIM >= 1), numAnchorBlockY * AnchorBlockSizeY / unit_y,numAnchorBlockZ * AnchorBlockSizeZ / unit_z + (SPLINE_DIM >= 3));
-                    unit_y /= 2;
-                    }
-                    if constexpr (SPLINE_DIM >= 3) {
-                    interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xblue_reverse), decltype(yblue_reverse), decltype(zblue_reverse), true, false, false, COARSEN, LINEAR_BLOCK_SIZE, BORDER_EXCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xblue_reverse, yblue_reverse, zblue_reverse, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x + (SPLINE_DIM >= 1), numAnchorBlockY * AnchorBlockSizeY / unit_y + (SPLINE_DIM >= 2), numAnchorBlockZ * AnchorBlockSizeZ / unit_z);
-                    unit_z /= 2;
-                    }
+                if constexpr (SPLINE_DIM >= 3) {
+                interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xblue), decltype(yblue), decltype(zblue), true, false, false, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xblue, yblue, zblue, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x + (SPLINE_DIM >= 1), numAnchorBlockY * AnchorBlockSizeY / unit_y + (SPLINE_DIM >= 2), numAnchorBlockZ * AnchorBlockSizeZ / unit_z);
+                unit_z /= 2;
                 }
-                else{
-                    if constexpr (SPLINE_DIM >= 3) {
-                    interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xblue), decltype(yblue), decltype(zblue), true, false, false, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xblue, yblue, zblue, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x + (SPLINE_DIM >= 1), numAnchorBlockY * AnchorBlockSizeY / unit_y + (SPLINE_DIM >= 2), numAnchorBlockZ * AnchorBlockSizeZ / unit_z);
-                    unit_z /= 2;
-                    }
-                    if constexpr (SPLINE_DIM >= 2) {
-                    interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyellow), decltype(yyellow), decltype(zyellow), false, true, false, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyellow, yyellow, zyellow, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x + (SPLINE_DIM >= 1), numAnchorBlockY * AnchorBlockSizeY / unit_y, numAnchorBlockZ * AnchorBlockSizeZ / unit_z + (SPLINE_DIM >= 3));
-                    unit_y /= 2;
-                    }
-                    if constexpr (SPLINE_DIM >= 1) {
-                    interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xhollow), decltype(yhollow), decltype(zhollow), false, false, true, COARSEN, LINEAR_BLOCK_SIZE, BORDER_EXCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xhollow, yhollow, zhollow, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x, numAnchorBlockY * AnchorBlockSizeY / unit_y + (SPLINE_DIM >= 2), numAnchorBlockZ * AnchorBlockSizeZ / unit_z + (SPLINE_DIM >= 3));
-                    unit_x /= 2;
-                    }
+                if constexpr (SPLINE_DIM >= 2) {
+                interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyellow), decltype(yyellow), decltype(zyellow), false, true, false, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyellow, yyellow, zyellow, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x + (SPLINE_DIM >= 1), numAnchorBlockY * AnchorBlockSizeY / unit_y, numAnchorBlockZ * AnchorBlockSizeZ / unit_z + (SPLINE_DIM >= 3));
+                unit_y /= 2;
                 }
-            }
+                if constexpr (SPLINE_DIM >= 1) {
+                interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xhollow), decltype(yhollow), decltype(zhollow), false, false, true, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xhollow, yhollow, zhollow, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x, numAnchorBlockY * AnchorBlockSizeY / unit_y + (SPLINE_DIM >= 2), numAnchorBlockZ * AnchorBlockSizeZ / unit_z + (SPLINE_DIM >= 3));
+                unit_x /= 2;
+                }
+           }
+        }
+    }
 
+        //}
+        //else{
+    unit = 1;
+    calc_eb(unit);
+    unit_x = (SPLINE_DIM >= 1) ? unit * 2 : 1;
+    unit_y = (SPLINE_DIM >= 2) ? unit * 2 : 1;
+    unit_z = (SPLINE_DIM >= 3) ? unit * 2 : 1;
+    if(intp_param.use_md[level_id]){
+        int N_x = AnchorBlockSizeX / (unit * 2);
+        int N_y = AnchorBlockSizeY / (unit * 2);
+        int N_z = AnchorBlockSizeZ / (unit * 2);
+        int N_line = N_x * (N_y + 1) * (N_z + 1) + (N_x + 1) * N_y * (N_z + 1) + (N_x + 1) * (N_y + 1) * N_z;
+        int N_face = N_x * N_y * (N_z + 1) + N_x * (N_y + 1) * N_z + (N_x + 1) * N_y * N_z; 
+        int N_cube = N_x * N_y * N_z;
+        if(intp_param.use_natural[level_id]==0){
+            if constexpr (SPLINE_DIM >= 1)
+            interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_line<SPLINE_DIM, AnchorBlockSizeX>), true, false, false, LINEAR_BLOCK_SIZE, COARSEN, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_line<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nan_cubic_interp, N_line);
+            if constexpr (SPLINE_DIM >= 2)
+            interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_face<SPLINE_DIM, AnchorBlockSizeX>), false, true, false, LINEAR_BLOCK_SIZE, COARSEN, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_face<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nan_cubic_interp, N_face);
+            if constexpr (SPLINE_DIM >= 3)
+            interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_cube<SPLINE_DIM, AnchorBlockSizeX>), false, false, true, LINEAR_BLOCK_SIZE, COARSEN, BORDER_EXCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_cube<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nan_cubic_interp, N_cube);
+        }
+        else{
+            if constexpr (SPLINE_DIM >= 1)
+            interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_line<SPLINE_DIM, AnchorBlockSizeX>), true, false, false, LINEAR_BLOCK_SIZE, COARSEN, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_line<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nat_cubic_interp, N_line);
+            if constexpr (SPLINE_DIM >= 2)
+            interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_face<SPLINE_DIM, AnchorBlockSizeX>), false, true, false, LINEAR_BLOCK_SIZE, COARSEN, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_face<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nat_cubic_interp, N_face);
+            if constexpr (SPLINE_DIM >= 3)
+            interpolate_stage_md<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyzmap_cube<SPLINE_DIM, AnchorBlockSizeX>), false, false, true, LINEAR_BLOCK_SIZE, COARSEN, BORDER_EXCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyzmap_cube<SPLINE_DIM, AnchorBlockSizeX>, unit, cur_eb_r, cur_ebx2, radius, nat_cubic_interp, N_cube);
+        }
+    }
+    else{
+        if(intp_param.reverse[level_id]){
+            if constexpr (SPLINE_DIM >= 1) {
+            interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xhollow_reverse), decltype(yhollow_reverse), decltype(zhollow_reverse), false, false, true, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xhollow_reverse, yhollow_reverse, zhollow_reverse, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x, numAnchorBlockY * AnchorBlockSizeY / unit_y + (SPLINE_DIM >= 2), numAnchorBlockZ * AnchorBlockSizeZ / unit_z + (SPLINE_DIM >= 3));
+            unit_x /= 2;
+            }
+            if constexpr (SPLINE_DIM >= 2) {
+            interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyellow_reverse), decltype(yyellow_reverse), decltype(zyellow_reverse), false, true, false, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyellow_reverse, yyellow_reverse, zyellow_reverse, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x + (SPLINE_DIM >= 1), numAnchorBlockY * AnchorBlockSizeY / unit_y,numAnchorBlockZ * AnchorBlockSizeZ / unit_z + (SPLINE_DIM >= 3));
+            unit_y /= 2;
+            }
+            if constexpr (SPLINE_DIM >= 3) {
+            interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xblue_reverse), decltype(yblue_reverse), decltype(zblue_reverse), true, false, false, COARSEN, LINEAR_BLOCK_SIZE, BORDER_EXCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xblue_reverse, yblue_reverse, zblue_reverse, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x + (SPLINE_DIM >= 1), numAnchorBlockY * AnchorBlockSizeY / unit_y + (SPLINE_DIM >= 2), numAnchorBlockZ * AnchorBlockSizeZ / unit_z);
+            unit_z /= 2;
+            }
+        }
+        else{
+            if constexpr (SPLINE_DIM >= 3) {
+            interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xblue), decltype(yblue), decltype(zblue), true, false, false, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xblue, yblue, zblue, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x + (SPLINE_DIM >= 1), numAnchorBlockY * AnchorBlockSizeY / unit_y + (SPLINE_DIM >= 2), numAnchorBlockZ * AnchorBlockSizeZ / unit_z);
+            unit_z /= 2;
+            }
+            if constexpr (SPLINE_DIM >= 2) {
+            interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xyellow), decltype(yyellow), decltype(zyellow), false, true, false, COARSEN, LINEAR_BLOCK_SIZE, BORDER_INCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xyellow, yyellow, zyellow, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x + (SPLINE_DIM >= 1), numAnchorBlockY * AnchorBlockSizeY / unit_y, numAnchorBlockZ * AnchorBlockSizeZ / unit_z + (SPLINE_DIM >= 3));
+            unit_y /= 2;
+            }
+            if constexpr (SPLINE_DIM >= 1) {
+            interpolate_stage<T1, T2, FP, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, decltype(xhollow), decltype(yhollow), decltype(zhollow), false, false, true, COARSEN, LINEAR_BLOCK_SIZE, BORDER_EXCLUSIVE, WORKFLOW>(s_data, s_ectrl,data_size, xhollow, yhollow, zhollow, unit, cur_eb_r, cur_ebx2, radius, intp_param.use_natural[level_id], numAnchorBlockX * AnchorBlockSizeX / unit_x, numAnchorBlockY * AnchorBlockSizeY / unit_y + (SPLINE_DIM >= 2), numAnchorBlockZ * AnchorBlockSizeZ / unit_z + (SPLINE_DIM >= 3));
+            unit_x /= 2;
+            }
         }
     }
 
@@ -1825,6 +1827,9 @@ __global__ void cusz::c_spline_infprecis_data(
         global2shmem_data<T, T, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, LINEAR_BLOCK_SIZE>(data, data_size, data_leap, shmem.data);
 
         c_gather_anchor<T, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ>(data, data_size, data_leap, anchor, anchor_leap);
+        
+
+
         cusz::device_api::spline_layout_interpolate<T, T, FP, LEVEL, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, LINEAR_BLOCK_SIZE, SPLINE3_COMPR, false>(
             shmem.data, shmem.ectrl, data_size, eb_r, ebx2, radius, intp_param);
 
