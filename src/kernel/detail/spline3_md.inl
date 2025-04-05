@@ -1637,6 +1637,7 @@ __device__ void cusz::device_api::spline_layout_interpolate(
         unit_x = (SPLINE_DIM >= 1) ? unit * 2 : 1;
         unit_y = (SPLINE_DIM >= 2) ? unit * 2 : 1;
         unit_z = (SPLINE_DIM >= 3) ? unit * 2 : 1;
+        level_id -= 1;
         //if(level_id != 0){
             
         //if(intp_param.use_md[level_id]){
@@ -1702,6 +1703,7 @@ __device__ void cusz::device_api::spline_layout_interpolate(
         unit_x = (SPLINE_DIM >= 1) ? unit * 2 : 1;
         unit_y = (SPLINE_DIM >= 2) ? unit * 2 : 1;
         unit_z = (SPLINE_DIM >= 3) ? unit * 2 : 1;
+        level_id -= 1;
         //if(level_id != 0){
             
         //if(intp_param.use_md[level_id]){
@@ -1774,6 +1776,7 @@ __device__ void cusz::device_api::spline_layout_interpolate(
     unit_x = (SPLINE_DIM >= 1) ? unit * 2 : 1;
     unit_y = (SPLINE_DIM >= 2) ? unit * 2 : 1;
     unit_z = (SPLINE_DIM >= 3) ? unit * 2 : 1;
+    level_id -= 1;
     
     //if(intp_param.use_md[level_id]){
      if constexpr (L0_MD){
