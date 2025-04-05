@@ -219,7 +219,7 @@ int spline_construct(
         }
         
         //printf("use_md[3] errors[2]=%f, best_error=%f\n", errors[2], best_error);
-        intp_param.use_md[3] = false;//errors[2] < best_error; 
+        intp_param.use_md[3] = errors[2] < best_error; 
         best_error = fmin(errors[2],best_error);
         best_ave_pre_error[3] = best_error / (calcnum(1) * block_num);
 
@@ -233,7 +233,7 @@ int spline_construct(
           intp_param.reverse[2] = false;
         }
         //printf("use_md[2] errors[5]=%f, best_error=%f\n", errors[5], best_error);
-        intp_param.use_md[2] = false;// errors[5] < best_error; 
+        intp_param.use_md[2] =  errors[5] < best_error; 
         best_error = fmin(errors[5],best_error);
         best_ave_pre_error[2] = best_error / (calcnum(2) * block_num);
 
@@ -248,7 +248,7 @@ int spline_construct(
         intp_param.use_natural[1] = best_idx >  8;
         //printf("use_md[1] errors[8]=%f, best_error=%f\n", errors[8], best_error);
         //printf("use_md[1] errors[11]=%f, best_error=%f\n", errors[11], best_error);
-        intp_param.use_md[1] =false;//(best_idx ==  8 or best_idx ==  11) ;
+        intp_param.use_md[1] =(best_idx ==  8 or best_idx ==  11) ;
         intp_param.reverse[1] = best_idx%3;
 
         best_ave_pre_error[1]= best_error/(calcnum(4)*block_num);
@@ -265,7 +265,7 @@ int spline_construct(
         intp_param.use_natural[0] = best_idx >  14;
         //printf("use_md[1] errors[14]=%f, best_error=%f\n", errors[14], best_error);
         //printf("use_md[1] errors[17]=%f, best_error=%f\n", errors[17], best_error);
-        intp_param.use_md[0] = false;//(best_idx ==  14 or best_idx ==  17);
+        intp_param.use_md[0] = (best_idx ==  14 or best_idx ==  17);
         intp_param.reverse[0] = best_idx%3;
 
         best_ave_pre_error[0]= best_error/(calcnum(8)*block_num);
