@@ -573,7 +573,7 @@ int spline_reconstruct(
     #define CALL_KERNEL_X(MD3, MD2, MD1, MD0)                                                       \
     cusz::x_spline_infprecis_data<E*, T*, float, 4, SPLINE_DIM_3, BLOCK16, BLOCK16, BLOCK16,       \
   1, 1, 1,MD3, MD2, MD1, MD0, DEFAULT_BLOCK_SIZE>                                                  \
-      <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>       \ 
+      <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>       \
       (ectrl->dptr(), ectrl->template len3<dim3>(), \
        ectrl->template st3<dim3>(),   \
        anchor->dptr(), anchor->template len3<dim3>(), \
