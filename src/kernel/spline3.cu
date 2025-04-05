@@ -265,7 +265,7 @@ int spline_construct(
         intp_param.use_natural[0] = best_idx >  14;
         //printf("use_md[1] errors[14]=%f, best_error=%f\n", errors[14], best_error);
         //printf("use_md[1] errors[17]=%f, best_error=%f\n", errors[17], best_error);
-        intp_param.use_md[0] = true;//(best_idx ==  14 or best_idx ==  17);
+        intp_param.use_md[0] = (best_idx ==  14 or best_idx == 17);
         intp_param.reverse[0] = best_idx%3;
 
         best_ave_pre_error[0]= best_error/(calcnum(8)*block_num);
