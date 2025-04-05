@@ -218,7 +218,7 @@ int spline_construct(
           intp_param.reverse[3] = false;
         }
         
-        printf("use_md[3] errors[2]=%f, best_error=%f\n", errors[2], best_error);
+        //printf("use_md[3] errors[2]=%f, best_error=%f\n", errors[2], best_error);
         intp_param.use_md[3] = errors[2] < best_error; 
         best_error = fmin(errors[2],best_error);
         best_ave_pre_error[3] = best_error / (calcnum(1) * block_num);
@@ -232,8 +232,8 @@ int spline_construct(
           best_error = errors[3];
           intp_param.reverse[2] = false;
         }
-        printf("use_md[2] errors[5]=%f, best_error=%f\n", errors[5], best_error);
-        intp_param.use_md[2] = errors[5] < best_error; 
+        //printf("use_md[2] errors[5]=%f, best_error=%f\n", errors[5], best_error);
+        intp_param.use_md[2] = false;// errors[5] < best_error; 
         best_error = fmin(errors[5],best_error);
         best_ave_pre_error[2] = best_error / (calcnum(2) * block_num);
 
@@ -246,9 +246,9 @@ int spline_construct(
           }
         }
         intp_param.use_natural[1] = best_idx >  8;
-        printf("use_md[1] errors[8]=%f, best_error=%f\n", errors[8], best_error);
-        printf("use_md[1] errors[11]=%f, best_error=%f\n", errors[11], best_error);
-        intp_param.use_md[1] = (best_idx ==  8 or best_idx ==  11) ;
+        //printf("use_md[1] errors[8]=%f, best_error=%f\n", errors[8], best_error);
+        //printf("use_md[1] errors[11]=%f, best_error=%f\n", errors[11], best_error);
+        intp_param.use_md[1] =false;//(best_idx ==  8 or best_idx ==  11) ;
         intp_param.reverse[1] = best_idx%3;
 
         best_ave_pre_error[1]= best_error/(calcnum(4)*block_num);
@@ -263,9 +263,9 @@ int spline_construct(
           }
         }
         intp_param.use_natural[0] = best_idx >  14;
-        printf("use_md[1] errors[14]=%f, best_error=%f\n", errors[14], best_error);
-        printf("use_md[1] errors[17]=%f, best_error=%f\n", errors[17], best_error);
-        intp_param.use_md[0] = (best_idx ==  14 or best_idx ==  17);
+        //printf("use_md[1] errors[14]=%f, best_error=%f\n", errors[14], best_error);
+        //printf("use_md[1] errors[17]=%f, best_error=%f\n", errors[17], best_error);
+        intp_param.use_md[0] = false;//(best_idx ==  14 or best_idx ==  17);
         intp_param.reverse[0] = best_idx%3;
 
         best_ave_pre_error[0]= best_error/(calcnum(8)*block_num);
@@ -275,8 +275,8 @@ int spline_construct(
 
     // if CONSTEXPR (SPLINE_DIM == 2){
     if (l3.z == 1){
-      printf("s_size.x = %d, .y = %d, .z = %d\n", s_size_x, s_size_y, s_size_z);
-      printf("l3.x = %d, .y = %d, .z = %d\n", l3.x, l3.y, l3.z);
+      //printf("s_size.x = %d, .y = %d, .z = %d\n", s_size_x, s_size_y, s_size_z);
+      //printf("l3.x = %d, .y = %d, .z = %d\n", l3.x, l3.y, l3.z);
       cusz::pa_spline_infprecis_data<T*, float, LEVEL, SPLINE_DIM_2, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, DEFAULT_BLOCK_SIZE><<<dim3(s_size_x * s_size_y * s_size_z, 6 * LEVEL, 1), dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>> (data->dptr(), data->template len3<dim3>(), data->template st3<dim3>(), dim3(s_start_x, s_start_y, s_start_z), dim3(s_size_x, s_size_y, s_size_z), dim3(S_STRIDE, S_STRIDE, S_STRIDE), eb_r, ebx2, intp_param, profiling_errors->dptr(), true);
         
       STOP_GPUEVENT_RECORDING(stream);
@@ -304,9 +304,9 @@ int spline_construct(
         intp_param.use_md[level_id] = ((best_idx % 6) == 2 or (best_idx % 6) ==  5) ;
         intp_param.reverse[level_id] = best_idx % 3;
         best_ave_pre_error[level_id]= best_error / (calcnum(1 << level) * block_num);
-        printf(" BESTERROR=%f\n", best_ave_pre_error[level_id]);
+        //printf(" BESTERROR=%f\n", best_ave_pre_error[level_id]);
       }
-      printf("\n");
+      //printf("\n");
     }
       // intp_param.use_md[0] = 1;
       // intp_param.use_md[1] = 1;
@@ -431,6 +431,7 @@ int spline_construct(
 
 
     }
+    /*
     if(l3.z != 1){
       printf("\nNAT:");
       for(int i = 0; i < 4; ++i) printf(" %d", intp_param.use_natural[4 - i - 1]);
@@ -446,8 +447,8 @@ int spline_construct(
       for(int i = 0; i < LEVEL; ++i) printf(" %d", intp_param.use_md[LEVEL - i - 1]);
       printf("\nREVERSE:");
       for(int i = 0; i < LEVEL; ++i) printf(" %d", intp_param.reverse[LEVEL - i - 1]);
-    }
-      printf("\nA B: %.2f %.2f\n",intp_param.alpha,intp_param.beta);
+    }*/
+      //printf("\nA B: %.2f %.2f\n",intp_param.alpha,intp_param.beta);
   }
   CREATE_GPUEVENT_PAIR;
   START_GPUEVENT_RECORDING(stream);
