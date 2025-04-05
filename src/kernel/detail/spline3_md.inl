@@ -98,6 +98,7 @@ template <
     int numAnchorBlockX = 4,  // Number of Anchor blocks along X
     int numAnchorBlockY = 1,  // Number of Anchor blocks along Y
     int numAnchorBlockZ = 1,  // Number of Anchor blocks along Z
+    bool L3_MD = false, bool L2_MD = false, bool L1_MD = false, bool L0_MD = false,
     int  LINEAR_BLOCK_SIZE = DEFAULT_LINEAR_BLOCK_SIZE, 
     typename CompactVal = TITER,
     typename CompactIdx = uint32_t*,
@@ -131,6 +132,7 @@ template <
     int numAnchorBlockX = 4,  // Number of Anchor blocks along X
     int numAnchorBlockY = 1,  // Number of Anchor blocks along Y
     int numAnchorBlockZ = 1,  // Number of Anchor blocks along Z
+    bool L3_MD = false, bool L2_MD = false, bool L1_MD = false, bool L0_MD = false,
     int LINEAR_BLOCK_SIZE = DEFAULT_LINEAR_BLOCK_SIZE>
 __global__ void x_spline_infprecis_data(
     EITER   ectrl,        // input 1
@@ -211,6 +213,7 @@ int AnchorBlockSizeZ = 1,
 int numAnchorBlockX = 4,  // Number of Anchor blocks along X
 int numAnchorBlockY = 1,  // Number of Anchor blocks along Y
 int numAnchorBlockZ = 1,  // Number of Anchor blocks along Z
+bool L3_MD = false, bool L2_MD = false, bool L1_MD = false, bool L0_MD = false,
 int LINEAR_BLOCK_SIZE = DEFAULT_LINEAR_BLOCK_SIZE,
     bool WORKFLOW         = SPLINE3_COMPR,
     bool PROBE_PRED_ERROR = false>
@@ -1787,7 +1790,7 @@ template <int LEVEL> __forceinline__ __device__ void pre_compute(DIM3 data_size,
 }
 
 template <typename TITER, typename EITER, typename FP,  int LEVEL, int SPLINE_DIM, int AnchorBlockSizeX, int AnchorBlockSizeY, int AnchorBlockSizeZ, int numAnchorBlockX, 
-int numAnchorBlockY, int numAnchorBlockZ, int LINEAR_BLOCK_SIZE, typename CompactVal, typename CompactIdx, typename CompactNum>
+int numAnchorBlockY, int numAnchorBlockZ, bool L3_MD, bool L2_MD, bool L1_MD, bool L0_MD, int LINEAR_BLOCK_SIZE, typename CompactVal, typename CompactIdx, typename CompactNum>
 __global__ void cusz::c_spline_infprecis_data(
     TITER   data,
     DIM3    data_size,
@@ -1833,7 +1836,7 @@ __global__ void cusz::c_spline_infprecis_data(
         
 
 
-        cusz::device_api::spline_layout_interpolate<T, T, FP, LEVEL, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, LINEAR_BLOCK_SIZE, SPLINE3_COMPR, false>(
+        cusz::device_api::spline_layout_interpolate<T, T, FP, LEVEL, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, L3_MD, L2_MD, L1_MD, L0_MD, LINEAR_BLOCK_SIZE, SPLINE3_COMPR, false, >(
             shmem.data, shmem.ectrl, data_size, eb_r, ebx2, radius, intp_param);
 
         shmem2global_data_with_compaction<T, E, LEVEL, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY,  numAnchorBlockZ, LINEAR_BLOCK_SIZE>(shmem.ectrl, ectrl, ectrl_size, ectrl_leap, radius, shmem.grid_leaps,shmem.prefix_nums, compact_val, compact_idx, compact_num);
@@ -1850,6 +1853,7 @@ template <
     int numAnchorBlockX,  // Number of Anchor blocks along X
     int numAnchorBlockY,  // Number of Anchor blocks along Y
     int numAnchorBlockZ,  // Number of Anchor blocks along Z
+    ool L3_MD, bool L2_MD, bool L1_MD, bool L0_MD,
     int LINEAR_BLOCK_SIZE>
 __global__ void cusz::x_spline_infprecis_data(
     EITER   ectrl,        // input 1
@@ -1887,7 +1891,7 @@ __global__ void cusz::x_spline_infprecis_data(
     x_reset_scratch_data<T, T, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, LINEAR_BLOCK_SIZE>(shmem.data, shmem.ectrl, anchor, anchor_size, anchor_leap);
     global2shmem_fuse<T, E, LEVEL, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, LINEAR_BLOCK_SIZE>(ectrl, ectrl_size, ectrl_leap, outlier_tmp, shmem.ectrl, shmem.grid_leaps, shmem.prefix_nums);
 
-    cusz::device_api::spline_layout_interpolate<T, T, FP, LEVEL, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, LINEAR_BLOCK_SIZE, SPLINE3_DECOMPR, false>(
+    cusz::device_api::spline_layout_interpolate<T, T, FP, LEVEL, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, L3_MD, L2_MD, L1_MD, L0_MD, LINEAR_BLOCK_SIZE, SPLINE3_DECOMPR, false>(
         shmem.data, shmem.ectrl, data_size, eb_r, ebx2, radius, intp_param);
     shmem2global_data<T, T, SPLINE_DIM, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ, numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, LINEAR_BLOCK_SIZE>(shmem.data, data, data_size, data_leap);
 }

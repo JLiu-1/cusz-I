@@ -450,6 +450,15 @@ int spline_construct(
     }
       printf("\nA B: %.2f %.2f\n",intp_param.alpha,intp_param.beta);
   }
+
+  constexpr int md_mask() {
+    return (md3 << 3) | (md2 << 2) | (md1 << 1) | (md0 << 0);
+  }
+
+
+
+
+
   CREATE_GPUEVENT_PAIR;
   START_GPUEVENT_RECORDING(stream);
 
@@ -459,7 +468,7 @@ int spline_construct(
           div(l3.y, AnchorBlockSizeY * numAnchorBlockY),
           div(l3.z, AnchorBlockSizeZ * numAnchorBlockZ));
       cusz::c_spline_infprecis_data<T*, E*, float, LEVEL, SPLINE_DIM_2, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ,
-    numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, DEFAULT_BLOCK_SIZE >  //
+    numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, false, false, false, false,DEFAULT_BLOCK_SIZE >  //
         <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>(
             data->dptr(), data->template len3<dim3>(),
             data->template st3<dim3>(),  //
@@ -472,15 +481,51 @@ int spline_construct(
     auto grid_dim = dim3(div(l3.x, BLOCK16),
           div(l3.y, BLOCK16),
           div(l3.z, BLOCK16));
-    cusz::c_spline_infprecis_data<T*, E*, float, 4, SPLINE_DIM_3, BLOCK16, BLOCK16, BLOCK16,
-    1, 1, 1, DEFAULT_BLOCK_SIZE>  //
-        <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>(
-            data->dptr(), data->template len3<dim3>(),
-            data->template st3<dim3>(),  //
-            ectrl->dptr(), ectrl->template len3<dim3>(),
-            ectrl->template st3<dim3>(),  //
-            anchor->dptr(), anchor->template st3<dim3>(), ot->val(), ot->idx(),
-            ot->num(), eb_r, ebx2, radius, intp_param);//,profiling_errors->dptr());
+
+    auto md_mask  = [](bool md3, bool md2, bool md1, bool md0){
+        return (md3 << 3) | (md2 << 2) | (md1 << 1) | (md0 << 0);
+    };
+
+    #define CALL_KERNEL_C(MD3, MD2, MD1, MD0)                                                       \
+    cusz::c_spline_infprecis_data<T*, E*, float, 4, SPLINE_DIM_3,                              \
+        BLOCK16, BLOCK16, BLOCK16, 1, 1, 1,                                                    \
+        MD3, MD2, MD1, MD0, DEFAULT_BLOCK_SIZE>                                                 \
+        <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, stream>>>(                              \
+            data->dptr(), data->template len3<dim3>(), data->template st3<dim3>(),              \
+            ectrl->dptr(), ectrl->template len3<dim3>(), ectrl->template st3<dim3>(),             \
+            anchor->dptr(), anchor->template st3<dim3>(),                                       \
+            ot->val(), ot->idx(), ot->num(),                                                     \
+            eb_r, ebx2, radius, intp_param);
+
+  
+        int selector = md_mask(
+            intp_param.use_md[3],
+            intp_param.use_md[2],
+            intp_param.use_md[1],
+            intp_param.use_md[0]
+        );
+
+        switch (selector) {
+            case 0b0000: CALL_KERNEL_C(false, false, false, false); break;
+            case 0b0001: CALL_KERNEL_C(false, false, false, true);  break;
+            case 0b0010: CALL_KERNEL_C(false, false, true, false);  break;
+            case 0b0011: CALL_KERNEL_C(false, false, true, true);   break;
+            case 0b0100: CALL_KERNEL_C(false, true, false, false);  break;
+            case 0b0101: CALL_KERNEL_C(false, true, false, true);   break;
+            case 0b0110: CALL_KERNEL_C(false, true, true, false);   break;
+            case 0b0111: CALL_KERNEL_C(false, true, true, true);    break;
+            case 0b1000: CALL_KERNEL_C(true, false, false, false);  break;
+            case 0b1001: CALL_KERNEL_C(true, false, false, true);   break;
+            case 0b1010: CALL_KERNEL_C(true, false, true, false);   break;
+            case 0b1011: CALL_KERNEL_C(true, false, true, true);    break;
+            case 0b1100: CALL_KERNEL_C(true, true, false, false);   break;
+            case 0b1101: CALL_KERNEL_C(true, true, false, true);    break;
+            case 0b1110: CALL_KERNEL_C(true, true, true, false);    break;
+            case 0b1111: CALL_KERNEL_C(true, true, true, true);     break;
+            default:
+                break;
+        }
+    
   }
   STOP_GPUEVENT_RECORDING(stream);
   CHECK_GPU(GpuStreamSync(stream));
@@ -513,7 +558,7 @@ int spline_reconstruct(
     dim3(div(l3.x, AnchorBlockSizeX * numAnchorBlockX ), div(l3.y, AnchorBlockSizeY * numAnchorBlockY ), div(l3.z, AnchorBlockSizeZ * numAnchorBlockZ ));
 
     cusz::x_spline_infprecis_data<E*, T*, float, LEVEL, SPLINE_DIM_2, AnchorBlockSizeX, AnchorBlockSizeY, AnchorBlockSizeZ,
-  numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, DEFAULT_BLOCK_SIZE>   //
+  numAnchorBlockX, numAnchorBlockY, numAnchorBlockZ, false, false, false, false, DEFAULT_BLOCK_SIZE>   //
       <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>  //
       (ectrl->dptr(), ectrl->template len3<dim3>(),
        ectrl->template st3<dim3>(),  //
@@ -528,8 +573,13 @@ int spline_reconstruct(
     auto grid_dim =
     dim3(div(l3.x, BLOCK16 ), div(l3.y, BLOCK16 ), div(l3.z, BLOCK16 ));
 
+    auto md_mask  = [](bool md3, bool md2, bool md1, bool md0){
+        return (md3 << 3) | (md2 << 2) | (md1 << 1) | (md0 << 0);
+    };
+
+    #define CALL_KERNEL_X(MD3, MD2, MD1, MD0)                                                       \
     cusz::x_spline_infprecis_data<E*, T*, float, 4, SPLINE_DIM_3, BLOCK16, BLOCK16, BLOCK16,
-  1, 1, 1, DEFAULT_BLOCK_SIZE>   //
+  1, 1, 1,MD3, MD2, MD1, MD0, DEFAULT_BLOCK_SIZE>   //
       <<<grid_dim, dim3(DEFAULT_BLOCK_SIZE, 1, 1), 0, (GpuStreamT)stream>>>  //
       (ectrl->dptr(), ectrl->template len3<dim3>(),
        ectrl->template st3<dim3>(),  //
@@ -539,6 +589,39 @@ int spline_reconstruct(
        xdata->template st3<dim3>(),  //
        outlier_tmp,
        eb_r, ebx2, radius, intp_param);
+
+  
+        int selector = md_mask(
+            intp_param.use_md[3],
+            intp_param.use_md[2],
+            intp_param.use_md[1],
+            intp_param.use_md[0]
+        );
+
+        switch (selector) {
+            case 0b0000: CALL_KERNEL_X(false, false, false, false); break;
+            case 0b0001: CALL_KERNEL_X(false, false, false, true);  break;
+            case 0b0010: CALL_KERNEL_X_X(false, false, true, false);  break;
+            case 0b0011: CALL_KERNEL_X(false, false, true, true);   break;
+            case 0b0100: CALL_KERNEL_X(false, true, false, false);  break;
+            case 0b0101: CALL_KERNEL_X(false, true, false, true);   break;
+            case 0b0110: CALL_KERNEL_X(false, true, true, false);   break;
+            case 0b0111: CALL_KERNEL_X(false, true, true, true);    break;
+            case 0b1000: CALL_KERNEL_X(true, false, false, false);  break;
+            case 0b1001: CALL_KERNEL_X(true, false, false, true);   break;
+            case 0b1010: CALL_KERNEL_X(true, false, true, false);   break;
+            case 0b1011: CALL_KERNEL_X(true, false, true, true);    break;
+            case 0b1100: CALL_KERNEL_X(true, true, false, false);   break;
+            case 0b1101: CALL_KERNEL_X(true, true, false, true);    break;
+            case 0b1110: CALL_KERNEL_X(true, true, true, false);    break;
+            case 0b1111: CALL_KERNEL_X(true, true, true, true);     break;
+            default:
+                break;
+        }
+
+
+
+    
   }
   STOP_GPUEVENT_RECORDING(stream);
   CHECK_GPU(GpuStreamSync(stream));
