@@ -164,9 +164,9 @@ int spline_construct(
 
       auto calc_start_size = [&](auto dim, auto & s_start, auto &s_size, auto BLOCKSIZE) {
           auto mid = dim / 2;
-          auto k = (mid - BLOCKSIZE / 2) / (6 * BLOCKSIZE);  
-          auto t = (dim - BLOCKSIZE / 2 - 1 - mid) / (6 * BLOCKSIZE);
-          s_start = mid - k * (6 * BLOCKSIZE);
+          auto k = (mid - BLOCKSIZE / 2) / S_STRIDE;  
+          auto t = (dim - BLOCKSIZE / 2 - 1 - mid) / S_STRIDE;
+          s_start = mid - k * S_STRIDE;
           s_size = k + t + 1;
       };
 
