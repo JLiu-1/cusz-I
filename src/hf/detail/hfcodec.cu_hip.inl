@@ -93,52 +93,49 @@ __device__ void hf_decode_single_thread_inflate(
 // TODO change size_t to unsigned int
 template <typename H, typename E>
 __device__ void psz::detail::hf_decode_single_thread_inflate(
-    const H* input,    // 压缩数据输入（全局内存）
-    E* out,            // 解码后符号输出（全局内存）
-    int total_bw,      // 压缩数据的总比特数
-    const uint8_t* revbook) // 查找表，已加载到共享内存中
+    H* input,         // 压缩数据输入（全局内存）
+    E* out,           // 解码后符号输出（全局内存）
+    int total_bw,     // 压缩数据的总比特数
+    uint8_t* revbook) // 查找表，已加载到共享内存中
 {
-    // 每个H型数据的位宽
     constexpr int CELL_BITWIDTH = sizeof(H) * 8;
 
-    // 输出索引、全局已处理比特数、输入word索引
-    int outIndex = 0;
-    int bitCount = 0;  
-    int wordIndex = 0;
-    
-    // 从输入加载第一个数据单元到位缓冲区
+    int outIndex = 0;   // 输出数据索引
+    int bitCount = 0;   // 已消费的比特数
+    int wordIndex = 0;  // 当前输入数据的word索引
+
+    // 加载第一个输入数据单元
     H bitBuffer = input[wordIndex];
-    
-    // 加载查找表：revbook中按以下布局存储
-    //   - 前 CELL_BITWIDTH * sizeof(H) 字节存放 first[]
-    //   - 接下来 CELL_BITWIDTH * sizeof(H) 字节存放 entry[]
-    //   - 剩下存放 keys[]
+
+    // 从查找表中获取3个部分：
+    // first[]: 每个码长的起始码值
+    // entry[]: 对应码长在keys[]中的偏移量
+    // keys[]:  实际输出符号
     const H* first = reinterpret_cast<const H*>(revbook);
     const H* entry = first + CELL_BITWIDTH;
     const E* keys = reinterpret_cast<const E*>(revbook + sizeof(H) * (2 * CELL_BITWIDTH));
-    
-    // Lookahead 寄存器：初始载入一个数据单元
+
+    // 初始化lookahead窗口
     unsigned int lookahead = bitBuffer;
     int lookahead_bits = CELL_BITWIDTH;
 
-    // 主循环：逐个符号解码
+    // 主循环：每次解码一个符号
     while (bitCount < total_bw) {
-        // 如果当前窗口位数较少且未到末尾，则从输入加载下一数据单元
+        // 若当前窗口可用比特不足，且数据未读完，则加载下一个word
         if (lookahead_bits < 16 && (bitCount + lookahead_bits < total_bw)) {
             wordIndex++;
             bitBuffer = input[wordIndex];
             lookahead = (lookahead << CELL_BITWIDTH) | bitBuffer;
             lookahead_bits += CELL_BITWIDTH;
         }
-        
-        // Lookahead解码：尝试取1~CELL_BITWIDTH个比特，直到找到满足条件的码字
+
+        // 使用lookahead窗口解码：尝试从1到CELL_BITWIDTH个比特判断当前码字
         int code = 0;
         int code_length = 0;
         bool found = false;
         for (int l = 1; l <= CELL_BITWIDTH && l <= lookahead_bits; ++l) {
-            // 从窗口中提取当前l位
+            // 提取当前l位
             code = (lookahead >> (lookahead_bits - l)) & ((1 << l) - 1);
-            // 当码值达到查找表要求时，即可判定符号
             if (code >= first[l]) {
                 code_length = l;
                 found = true;
@@ -146,15 +143,15 @@ __device__ void psz::detail::hf_decode_single_thread_inflate(
             }
         }
         if (!found) {
-            // 输入可能不完整或数据损坏，退出解码
+            // 如果未找到合适的码字，可能是数据异常，退出循环
             break;
         }
         
-        // 利用查找表计算输出符号
+        // 利用查找表确定符号
         int index = entry[code_length] + (code - first[code_length]);
         out[outIndex++] = keys[index];
         
-        // 消耗掉已使用的比特
+        // 消耗掉已处理的比特
         lookahead_bits -= code_length;
         bitCount += code_length;
     }
