@@ -285,7 +285,7 @@ __global__ void hf_decode_kernel(
     // 计算全局线程ID
     int gid = blockIdx.x * blockDimX + tid;
     if (gid < pardeg) {
-        hf_decode_single_thread_inflate(
+        psz::detail::hf_decode_single_thread_inflate(
             in + par_entry[gid],   // 当前线程对应的数据起始位置
             out + sublen * gid,      // 当前线程输出区域
             par_nbit[gid],           // 当前数据的总比特数
