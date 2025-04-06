@@ -691,7 +691,7 @@ shmem2global_data_with_compaction(volatile T1 s_buf[AnchorBlockSizeZ * numAnchor
 
             // TODO this is for algorithmic demo by reading from shmem
             // For performance purpose, it can be inlined in quantization
-            dram_buf[gid] = quantizable * static_cast<T2>(candidate);
+            dram_buf[data_gid] = quantizable * static_cast<T2>(candidate);
         }
     }
 }
