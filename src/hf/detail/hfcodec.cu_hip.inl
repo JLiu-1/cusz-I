@@ -93,53 +93,71 @@ __device__ void hf_decode_single_thread_inflate(
 // TODO change size_t to unsigned int
 template <typename H, typename E>
 __device__ void psz::detail::hf_decode_single_thread_inflate(
-    H* input, E* out, int const total_bw, BYTE* revbook)
+    const H* input,    // 压缩数据输入（全局内存）
+    E* out,            // 解码后符号输出（全局内存）
+    int total_bw,      // 压缩数据的总比特数
+    const uint8_t* revbook) // 查找表，已加载到共享内存中
 {
-  constexpr auto CELL_BITWIDTH = sizeof(H) * 8;
+    // 每个H型数据的位宽
+    constexpr int CELL_BITWIDTH = sizeof(H) * 8;
 
-  int next_bit;
-  auto idx_bit = 0;
-  auto idx_byte = 0;
-  auto idx_out = 0;
+    // 输出索引、全局已处理比特数、输入word索引
+    int outIndex = 0;
+    int bitCount = 0;  
+    int wordIndex = 0;
+    
+    // 从输入加载第一个数据单元到位缓冲区
+    H bitBuffer = input[wordIndex];
+    
+    // 加载查找表：revbook中按以下布局存储
+    //   - 前 CELL_BITWIDTH * sizeof(H) 字节存放 first[]
+    //   - 接下来 CELL_BITWIDTH * sizeof(H) 字节存放 entry[]
+    //   - 剩下存放 keys[]
+    const H* first = reinterpret_cast<const H*>(revbook);
+    const H* entry = first + CELL_BITWIDTH;
+    const E* keys = reinterpret_cast<const E*>(revbook + sizeof(H) * (2 * CELL_BITWIDTH));
+    
+    // Lookahead 寄存器：初始载入一个数据单元
+    unsigned int lookahead = bitBuffer;
+    int lookahead_bits = CELL_BITWIDTH;
 
-  H bufr = input[idx_byte];
-
-  auto first = reinterpret_cast<H*>(revbook);
-  auto entry = first + CELL_BITWIDTH;
-  auto keys = reinterpret_cast<E*>(revbook + sizeof(H) * (2 * CELL_BITWIDTH));
-  H v = (bufr >> (CELL_BITWIDTH - 1)) & 0x1;  // get the first bit
-  auto l = 1;
-  auto i = 0;
-
-  while (i < total_bw) {
-    while (v < first[l]) {  // append next i_cb bit
-      ++i;
-      idx_byte = i / CELL_BITWIDTH;  // [1:exclusive]
-      idx_bit = i % CELL_BITWIDTH;
-      if (idx_bit == 0) {
-        // idx_byte += 1; // [1:exclusive]
-        bufr = input[idx_byte];
-      }
-
-      next_bit = ((bufr >> (CELL_BITWIDTH - 1 - idx_bit)) & 0x1);
-      v = (v << 1) | next_bit;
-      ++l;
+    // 主循环：逐个符号解码
+    while (bitCount < total_bw) {
+        // 如果当前窗口位数较少且未到末尾，则从输入加载下一数据单元
+        if (lookahead_bits < 16 && (bitCount + lookahead_bits < total_bw)) {
+            wordIndex++;
+            bitBuffer = input[wordIndex];
+            lookahead = (lookahead << CELL_BITWIDTH) | bitBuffer;
+            lookahead_bits += CELL_BITWIDTH;
+        }
+        
+        // Lookahead解码：尝试取1~CELL_BITWIDTH个比特，直到找到满足条件的码字
+        int code = 0;
+        int code_length = 0;
+        bool found = false;
+        for (int l = 1; l <= CELL_BITWIDTH && l <= lookahead_bits; ++l) {
+            // 从窗口中提取当前l位
+            code = (lookahead >> (lookahead_bits - l)) & ((1 << l) - 1);
+            // 当码值达到查找表要求时，即可判定符号
+            if (code >= first[l]) {
+                code_length = l;
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            // 输入可能不完整或数据损坏，退出解码
+            break;
+        }
+        
+        // 利用查找表计算输出符号
+        int index = entry[code_length] + (code - first[code_length]);
+        out[outIndex++] = keys[index];
+        
+        // 消耗掉已使用的比特
+        lookahead_bits -= code_length;
+        bitCount += code_length;
     }
-    out[idx_out++] = keys[entry[l] + v - first[l]];
-    {
-      ++i;
-      idx_byte = i / CELL_BITWIDTH;  // [2:exclusive]
-      idx_bit = i % CELL_BITWIDTH;
-      if (idx_bit == 0) {
-        // idx_byte += 1; // [2:exclusive]
-        bufr = input[idx_byte];
-      }
-
-      next_bit = ((bufr >> (CELL_BITWIDTH - 1 - idx_bit)) & 0x1);
-      v = 0x0 | next_bit;
-    }
-    l = 1;
-  }
 }
 
 template <typename E, typename H>
@@ -241,29 +259,39 @@ __global__ void psz::detail::hf_encode_phase4_concatenate(
   }
 }
 
+// 优化后的Huffman解码kernel
 template <typename E, typename H, typename M>
 __global__ void hf_decode_kernel(
-    H* in, uint8_t* revbook, M* par_nbit, M* par_entry,
-    int const revbook_nbyte, int const sublen, int const pardeg, E* out)
+    H* in,                // 压缩数据输入（全局内存）
+    uint8_t* revbook,     // 查找表（全局内存）
+    M* par_nbit,          // 每段压缩数据的总比特数
+    M* par_entry,         // 每段压缩数据在输入数据中的起始偏移
+    int const revbook_nbyte, // 查找表字节数
+    int const sublen,        // 每个线程输出数据的长度
+    int const pardeg,        // 总的并行度
+    E* out)                  // 解码输出（全局内存）
 {
-  extern __shared__ uint8_t shmem[];
-  constexpr auto block_dim = HuffmanHelper::BLOCK_DIM_DEFLATE;
-
-  auto R = (revbook_nbyte - 1 + block_dim) / block_dim;
-
-  for (auto i = 0; i < R; i++) {
-    if (TIX + i * block_dim < revbook_nbyte)
-      shmem[TIX + i * block_dim] = revbook[TIX + i * block_dim];
-  }
-  __syncthreads();
-
-  auto gid = BIX * BDX + TIX;
-
-  if (gid < pardeg) {
-    psz::detail::hf_decode_single_thread_inflate(
-        in + par_entry[gid], out + sublen * gid, par_nbit[gid], shmem);
+    // 利用共享内存存储查找表，减少全局内存访问
+    extern __shared__ uint8_t shmem[];
+    int tid = threadIdx.x;
+    int blockDimX = blockDim.x;
+    
+    // 每个线程分段加载共享内存数据
+    for (int i = tid; i < revbook_nbyte; i += blockDimX) {
+        shmem[i] = revbook[i];
+    }
     __syncthreads();
-  }
+
+    // 计算全局线程ID
+    int gid = blockIdx.x * blockDimX + tid;
+    if (gid < pardeg) {
+        hf_decode_single_thread_inflate(
+            in + par_entry[gid],   // 当前线程对应的数据起始位置
+            out + sublen * gid,      // 当前线程输出区域
+            par_nbit[gid],           // 当前数据的总比特数
+            shmem                  // 查找表数据已加载到共享内存
+        );
+    }
 }
 
 #endif
