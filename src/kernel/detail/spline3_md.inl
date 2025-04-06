@@ -669,8 +669,9 @@ shmem2global_data_with_compaction(volatile T1 s_buf[AnchorBlockSizeZ * numAnchor
         bool quantizable = (candidate >= 0) and (candidate < 2*radius);
 
         if (gx < buf_size.x and gy < buf_size.y and gz < buf_size.z) {
+            auto data_gid = gx + gy * buf_leap.y + gz * buf_leap.z;
             if (not quantizable) {
-                auto data_gid = gx + gy * buf_leap.y + gz * buf_leap.z;
+                
                 auto cur_idx = atomicAdd(dram_compactnum, 1);
                 dram_compactidx[cur_idx] = data_gid;
                 dram_compactval[cur_idx] = candidate;
