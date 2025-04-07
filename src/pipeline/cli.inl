@@ -22,7 +22,6 @@
 #include "dryrun.hh"
 #include "mem.hh"
 #include "tehm.hh"
-#include "rre/rre.h"
 #if defined(PSZ_USE_CUDA) || defined(PSZ_USE_HIP)
 #include "utils/analyzer.hh"
 #endif
@@ -174,16 +173,9 @@ class CLI {
         ->file(ctx->infile, FromFile)
         ->control({H2D});
 
-    int size_before_rre1;
-    memcpy(&size_before_rre1, compressed->hptr(), sizeof(int));
-    uint8_t* compressed_before_rre1;
-    float decompress_time_rre1;
-    RRE1_DECOMPRESS(compressed->dptr(), &compressed_before_rre1, &size_before_rre1, &decompress_time_rre1);
-
     auto header = new psz_header;
-    cudaMemcpy(header, compressed_before_rre1, sizeof(psz_header), cudaMemcpyDeviceToHost);
+    memcpy(header, compressed->hptr(), sizeof(psz_header));
     auto len = psz_utils::uncompressed_len(header);
-    header->compressed_len = compressed_len;
 
     auto decompressed = new pszmem_cxx<T>(len, 1, 1, "decompressed");
     decompressed->control({MallocHost, Malloc});
@@ -198,10 +190,8 @@ class CLI {
     //compressor->header->intp_param = ctx->intp_param;
     
     psz_decompress(
-        compressor, compressed_before_rre1, psz_utils::filesize(header),
+        compressor, compressed->dptr(), psz_utils::filesize(header),
         decompressed->dptr(), decomp_len, (void*)&timerecord, stream);
-
-    timerecord.push_back({"rre1", decompress_time_rre1});
 
     if (ctx->report_time)
       psz::TimeRecordViewer::view_decompression(
